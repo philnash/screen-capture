@@ -1,0 +1,15 @@
+{
+  "name": "Twilio Video Screen sharing",
+  "description":
+    "An extension to allow you to test Twilio Video screen sharing locally.",
+  "version": "0.1.0",
+  "manifest_version": 2,
+  "background": {
+    "scripts": ["extension.js"],
+    "persistent": false
+  },
+  "externally_connectable": {
+    "matches": ["*://localhost/*"]
+  },
+  "permissions": ["desktopCapture"]
+}
