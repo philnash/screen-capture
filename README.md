@@ -4,7 +4,7 @@ This repo is an exploration of screen capture in browsers, including using scree
 
 ## Chrome extension
 
-In the `/extension` directory is a minimal implementation of a Chrome extension that will give access to strams from the [`chrome.desktopCapture` API](https://developer.chrome.com/extensions/desktopCapture).
+In the `/extension` directory is a minimal implementation of a Chrome extension that will give access to streams from the [`chrome.desktopCapture` API](https://developer.chrome.com/extensions/desktopCapture).
 
 ## Screen capture in Chrome
 
