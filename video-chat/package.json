@@ -1,0 +1,22 @@
+{
+  "name": "video-call",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run build\" \"nodenv ./server.js\"",
+    "build": "watchify src/index.js -o public/index.js"
+  },
+  "keywords": [],
+  "author": "Phil Nash <philnash@twilio.com>",
+  "license": "MIT",
+  "dependencies": {
+    "browserify": "^15.1.0",
+    "concurrently": "^3.5.1",
+    "express": "^4.16.2",
+    "node-env-run": "^2.0.1",
+    "twilio": "^3.11.0",
+    "twilio-video": "^1.7.0",
+    "watchify": "^3.9.0"
+  }
+}
