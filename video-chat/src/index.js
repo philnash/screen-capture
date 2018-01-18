@@ -6,6 +6,62 @@ var activeRoom;
 var previewTracks;
 var identity;
 var roomName;
+var screenTrack;
+
+function isFirefox() {
+  var mediaSourceSupport = !!navigator.mediaDevices.getSupportedConstraints()
+    .mediaSource;
+  var matchData = navigator.userAgent.match(/Firefox\/(\d+)/);
+  var firefoxVersion = 0;
+  if (matchData && matchData[1]) {
+    firefoxVersion = parseInt(matchData[1], 10);
+  }
+  return mediaSourceSupport && firefoxVersion >= 52;
+}
+
+function isChrome() {
+  return 'chrome' in window;
+}
+
+function canScreenShare() {
+  return isChrome || isFirefox;
+}
+
+function getUserScreen() {
+  var extensionId = YOUR_EXTENSION_ID;
+  if (!canScreenShare()) {
+    return;
+  }
+  if (isChrome()) {
+    return new Promise((resolve, reject) => {
+      const request = {
+        sources: ['screen']
+      };
+      chrome.runtime.sendMessage(extensionId, request, response => {
+        if (response && response.type === 'success') {
+          resolve({ streamId: response.streamId });
+        } else {
+          reject(new Error('Could not get stream'));
+        }
+      });
+    }).then(response => {
+      return navigator.mediaDevices.getUserMedia({
+        video: {
+          mandatory: {
+            chromeMediaSource: 'desktop',
+            chromeMediaSourceId: response.streamId
+          }
+        }
+      });
+    });
+  } else if (isFirefox()) {
+    return navigator.mediaDevices.getUserMedia({
+      video: {
+        mediaSource: 'screen'
+      }
+    });
+  }
+}
 
 // Attach the Tracks to the DOM.
 function attachTracks(tracks, container) {
@@ -88,6 +144,23 @@ function getToken(id) {
       log('Leaving room...');
       activeRoom.disconnect();
     };
+
+    document.getElementById('button-share-screen').onclick = function() {
+      getUserScreen().then(function(stream) {
+        screenTrack = stream.getVideoTracks()[0];
+        activeRoom.localParticipant.publishTrack(screenTrack);
+        document.getElementById('button-share-screen').style.display = 'none';
+        document.getElementById('button-unshare-screen').style.display =
+          'inline';
+      });
+    };
+
+    document.getElementById('button-unshare-screen').onclick = function() {
+      activeRoom.localParticipant.unpublishTrack(screenTrack);
+      screenTrack = null;
+      document.getElementById('button-share-screen').style.display = 'inline';
+      document.getElementById('button-unshare-screen').style.display = 'none';
+    };
   });
 }
 
@@ -98,6 +171,9 @@ function roomJoined(room) {
   log("Joined as '" + identity + "'");
   document.getElementById('button-join').style.display = 'none';
   document.getElementById('button-leave').style.display = 'inline';
+  if (canScreenShare()) {
+    document.getElementById('button-share-screen').style.display = 'inline';
+  }
 
   // Attach LocalParticipant's Tracks, if not already attached.
   var previewContainer = document.getElementById('local-media');
