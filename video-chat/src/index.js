@@ -8,86 +8,47 @@ var identity;
 var roomName;
 var screenTrack;
 
-function isFirefox() {
-  var mediaSourceSupport = !!navigator.mediaDevices.getSupportedConstraints()
-    .mediaSource;
-  var matchData = navigator.userAgent.match(/Firefox\/(\d+)/);
-  var firefoxVersion = 0;
-  if (matchData && matchData[1]) {
-    firefoxVersion = parseInt(matchData[1], 10);
-  }
-  return mediaSourceSupport && firefoxVersion >= 52;
-}
-
-function isChrome() {
-  return 'chrome' in window;
-}
-
 function canScreenShare() {
-  return isChrome || isFirefox;
-}
-
-function getUserScreen() {
-  var extensionId = YOUR_EXTENSION_ID;
-  if (!canScreenShare()) {
-    return;
-  }
-  if (isChrome()) {
-    return new Promise((resolve, reject) => {
-      const request = {
-        sources: ['screen']
-      };
-      chrome.runtime.sendMessage(extensionId, request, response => {
-        if (response && response.type === 'success') {
-          resolve({ streamId: response.streamId });
-        } else {
-          reject(new Error('Could not get stream'));
-        }
-      });
-    }).then(response => {
-      return navigator.mediaDevices.getUserMedia({
-        video: {
-          mandatory: {
-            chromeMediaSource: 'desktop',
-            chromeMediaSourceId: response.streamId
-          }
-        }
-      });
-    });
-  } else if (isFirefox()) {
-    return navigator.mediaDevices.getUserMedia({
-      video: {
-        mediaSource: 'screen'
-      }
-    });
-  }
+  return "getDisplayMedia" in navigator.mediaDevices;
 }
 
 // Attach the Tracks to the DOM.
 function attachTracks(tracks, container) {
   tracks.forEach(function(track) {
-    container.appendChild(track.attach());
+    if (track) {
+      container.appendChild(track.attach());
+    }
   });
 }
 
 // Attach the Participant's Tracks to the DOM.
 function attachParticipantTracks(participant, container) {
-  var tracks = Array.from(participant.tracks.values());
+  var tracks = Array.from(participant.tracks.values()).map(
+    function(publication) {
+      return publication.track;
+    }
+  );
   attachTracks(tracks, container);
 }
 
 // Detach the Tracks from the DOM.
 function detachTracks(tracks) {
   tracks.forEach(function(track) {
-    track.detach().forEach(function(detachedElement) {
-      detachedElement.remove();
-    });
+    if (track) {
+      track.detach().forEach(function(detachedElement) {
+        detachedElement.remove();
+      });
+    }
   });
 }
 
 // Detach the Participant's Tracks from the DOM.
 function detachParticipantTracks(participant) {
-  var tracks = Array.from(participant.tracks.values());
+  var tracks = Array.from(participant.tracks.values()).map(
+    function(publication) {
+      return publication.track
+    }
+  );
   detachTracks(tracks);
 }
 
@@ -146,7 +107,7 @@ function getToken(id) {
     };
 
     document.getElementById('button-share-screen').onclick = function() {
-      getUserScreen().then(function(stream) {
+      navigator.mediaDevices.getDisplayMedia().then(function(stream) {
         screenTrack = stream.getVideoTracks()[0];
         activeRoom.localParticipant.publishTrack(screenTrack);
         document.getElementById('button-share-screen').style.display = 'none';
@@ -194,14 +155,14 @@ function roomJoined(room) {
   });
 
   // When a Participant adds a Track, attach it to the DOM.
-  room.on('trackAdded', function(track, participant) {
+  room.on('trackSubscribed', function(track, publication, participant) {
     log(participant.identity + ' added track: ' + track.kind);
     var previewContainer = document.getElementById('remote-media');
     attachTracks([track], previewContainer);
   });
 
   // When a Participant removes a Track, detach it from the DOM.
-  room.on('trackRemoved', function(track, participant) {
+  room.on('trackUnsubscribed', function(track, publication, participant) {
     log(participant.identity + ' removed track: ' + track.kind);
     detachTracks([track]);
   });
