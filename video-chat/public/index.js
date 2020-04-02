@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 module.exports={
   "_from": "@twilio/sip.js@^0.7.7",
   "_id": "@twilio/sip.js@0.7.7",
@@ -972,7 +972,7 @@ return EventEmitter;
 
 };
 
-},{"events":54}],8:[function(require,module,exports){
+},{"events":152}],8:[function(require,module,exports){
 "use strict";
 /**
  * @fileoverview Exceptions
@@ -12517,7 +12517,7 @@ function shimDataChannel(dataChannel) {
 
 module.exports = ChromeRTCPeerConnection;
 
-},{"../mediastream":38,"../rtcrtpsender":45,"../rtcsessiondescription/chrome":46,"../util":50,"../util/eventtarget":49,"../util/latch":51,"../util/sdp":52,"util":149}],42:[function(require,module,exports){
+},{"../mediastream":38,"../rtcrtpsender":45,"../rtcsessiondescription/chrome":46,"../util":50,"../util/eventtarget":49,"../util/latch":51,"../util/sdp":52,"util":151}],42:[function(require,module,exports){
 /* globals mozRTCPeerConnection, RTCPeerConnection */
 'use strict';
 
@@ -12902,7 +12902,7 @@ function getActiveSenders(peerConnection) {
 
 module.exports = FirefoxRTCPeerConnection;
 
-},{"../rtcrtpsender":45,"../rtcsessiondescription/firefox":47,"../util":50,"../util/eventtarget":49,"../util/sdp":52,"util":149}],43:[function(require,module,exports){
+},{"../rtcrtpsender":45,"../rtcsessiondescription/firefox":47,"../util":50,"../util/eventtarget":49,"../util/sdp":52,"util":151}],43:[function(require,module,exports){
 'use strict';
 
 var guessBrowser = require('../util').guessBrowser;
@@ -13301,7 +13301,7 @@ function getActiveSenders(peerConnection) {
 
 module.exports = SafariRTCPeerConnection;
 
-},{"../rtcrtpsender":45,"../util":50,"../util/eventtarget":49,"../util/latch":51,"../util/sdp":52,"util":149}],45:[function(require,module,exports){
+},{"../rtcrtpsender":45,"../util":50,"../util/eventtarget":49,"../util/latch":51,"../util/sdp":52,"util":151}],45:[function(require,module,exports){
 'use strict';
 
 /**
@@ -13451,7 +13451,7 @@ EventTarget.prototype.removeEventListener = function removeEventListener() {
 
 module.exports = EventTarget;
 
-},{"events":54}],50:[function(require,module,exports){
+},{"events":152}],50:[function(require,module,exports){
 'use strict';
 
 /**
@@ -14125,310 +14125,6 @@ module.exports={
 }
 
 },{}],54:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-function EventEmitter() {
-  this._events = this._events || {};
-  this._maxListeners = this._maxListeners || undefined;
-}
-module.exports = EventEmitter;
-
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._maxListeners = undefined;
-
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-EventEmitter.defaultMaxListeners = 10;
-
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function(n) {
-  if (!isNumber(n) || n < 0 || isNaN(n))
-    throw TypeError('n must be a positive number');
-  this._maxListeners = n;
-  return this;
-};
-
-EventEmitter.prototype.emit = function(type) {
-  var er, handler, len, args, i, listeners;
-
-  if (!this._events)
-    this._events = {};
-
-  // If there is no 'error' event listener then throw.
-  if (type === 'error') {
-    if (!this._events.error ||
-        (isObject(this._events.error) && !this._events.error.length)) {
-      er = arguments[1];
-      if (er instanceof Error) {
-        throw er; // Unhandled 'error' event
-      } else {
-        // At least give some kind of context to the user
-        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
-        err.context = er;
-        throw err;
-      }
-    }
-  }
-
-  handler = this._events[type];
-
-  if (isUndefined(handler))
-    return false;
-
-  if (isFunction(handler)) {
-    switch (arguments.length) {
-      // fast cases
-      case 1:
-        handler.call(this);
-        break;
-      case 2:
-        handler.call(this, arguments[1]);
-        break;
-      case 3:
-        handler.call(this, arguments[1], arguments[2]);
-        break;
-      // slower
-      default:
-        args = Array.prototype.slice.call(arguments, 1);
-        handler.apply(this, args);
-    }
-  } else if (isObject(handler)) {
-    args = Array.prototype.slice.call(arguments, 1);
-    listeners = handler.slice();
-    len = listeners.length;
-    for (i = 0; i < len; i++)
-      listeners[i].apply(this, args);
-  }
-
-  return true;
-};
-
-EventEmitter.prototype.addListener = function(type, listener) {
-  var m;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events)
-    this._events = {};
-
-  // To avoid recursion in the case that type === "newListener"! Before
-  // adding it to the listeners, first emit "newListener".
-  if (this._events.newListener)
-    this.emit('newListener', type,
-              isFunction(listener.listener) ?
-              listener.listener : listener);
-
-  if (!this._events[type])
-    // Optimize the case of one listener. Don't need the extra array object.
-    this._events[type] = listener;
-  else if (isObject(this._events[type]))
-    // If we've already got an array, just append.
-    this._events[type].push(listener);
-  else
-    // Adding the second element, need to change to array.
-    this._events[type] = [this._events[type], listener];
-
-  // Check for listener leak
-  if (isObject(this._events[type]) && !this._events[type].warned) {
-    if (!isUndefined(this._maxListeners)) {
-      m = this._maxListeners;
-    } else {
-      m = EventEmitter.defaultMaxListeners;
-    }
-
-    if (m && m > 0 && this._events[type].length > m) {
-      this._events[type].warned = true;
-      console.error('(node) warning: possible EventEmitter memory ' +
-                    'leak detected. %d listeners added. ' +
-                    'Use emitter.setMaxListeners() to increase limit.',
-                    this._events[type].length);
-      if (typeof console.trace === 'function') {
-        // not supported in IE 10
-        console.trace();
-      }
-    }
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.once = function(type, listener) {
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  var fired = false;
-
-  function g() {
-    this.removeListener(type, g);
-
-    if (!fired) {
-      fired = true;
-      listener.apply(this, arguments);
-    }
-  }
-
-  g.listener = listener;
-  this.on(type, g);
-
-  return this;
-};
-
-// emits a 'removeListener' event iff the listener was removed
-EventEmitter.prototype.removeListener = function(type, listener) {
-  var list, position, length, i;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events || !this._events[type])
-    return this;
-
-  list = this._events[type];
-  length = list.length;
-  position = -1;
-
-  if (list === listener ||
-      (isFunction(list.listener) && list.listener === listener)) {
-    delete this._events[type];
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-
-  } else if (isObject(list)) {
-    for (i = length; i-- > 0;) {
-      if (list[i] === listener ||
-          (list[i].listener && list[i].listener === listener)) {
-        position = i;
-        break;
-      }
-    }
-
-    if (position < 0)
-      return this;
-
-    if (list.length === 1) {
-      list.length = 0;
-      delete this._events[type];
-    } else {
-      list.splice(position, 1);
-    }
-
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.removeAllListeners = function(type) {
-  var key, listeners;
-
-  if (!this._events)
-    return this;
-
-  // not listening for removeListener, no need to emit
-  if (!this._events.removeListener) {
-    if (arguments.length === 0)
-      this._events = {};
-    else if (this._events[type])
-      delete this._events[type];
-    return this;
-  }
-
-  // emit removeListener for all listeners on all events
-  if (arguments.length === 0) {
-    for (key in this._events) {
-      if (key === 'removeListener') continue;
-      this.removeAllListeners(key);
-    }
-    this.removeAllListeners('removeListener');
-    this._events = {};
-    return this;
-  }
-
-  listeners = this._events[type];
-
-  if (isFunction(listeners)) {
-    this.removeListener(type, listeners);
-  } else if (listeners) {
-    // LIFO order
-    while (listeners.length)
-      this.removeListener(type, listeners[listeners.length - 1]);
-  }
-  delete this._events[type];
-
-  return this;
-};
-
-EventEmitter.prototype.listeners = function(type) {
-  var ret;
-  if (!this._events || !this._events[type])
-    ret = [];
-  else if (isFunction(this._events[type]))
-    ret = [this._events[type]];
-  else
-    ret = this._events[type].slice();
-  return ret;
-};
-
-EventEmitter.prototype.listenerCount = function(type) {
-  if (this._events) {
-    var evlistener = this._events[type];
-
-    if (isFunction(evlistener))
-      return 1;
-    else if (evlistener)
-      return evlistener.length;
-  }
-  return 0;
-};
-
-EventEmitter.listenerCount = function(emitter, type) {
-  return emitter.listenerCount(type);
-};
-
-function isFunction(arg) {
-  return typeof arg === 'function';
-}
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-
-},{}],55:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -14614,7 +14310,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],56:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 'use strict';
 
 var CancelablePromise = require('./util/cancelablepromise');
@@ -14629,11 +14325,11 @@ var CancelablePromise = require('./util/cancelablepromise');
  * @returns CancelablePromise<Room>
  */
 function createCancelableRoomPromise(getLocalTracks, createLocalParticipant, createRoomSignaling, createRoom) {
-  var cancelableRoomSignalingPromise;
+  var cancelableRoomSignalingPromise = void 0;
   var cancelationError = new Error('Canceled');
 
   return new CancelablePromise(function onCreate(resolve, reject, isCanceled) {
-    var localParticipant;
+    var localParticipant = void 0;
     getLocalTracks(function getLocalTracksSucceeded(localTracks) {
       if (isCanceled()) {
         return CancelablePromise.reject(cancelationError);
@@ -14663,9 +14359,10 @@ function createCancelableRoomPromise(getLocalTracks, createLocalParticipant, cre
 }
 
 module.exports = createCancelableRoomPromise;
-
-},{"./util/cancelablepromise":126}],57:[function(require,module,exports){
+},{"./util/cancelablepromise":128}],56:[function(require,module,exports){
 'use strict';
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var CancelablePromise = require('./util/cancelablepromise');
 var createCancelableRoomPromise = require('./cancelableroompromise');
@@ -14676,10 +14373,10 @@ var Room = require('./room');
 var E = require('./util/constants').typeErrors;
 var EncodingParametersImpl = require('./encodingparameters');
 var guessBrowser = require('./util').guessBrowser;
-var LocalAudioTrack = require('./media/track/localaudiotrack');
-var LocalDataTrack = require('./media/track/localdatatrack');
+var LocalAudioTrack = require('./media/track/es5/localaudiotrack');
+var LocalDataTrack = require('./media/track/es5/localdatatrack');
 var LocalParticipant = require('./localparticipant');
-var LocalVideoTrack = require('./media/track/localvideotrack');
+var LocalVideoTrack = require('./media/track/es5/localvideotrack');
 var Log = require('./util/log');
 var MediaStreamTrack = require('@twilio/webrtc').MediaStreamTrack;
 var NTSIceServerSource = require('./iceserversource/nts');
@@ -14783,13 +14480,15 @@ function connect(token, options) {
   if (typeof options === 'undefined') {
     options = {};
   }
-  if (typeof options !== 'object' || Array.isArray(options)) {
-    return CancelablePromise.reject(new E.INVALID_TYPE('options', 'object'));
+  if ((typeof options === 'undefined' ? 'undefined' : _typeof(options)) !== 'object' || Array.isArray(options)) {
+    return CancelablePromise.reject(E.INVALID_TYPE('options', 'object'));
   }
 
   options = Object.assign({
+    abortOnIceServersTimeout: false,
     createLocalTracks: createLocalTracks,
     environment: constants.DEFAULT_ENVIRONMENT,
+    iceServersTimeout: constants.ICE_SERVERS_TIMEOUT_MS,
     insights: true,
     LocalAudioTrack: LocalAudioTrack,
     LocalDataTrack: LocalDataTrack,
@@ -14814,7 +14513,7 @@ function connect(token, options) {
   var logLevels = util.buildLogLevels(options.logLevel);
   var logComponentName = '[connect #' + ++connectCalls + ']';
 
-  var log;
+  var log = void 0;
   try {
     log = new Log('default', logComponentName, logLevels);
   } catch (error) {
@@ -14824,24 +14523,13 @@ function connect(token, options) {
 
   // NOTE(mroberts): Print the Safari warning once if the log-level is at least
   // "warn", i.e. neither "error" nor "off".
-  if (guessBrowser() === 'safari'
-    && !didPrintSafariWarning
-    && (log.logLevel !== 'error' && log.logLevel !== 'off')) {
+  if (guessBrowser() === 'safari' && !didPrintSafariWarning && log.logLevel !== 'error' && log.logLevel !== 'off') {
     didPrintSafariWarning = true;
-    log.warn([
-      'This release of twilio-video.js includes experimental support for',
-      'Safari 11 and newer. Support for Safari is "experimental" because,',
-      'at the time of writing, Safari does not support VP8. This means you',
-      'may experience codec issues in Group Rooms. You may also experience',
-      'codec issues in Peer-to-Peer (P2P) Rooms containing Android- or',
-      'iOS-based Participants who do not support H.264. However, P2P Rooms',
-      'with browser-based Participants should work. Please test this release',
-      'and report any issues to https://github.com/twilio/twilio-video.js'
-    ].join(' '));
+    log.warn(['This release of twilio-video.js includes experimental support for', 'Safari 11 and newer. Support for Safari is "experimental" because,', 'at the time of writing, Safari does not support VP8. This means you', 'may experience codec issues in Group Rooms. You may also experience', 'codec issues in Peer-to-Peer (P2P) Rooms containing Android- or', 'iOS-based Participants who do not support H.264. However, P2P Rooms', 'with browser-based Participants should work. Please test this release', 'and report any issues to https://github.com/twilio/twilio-video.js'].join(' '));
   }
 
   if (typeof token !== 'string') {
-    return CancelablePromise.reject(new E.INVALID_TYPE('token', 'string'));
+    return CancelablePromise.reject(E.INVALID_TYPE('token', 'string'));
   }
 
   // NOTE(mmalavalli): The Room "name" in "options" was being used
@@ -14852,11 +14540,10 @@ function connect(token, options) {
 
   if ('tracks' in options) {
     if (!Array.isArray(options.tracks)) {
-      return CancelablePromise.reject(new E.INVALID_TYPE('options.tracks',
-        'Array of LocalAudioTrack, LocalVideoTrack or MediaStreamTrack'));
+      return CancelablePromise.reject(E.INVALID_TYPE('options.tracks', 'Array of LocalAudioTrack, LocalVideoTrack or MediaStreamTrack'));
     }
     try {
-      options.tracks = options.tracks.map(function(track) {
+      options.tracks = options.tracks.map(function (track) {
         return util.asLocalTrack(track, localTrackOptions);
       });
     } catch (error) {
@@ -14875,11 +14562,12 @@ function connect(token, options) {
     maxVideoBitrate: options.maxVideoBitrate
   });
 
-  var iceServerSource = Array.isArray(options.iceServers)
-    ? new ConstantIceServerSource(options.iceServers)
-    : typeof options.iceServers === 'object'
-      ? options.iceServers
-      : new NTSIceServerSource(token, options);
+  var ntsIceServerSourceOptions = Object.assign({}, options, {
+    abortOnTimeout: options.abortOnIceServersTimeout,
+    timeout: options.iceServersTimeout
+  });
+
+  var iceServerSource = Array.isArray(options.iceServers) ? new ConstantIceServerSource(options.iceServers) : _typeof(options.iceServers) === 'object' ? options.iceServers : new NTSIceServerSource(token, ntsIceServerSourceOptions);
 
   var preferredCodecs = {
     audio: options.preferredAudioCodecs,
@@ -14891,18 +14579,14 @@ function connect(token, options) {
   // 2 - Create the LocalParticipant using options.tracks.
   // 3 - Connect to rtc-room-service and create the RoomSignaling.
   // 4 - Create the Room and then resolve the CancelablePromise.
-  var cancelableRoomPromise = createCancelableRoomPromise(
-    getLocalTracks.bind(null, options),
-    createLocalParticipant.bind(null, signaling, log, encodingParameters, options),
-    createRoomSignaling.bind(null, token, options, signaling, iceServerSource, encodingParameters, preferredCodecs),
-    createRoom.bind(null, options));
+  var cancelableRoomPromise = createCancelableRoomPromise(getLocalTracks.bind(null, options), createLocalParticipant.bind(null, signaling, log, encodingParameters, options), createRoomSignaling.bind(null, token, options, signaling, iceServerSource, encodingParameters, preferredCodecs), createRoom.bind(null, options));
 
-  cancelableRoomPromise.then(function(room) {
+  cancelableRoomPromise.then(function (room) {
     log.info('Connected to Room:', room.toString());
     log.info('Room name:', room.name);
     log.debug('Room:', room);
     return room;
-  }, function(error) {
+  }, function (error) {
     if (iceServerSource.isStarted) {
       iceServerSource.stop();
     }
@@ -14920,11 +14604,19 @@ function connect(token, options) {
  * You may pass these options to {@link connect} in order to override the
  * default behavior.
  * @typedef {object} ConnectOptions
+ * @property {boolean} [abortOnIceServersTimeout=false] - If fetching ICE
+ *   servers times out (for example, due to a restrictive network or slow HTTP
+ *   proxy), then, by default, twilio-video.js will fallback to using hard-coded
+ *   STUN servers and continue connecting to the Room. Setting this property to
+ *   <code>true</code> will cause twilio-video.js to abort instead, and
+ *   {@link connect} will reject with a {@link ConfigurationAcquireFailedError}.
  * @property {boolean|CreateLocalTrackOptions} [audio=true] - Whether or not to
  *   get local audio with <code>getUserMedia</code> when <code>tracks</code>
  *   are not provided.
  * @property {Array<RTCIceServer>} iceServers - Override the STUN and TURN
  *   servers used when connecting to {@link Room}s
+ * @property {number} [iceServersTimeout=3000] - Override the amount of time, in
+ *   milliseconds, that the SDK will wait when acquiring STUN and TURN servers
  * @property {RTCIceTransportPolicy} [iceTransportPolicy="all"] - Override the
  *   ICE transport policy to be one of "relay" or "all"
  * @property {boolean} [insights=true] - Whether publishing events
@@ -15044,7 +14736,7 @@ function createRoomSignaling(token, options, signaling, iceServerSource, encodin
   log.info('Getting ICE servers');
   log.debug('Options:', options);
 
-  return iceServerSource.start().then(function(iceServers) {
+  return iceServerSource.start().then(function (iceServers) {
     var roomSignalingParams = {
       token: token
     };
@@ -15056,13 +14748,7 @@ function createRoomSignaling(token, options, signaling, iceServerSource, encodin
     log.debug('Creating a new RoomSignaling');
     log.debug('RoomSignaling params:', roomSignalingParams);
 
-    return signaling.connect(
-      localParticipant._signaling,
-      token,
-      iceServerSource,
-      encodingParameters,
-      preferredCodecs,
-      options);
+    return signaling.connect(localParticipant._signaling, token, iceServerSource, encodingParameters, preferredCodecs, options);
   });
 }
 
@@ -15071,10 +14757,7 @@ function getLocalTracks(options, handleLocalTracks) {
 
   options.shouldStopLocalTracks = !options.tracks;
   if (options.shouldStopLocalTracks) {
-    log.info('LocalTracks were not provided, so they will be acquired '
-      + 'automatically before connecting to the Room. LocalTracks will '
-      + 'be released if connecting to the Room fails or if the Room '
-      + 'is disconnected');
+    log.info('LocalTracks were not provided, so they will be acquired ' + 'automatically before connecting to the Room. LocalTracks will ' + 'be released if connecting to the Room fails or if the Room ' + 'is disconnected');
   } else {
     log.info('Getting LocalTracks');
     log.debug('Options:', options);
@@ -15086,7 +14769,7 @@ function getLocalTracks(options, handleLocalTracks) {
     promise.catch(function handleLocalTracksFailed() {
       if (options.shouldStopLocalTracks) {
         log.info('The automatically acquired LocalTracks will now be stopped');
-        localTracks.forEach(function(track) {
+        localTracks.forEach(function (track) {
           track.stop();
         });
       }
@@ -15097,22 +14780,21 @@ function getLocalTracks(options, handleLocalTracks) {
 }
 
 function normalizeVideoCodecSettings(nameOrSettings) {
-  var settings = typeof nameOrSettings === 'string'
-    ? { codec: nameOrSettings }
-    : nameOrSettings;
+  var settings = typeof nameOrSettings === 'string' ? { codec: nameOrSettings } : nameOrSettings;
   switch (settings.codec.toLowerCase()) {
-    case 'vp8': {
-      return Object.assign({ simulcast: false }, settings);
-    }
-    default: {
-      return settings;
-    }
+    case 'vp8':
+      {
+        return Object.assign({ simulcast: false }, settings);
+      }
+    default:
+      {
+        return settings;
+      }
   }
 }
 
 module.exports = connect;
-
-},{"./cancelableroompromise":56,"./createlocaltracks":59,"./encodingparameters":64,"./iceserversource/constant":65,"./iceserversource/nts":66,"./localparticipant":68,"./media/track/localaudiotrack":71,"./media/track/localdatatrack":73,"./media/track/localvideotrack":77,"./room":93,"./signaling/v2":104,"./util":129,"./util/cancelablepromise":126,"./util/constants":127,"./util/log":132,"@twilio/webrtc":37}],58:[function(require,module,exports){
+},{"./cancelableroompromise":55,"./createlocaltracks":58,"./encodingparameters":63,"./iceserversource/constant":64,"./iceserversource/nts":65,"./localparticipant":67,"./media/track/es5/localaudiotrack":69,"./media/track/es5/localdatatrack":70,"./media/track/es5/localvideotrack":71,"./room":95,"./signaling/v2":106,"./util":131,"./util/cancelablepromise":128,"./util/constants":129,"./util/log":134,"@twilio/webrtc":37}],57:[function(require,module,exports){
 'use strict';
 
 var defaultCreateLocalTracks = require('./createlocaltracks');
@@ -15139,7 +14821,7 @@ function createLocalTrack(kind, options) {
   delete options.createLocalTracks;
   createOptions[kind] = Object.keys(options).length > 0 ? options : true;
 
-  return createLocalTracks(createOptions).then(function(localTracks) {
+  return createLocalTracks(createOptions).then(function (localTracks) {
     return localTracks[0];
   });
 }
@@ -15214,16 +14896,15 @@ module.exports = {
   audio: createLocalAudioTrack,
   video: createLocalVideoTrack
 };
-
-},{"./createlocaltracks":59,"./util/constants":127}],59:[function(require,module,exports){
+},{"./createlocaltracks":58,"./util/constants":129}],58:[function(require,module,exports){
 'use strict';
 
 var asLocalTrack = require('./util').asLocalTrack;
 var buildLogLevels = require('./util').buildLogLevels;
 var getUserMedia = require('@twilio/webrtc').getUserMedia;
-var LocalAudioTrack = require('./media/track/localaudiotrack');
-var LocalDataTrack = require('./media/track/localdatatrack');
-var LocalVideoTrack = require('./media/track/localvideotrack');
+var LocalAudioTrack = require('./media/track/es5/localaudiotrack');
+var LocalDataTrack = require('./media/track/es5/localdatatrack');
+var LocalVideoTrack = require('./media/track/es5/localvideotrack');
 var MediaStreamTrack = require('@twilio/webrtc').MediaStreamTrack;
 var Log = require('./util/log');
 var DEFAULT_LOG_LEVEL = require('./util/constants').DEFAULT_LOG_LEVEL;
@@ -15269,8 +14950,7 @@ var createLocalTrackCalls = 0;
  * });
  */
 function createLocalTracks(options) {
-  var isAudioVideoAbsent =
-    !(options && ('audio' in options || 'video' in options));
+  var isAudioVideoAbsent = !(options && ('audio' in options || 'video' in options));
 
   options = Object.assign({
     audio: isAudioVideoAbsent,
@@ -15306,12 +14986,8 @@ function createLocalTracks(options) {
   }
 
   var localTrackNameOptions = {
-    audio: options.audio && options.audio.name
-      ? { name: options.audio.name }
-      : {},
-    video: options.video && options.video.name
-      ? { name: options.video.name }
-      : {}
+    audio: options.audio && options.audio.name ? { name: options.audio.name } : {},
+    video: options.video && options.video.name ? { name: options.video.name } : {}
   };
 
   if (options.audio) {
@@ -15324,17 +15000,15 @@ function createLocalTracks(options) {
   return options.getUserMedia({
     audio: options.audio,
     video: options.video
-  }).then(function(mediaStream) {
+  }).then(function (mediaStream) {
     var mediaStreamTracks = mediaStream.getAudioTracks().concat(mediaStream.getVideoTracks());
 
-    log.info('Call to getUserMedia successful; got MediaStreamTracks:',
-      mediaStreamTracks);
+    log.info('Call to getUserMedia successful; got MediaStreamTracks:', mediaStreamTracks);
 
-    return mediaStreamTracks.map(function(mediaStreamTrack) {
-      return asLocalTrack(mediaStreamTrack, Object.assign(
-        localTrackNameOptions[mediaStreamTrack.kind], localTrackOptions));
+    return mediaStreamTracks.map(function (mediaStreamTrack) {
+      return asLocalTrack(mediaStreamTrack, Object.assign(localTrackNameOptions[mediaStreamTrack.kind], localTrackOptions));
     });
-  }, function(error) {
+  }, function (error) {
     log.warn('Call to getUserMedia failed:', error);
     throw error;
   });
@@ -15356,45 +15030,50 @@ function createLocalTracks(options) {
  */
 
 module.exports = createLocalTracks;
-
-},{"./media/track/localaudiotrack":71,"./media/track/localdatatrack":73,"./media/track/localvideotrack":77,"./util":129,"./util/constants":127,"./util/log":132,"@twilio/webrtc":37}],60:[function(require,module,exports){
+},{"./media/track/es5/localaudiotrack":69,"./media/track/es5/localdatatrack":70,"./media/track/es5/localvideotrack":71,"./util":131,"./util/constants":129,"./util/log":134,"@twilio/webrtc":37}],59:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var DataTrackTransceiver = require('./transceiver');
 
 /**
- * Construct an {@link DataTrackReceiver}.
- * @class
- * @classdesc A {@link DataTrackReceiver} represents a
- *   {@link DataTrackTransceiver} over which data can be received. Internally, it
- *   users a single RTCDataChannel to receive data.
+ * A {@link DataTrackReceiver} represents a {@link DataTrackTransceiver} over
+ * which data can be received. Internally, it users a single RTCDataChannel to
+ * receive data.
  * @extends DataTrackTransceiver
- * @param {RTCDataChannel} dataChannel
- * @fires DataTrackReceiver#message
+ * @emits DataTrackReceiver#message
  */
-function DataTrackReceiver(dataChannel) {
-  if (!(this instanceof DataTrackReceiver)) {
-    return new DataTrackReceiver(dataChannel);
+
+var DataTrackReceiver = function (_DataTrackTransceiver) {
+  _inherits(DataTrackReceiver, _DataTrackTransceiver);
+
+  /**
+   * Construct an {@link DataTrackReceiver}.
+   * @param {RTCDataChannel} dataChannel
+   */
+  function DataTrackReceiver(dataChannel) {
+    _classCallCheck(this, DataTrackReceiver);
+
+    // NOTE(mmalavalli): In Firefox, the default value for "binaryType" is "blob".
+    // So, we set it to "arraybuffer" to ensure that it is consistent with Chrome
+    // and Safari.
+    var _this = _possibleConstructorReturn(this, (DataTrackReceiver.__proto__ || Object.getPrototypeOf(DataTrackReceiver)).call(this, dataChannel.label, dataChannel.maxPacketLifeTime, dataChannel.maxRetransmits, dataChannel.ordered));
+
+    dataChannel.binaryType = 'arraybuffer';
+
+    dataChannel.addEventListener('message', function (event) {
+      _this.emit('message', event.data);
+    });
+    return _this;
   }
-  DataTrackTransceiver.call(this,
-    dataChannel.label,
-    dataChannel.maxPacketLifeTime,
-    dataChannel.maxRetransmits,
-    dataChannel.ordered);
 
-  // NOTE(mmalavalli): In Firefox, the default value for "binaryType" is "blob".
-  // So, we set it to "arraybuffer" to ensure that it is consistent with Chrome
-  // and Safari.
-  dataChannel.binaryType = 'arraybuffer';
-
-  var self = this;
-  dataChannel.addEventListener('message', function(event) {
-    self.emit('message', event.data);
-  });
-}
-
-inherits(DataTrackReceiver, DataTrackTransceiver);
+  return DataTrackReceiver;
+}(DataTrackTransceiver);
 
 /**
  * @event DataTrackReceiver#message
@@ -15402,127 +15081,161 @@ inherits(DataTrackReceiver, DataTrackTransceiver);
  */
 
 module.exports = DataTrackReceiver;
-
-},{"./transceiver":62,"util":149}],61:[function(require,module,exports){
+},{"./transceiver":61}],60:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var DataTrackTransceiver = require('./transceiver');
 var makeUUID = require('../util').makeUUID;
 
 /**
- * Construct a {@link DataTrackSender}.
- * @class
- * @classdesc A {@link DataTrackSender} represents a
- *   {@link DataTrackTransceiver} over which data can be sent. Internally, it uses a
- *   collection of RTCDataChannels to send data.
+ * A {@link DataTrackSender} represents a {@link DataTrackTransceiver} over
+ * which data can be sent. Internally, it uses a collection of RTCDataChannels
+ * to send data.
  * @extends DataTrackTransceiver
- * @param {?number} maxPacketLifeTime
- * @param {?number} maxRetransmits
- * @param {boolean} ordered
  */
-function DataTrackSender(maxPacketLifeTime, maxRetransmtis, ordered) {
-  if (!(this instanceof DataTrackSender)) {
-    return new DataTrackSender(maxPacketLifeTime, maxRetransmtis, ordered);
+
+var DataTrackSender = function (_DataTrackTransceiver) {
+  _inherits(DataTrackSender, _DataTrackTransceiver);
+
+  /**
+   * Construct a {@link DataTrackSender}.
+   * @param {?number} maxPacketLifeTime
+   * @param {?number} maxRetransmits
+   * @param {boolean} ordered
+   */
+  function DataTrackSender(maxPacketLifeTime, maxRetransmtis, ordered) {
+    _classCallCheck(this, DataTrackSender);
+
+    var _this = _possibleConstructorReturn(this, (DataTrackSender.__proto__ || Object.getPrototypeOf(DataTrackSender)).call(this, makeUUID(), maxPacketLifeTime, maxRetransmtis, ordered));
+
+    Object.defineProperties(_this, {
+      _dataChannels: {
+        value: new Set()
+      }
+    });
+    return _this;
   }
-  var id = makeUUID();
-  DataTrackTransceiver.call(this, id, maxPacketLifeTime, maxRetransmtis, ordered);
-  Object.defineProperties(this, {
-    _dataChannels: {
-      value: new Set()
+
+  /**
+   * Add an RTCDataChannel to the {@link DataTrackSender}.
+   * @param {RTCDataChannel} dataChannel
+   * @returns {this}
+   */
+
+
+  _createClass(DataTrackSender, [{
+    key: 'addDataChannel',
+    value: function addDataChannel(dataChannel) {
+      this._dataChannels.add(dataChannel);
+      return this;
     }
-  });
-}
 
-inherits(DataTrackSender, DataTrackTransceiver);
+    /**
+     * Remove an RTCDataChannel from the {@link DataTrackSender}.
+     * @param {RTCDataChannel} dataChannel
+     * @returns {this}
+     */
 
-/**
- * Add an RTCDataChannel to the {@link DataTrackSender}.
- * @param {RTCDataChannel} dataChannel
- * @returns {this}
- */
-DataTrackSender.prototype.addDataChannel = function addDataChannel(dataChannel) {
-  this._dataChannels.add(dataChannel);
-  return this;
-};
-
-/**
- * Remove an RTCDataChannel from the {@link DataTrackSender}.
- * @param {RTCDataChannel} dataChannel
- * @returns {this}
- */
-DataTrackSender.prototype.removeDataChannel = function removeDataChannel(dataChannel) {
-  this._dataChannels.delete(dataChannel);
-  return this;
-};
-
-/**
- * Send data over the {@link DataTrackSender}. Internally, this calls
- * <code>send</code> over each of the underlying RTCDataChannels.
- * @param {string|Blob|ArrayBuffer|ArrayBufferView} data
- * @returns {this}
- */
-DataTrackSender.prototype.send = function send(data) {
-  this._dataChannels.forEach(function(dataChannel) {
-    try {
-      dataChannel.send(data);
-    } catch (error) {
-      // Do nothing.
+  }, {
+    key: 'removeDataChannel',
+    value: function removeDataChannel(dataChannel) {
+      this._dataChannels.delete(dataChannel);
+      return this;
     }
-  });
-  return this;
-};
+
+    /**
+     * Send data over the {@link DataTrackSender}. Internally, this calls
+     * <code>send</code> over each of the underlying RTCDataChannels.
+     * @param {string|Blob|ArrayBuffer|ArrayBufferView} data
+     * @returns {this}
+     */
+
+  }, {
+    key: 'send',
+    value: function send(data) {
+      this._dataChannels.forEach(function (dataChannel) {
+        try {
+          dataChannel.send(data);
+        } catch (error) {
+          // Do nothing.
+        }
+      });
+      return this;
+    }
+  }]);
+
+  return DataTrackSender;
+}(DataTrackTransceiver);
 
 module.exports = DataTrackSender;
-
-},{"../util":129,"./transceiver":62,"util":149}],62:[function(require,module,exports){
+},{"../util":131,"./transceiver":61}],61:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
-var EventEmitter = require('events').EventEmitter;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var TrackTransceiver = require('../transceiver');
 
 /**
- * Construct a {@link DataTrackTransceiver}.
- * @class
- * @classdesc A {@link DataTrackTransceiver} represents either one or more local
- *   RTCDataChannels or a single remote RTCDataChannel. It can be used to send
- *   or receive data.
- * @param {string} id
- * @param {?number} maxPacketLifeTime
- * @param {?number} maxRetransmits
- * @param {boolean} ordered
+ * A {@link DataTrackTransceiver} represents either one or more local
+ * RTCDataChannels or a single remote RTCDataChannel. It can be used to send or
+ * receive data.
+ * @extends TrackTransceiver
  * @property {string} id
  * @property {string} kind - "data"
  * @property {?number} maxPacketLifeTime
  * @property {?number} maxRetransmits
  * @property {boolean} ordered
- * @implements TrackTransceiver
  */
-function DataTrackTransceiver(id, maxPacketLifeTime, maxRetransmits, ordered) {
-  EventEmitter.call(this);
-  TrackTransceiver.call(this, id, 'data');
-  Object.defineProperties(this, {
-    maxPacketLifeTime: {
-      enumerable: true,
-      value: maxPacketLifeTime
-    },
-    maxRetransmits: {
-      enumerable: true,
-      value: maxRetransmits
-    },
-    ordered: {
-      enumerable: true,
-      value: ordered
-    }
-  });
-}
 
-inherits(DataTrackTransceiver, EventEmitter);
+var DataTrackTransceiver = function (_TrackTransceiver) {
+  _inherits(DataTrackTransceiver, _TrackTransceiver);
+
+  /**
+   * Construct a {@link DataTrackTransceiver}.
+   * @param {string} id
+   * @param {?number} maxPacketLifeTime
+   * @param {?number} maxRetransmits
+   * @param {boolean} ordered
+   */
+  function DataTrackTransceiver(id, maxPacketLifeTime, maxRetransmits, ordered) {
+    _classCallCheck(this, DataTrackTransceiver);
+
+    var _this = _possibleConstructorReturn(this, (DataTrackTransceiver.__proto__ || Object.getPrototypeOf(DataTrackTransceiver)).call(this, id, 'data'));
+
+    Object.defineProperties(_this, {
+      maxPacketLifeTime: {
+        enumerable: true,
+        value: maxPacketLifeTime
+      },
+      maxRetransmits: {
+        enumerable: true,
+        value: maxRetransmits
+      },
+      ordered: {
+        enumerable: true,
+        value: ordered
+      }
+    });
+    return _this;
+  }
+
+  return DataTrackTransceiver;
+}(TrackTransceiver);
 
 module.exports = DataTrackTransceiver;
-
-},{"../transceiver":125,"events":54,"util":149}],63:[function(require,module,exports){
+},{"../transceiver":127}],62:[function(require,module,exports){
 'use strict';
 
 var request = require('./request');
@@ -15538,13 +15251,13 @@ var CONFIG_URL = 'https://ecs.us1.twilio.com/v1/Configuration';
  * @returns {Promise<Object>} configuration - An unformatted map of
  *   configuration settings specific to the specified service.
  * @throws {TwilioError}
- *//**
- * @typedef {Object} ECS.getConfigurationOptions
- * @property {?Object} [body] - A valid JSON payload to send to the
- *   ECS endpoint.
- * @property {?String} [configUrl='https://ecs.us1.twilio.com/v1/Configuration'] - A
- *   custom URL to POST ECS configuration requests to.
- */
+*/ /**
+   * @typedef {Object} ECS.getConfigurationOptions
+   * @property {?Object} [body] - A valid JSON payload to send to the
+   *   ECS endpoint.
+   * @property {?String} [configUrl='https://ecs.us1.twilio.com/v1/Configuration'] - A
+   *   custom URL to POST ECS configuration requests to.
+   */
 function getConfiguration(token, options) {
   if (!token) {
     throw new Error('<String>token is a required argument.');
@@ -15566,9 +15279,9 @@ function getConfiguration(token, options) {
     postData.body = toQueryString(options.body);
   }
 
-  return request.post(postData).then(function(responseText) {
+  return request.post(postData).then(function (responseText) {
     return parseJsonTextFromECS(responseText);
-  }, function(errorText) {
+  }, function (errorText) {
     var error = parseJsonTextFromECS(errorText);
     throw createTwilioError(error.code, error.message);
   });
@@ -15585,94 +15298,112 @@ function parseJsonTextFromECS(jsonText) {
 }
 
 function toQueryString(params) {
-  return Object.keys(params || { }).map(function(key) {
+  return Object.keys(params || {}).map(function (key) {
     return encodeURIComponent(key) + '=' + encodeURIComponent(params[key]);
   }).join('&');
 }
 
 module.exports.getConfiguration = getConfiguration;
-
-},{"./request":92,"./util/twilio-video-errors":141}],64:[function(require,module,exports){
+},{"./request":94,"./util/twilio-video-errors":143}],63:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var EventEmitter = require('events').EventEmitter;
 
 /**
- * EncodingParametersImpl
- * @class
- * @classdesc {@link EncodingParametersImpl} represents an object which notifies
- *   its listeners of any changes in the values of its properties.
+ * {@link EncodingParametersImpl} represents an object which notifies its
+ * listeners of any changes in the values of its properties.
  * @extends EventEmitter
  * @implements EncodingParameters
- * @fires EncodingParametersImpl#changed
+ * @emits EncodingParametersImpl#changed
  * @property {?number} maxAudioBitrate
  * @property {?number} maxVideoBitrate
- * @param {EncodingParamters} encodingParameters - Initial {@link EncodingParameters}
  */
-function EncodingParametersImpl(encodingParameters) {
-  if (!(this instanceof EncodingParametersImpl)) {
-    return new EncodingParametersImpl(encodingParameters);
+
+var EncodingParametersImpl = function (_EventEmitter) {
+  _inherits(EncodingParametersImpl, _EventEmitter);
+
+  /**
+   * Construct an {@link EncodingParametersImpl}.
+   * @param {EncodingParamters} encodingParameters - Initial {@link EncodingParameters}
+   */
+  function EncodingParametersImpl(encodingParameters) {
+    _classCallCheck(this, EncodingParametersImpl);
+
+    var _this = _possibleConstructorReturn(this, (EncodingParametersImpl.__proto__ || Object.getPrototypeOf(EncodingParametersImpl)).call(this));
+
+    encodingParameters = Object.assign({
+      maxAudioBitrate: null,
+      maxVideoBitrate: null
+    }, encodingParameters);
+
+    Object.defineProperties(_this, {
+      maxAudioBitrate: {
+        value: encodingParameters.maxAudioBitrate,
+        writable: true
+      },
+      maxVideoBitrate: {
+        value: encodingParameters.maxVideoBitrate,
+        writable: true
+      }
+    });
+    return _this;
   }
-  EventEmitter.call(this);
 
-  encodingParameters = Object.assign({
-    maxAudioBitrate: null,
-    maxVideoBitrate: null
-  }, encodingParameters);
+  /**
+   * Returns the bitrate values in an {@link EncodingParameters}.
+   * @returns {EncodingParameters}
+   */
 
-  Object.defineProperties(this, {
-    maxAudioBitrate: {
-      value: encodingParameters.maxAudioBitrate,
-      writable: true
-    },
-    maxVideoBitrate: {
-      value: encodingParameters.maxVideoBitrate,
-      writable: true
+
+  _createClass(EncodingParametersImpl, [{
+    key: 'toJSON',
+    value: function toJSON() {
+      return {
+        maxAudioBitrate: this.maxAudioBitrate,
+        maxVideoBitrate: this.maxVideoBitrate
+      };
     }
-  });
-}
 
-inherits(EncodingParametersImpl, EventEmitter);
+    /**
+     * Update the bitrate values with those in the given {@link EncodingParameters}.
+     * @param {EncodingParameters} encodingParameters - The new {@link EncodingParameters}
+     * @fires EncodingParametersImpl#changed
+     */
 
-/**
- * Returns the bitrate values in an {@link EncodingParameters}.
- * @returns {EncodingParameters}
- */
-EncodingParametersImpl.prototype.toJSON = function toJSON() {
-  return {
-    maxAudioBitrate: this.maxAudioBitrate,
-    maxVideoBitrate: this.maxVideoBitrate
-  };
-};
+  }, {
+    key: 'update',
+    value: function update(encodingParameters) {
+      var _this2 = this;
 
-/**
- * Update the bitrate values with those in the given {@link EncodingParameters}.
- * @param {EncodingParameters} encodingParameters - The new {@link EncodingParameters}
- * @fires EncodingParametersImpl#changed
- */
-EncodingParametersImpl.prototype.update = function update(encodingParameters) {
-  encodingParameters = Object.assign({
-    maxAudioBitrate: this.maxAudioBitrate,
-    maxVideoBitrate: this.maxVideoBitrate
-  }, encodingParameters);
+      encodingParameters = Object.assign({
+        maxAudioBitrate: this.maxAudioBitrate,
+        maxVideoBitrate: this.maxVideoBitrate
+      }, encodingParameters);
 
-  var self = this;
-  var shouldEmitChanged = [
-    'maxAudioBitrate',
-    'maxVideoBitrate'
-  ].reduce(function(shouldEmitChanged, maxKindBitrate) {
-    if (self[maxKindBitrate] !== encodingParameters[maxKindBitrate]) {
-      self[maxKindBitrate] = encodingParameters[maxKindBitrate];
-      shouldEmitChanged = true;
+      var shouldEmitChanged = ['maxAudioBitrate', 'maxVideoBitrate'].reduce(function (shouldEmitChanged, maxKindBitrate) {
+        if (_this2[maxKindBitrate] !== encodingParameters[maxKindBitrate]) {
+          _this2[maxKindBitrate] = encodingParameters[maxKindBitrate];
+          shouldEmitChanged = true;
+        }
+        return shouldEmitChanged;
+      }, false);
+
+      if (shouldEmitChanged) {
+        this.emit('changed');
+      }
     }
-    return shouldEmitChanged;
-  }, false);
+  }]);
 
-  if (shouldEmitChanged) {
-    this.emit('changed');
-  }
-};
+  return EncodingParametersImpl;
+}(EventEmitter);
 
 /**
  * At least one of the {@link EncodingParametersImpl}'s bitrate values changed.
@@ -15680,74 +15411,106 @@ EncodingParametersImpl.prototype.update = function update(encodingParameters) {
  */
 
 module.exports = EncodingParametersImpl;
-
-},{"events":54,"util":149}],65:[function(require,module,exports){
+},{"events":152}],64:[function(require,module,exports){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var EventEmitter = require('events').EventEmitter;
-var inherits = require('util').inherits;
 
 var instances = 0;
 
 /**
- * Construct a {@link ConstantIceServerSource}.
- * @class
- * @classdesc A {@link ConstantIceServerSource} only ever returns a single set
- *   of ICE servers. It is useful for providing a hard-coded set of ICE servers.
+ * A {@link ConstantIceServerSource} only ever returns a single set of ICE
+ * servers. It is useful for providing a hard-coded set of ICE servers.
+ * @extends EventEmitter
  * @implements {IceServerSource}
- * @param {Array<RTCIceServerInit>} iceServers
  */
-function ConstantIceServerSource(iceServers) {
-  EventEmitter.call(this);
-  Object.defineProperties(this, {
-    _instance: {
-      value: ++instances
-    },
-    _iceServers: {
-      enumerable: true,
-      value: iceServers,
-      writable: true
-    },
-    _isStarted: {
-      value: false,
-      writable: true
-    },
-    isStarted: {
-      enumerable: true,
-      get: function() {
-        return this._isStarted;
+
+var ConstantIceServerSource = function (_EventEmitter) {
+  _inherits(ConstantIceServerSource, _EventEmitter);
+
+  /**
+   * Construct a {@link ConstantIceServerSource}.
+   * @param {Array<RTCIceServerInit>} iceServers
+   */
+  function ConstantIceServerSource(iceServers) {
+    _classCallCheck(this, ConstantIceServerSource);
+
+    var _this = _possibleConstructorReturn(this, (ConstantIceServerSource.__proto__ || Object.getPrototypeOf(ConstantIceServerSource)).call(this));
+
+    Object.defineProperties(_this, {
+      _instance: {
+        value: ++instances
+      },
+      _iceServers: {
+        enumerable: true,
+        value: iceServers,
+        writable: true
+      },
+      _isStarted: {
+        value: false,
+        writable: true
+      },
+      isStarted: {
+        enumerable: true,
+        get: function get() {
+          return this._isStarted;
+        }
       }
+    });
+    return _this;
+  }
+
+  _createClass(ConstantIceServerSource, [{
+    key: 'start',
+    value: function start() {
+      this._isStarted = true;
+      return Promise.resolve(this._iceServers);
     }
-  });
-}
+  }, {
+    key: 'stop',
+    value: function stop() {
+      this._isStarted = false;
+    }
+  }, {
+    key: 'toString',
+    value: function toString() {
+      return '[ConstantIceServerSource #' + this._instance + ']';
+    }
+  }]);
 
-inherits(ConstantIceServerSource, EventEmitter);
-
-ConstantIceServerSource.prototype.start = function start() {
-  this._isStarted = true;
-  return Promise.resolve(this._iceServers);
-};
-
-ConstantIceServerSource.prototype.stop = function stop() {
-  this._isStarted = false;
-};
-
-ConstantIceServerSource.prototype.toString = function toString() {
-  return '[ConstantIceServerSource #' + this._instance + ']';
-};
+  return ConstantIceServerSource;
+}(EventEmitter);
 
 module.exports = ConstantIceServerSource;
-
-},{"events":54,"util":149}],66:[function(require,module,exports){
+},{"events":152}],65:[function(require,module,exports){
 'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var constants = require('../util/constants');
 var ECS = require('../ecs');
 var EventEmitter = require('events').EventEmitter;
-var inherits = require('util').inherits;
 var Log = require('../util/log');
 var TimeoutPromise = require('../util/timeoutpromise');
 var util = require('../util');
+
+var _require = require('../util/twilio-video-errors'),
+    ConfigurationAcquireFailedError = _require.ConfigurationAcquireFailedError;
+
 var version = require('../../package.json').version;
 
 var instances = 0;
@@ -15765,122 +15528,139 @@ var instances = 0;
  */
 
 /**
- * Construct an {@link NTSIceServerSource}.
- * @class
- * @classdesc A Network Traversal Service (NTS)-backed implementation of
- *   {@link IceServerSource}; useful for getting fresh TURN servers from Twilio
+ * A Network Traversal Service (NTS)-backed implementation of
+ * {@link IceServerSource}; useful for getting fresh TURN servers from Twilio.
+ * @extends EventEmitter
  * @implements {IceServerSource}
- * @param {string} token - Access Token
- * @param {NTSIceServerSourceOptions} [options]
  */
-function NTSIceServerSource(token, options) {
-  EventEmitter.call(this);
 
-  options = Object.assign({
-    defaultTTL: constants.ICE_SERVERS_DEFAULT_TTL,
-    environment: constants.DEFAULT_ENVIRONMENT,
-    getConfiguration: ECS.getConfiguration,
-    realm: constants.DEFAULT_REALM,
-    timeout: constants.ICE_SERVERS_TIMEOUT_MS
-  }, options);
+var NTSIceServerSource = function (_EventEmitter) {
+  _inherits(NTSIceServerSource, _EventEmitter);
 
-  /* eslint-disable new-cap */
-  var defaultIceServers = constants.DEFAULT_ICE_SERVERS(options.environment);
-  var ecsServer = options.ecsServer || constants.ECS_SERVER(options.environment, options.realm);
-  /* eslint-enable new-cap */
+  /**
+   * Construct an {@link NTSIceServerSource}.
+   * @param {string} token - Access Token
+   * @param {NTSIceServerSourceOptions} [options]
+   */
+  function NTSIceServerSource(token, options) {
+    _classCallCheck(this, NTSIceServerSource);
 
-  var log = options.log
-    ? options.log.createLog('default', this)
-    : new Log('default', this, util.buildLogLevels('off'));
+    var _this = _possibleConstructorReturn(this, (NTSIceServerSource.__proto__ || Object.getPrototypeOf(NTSIceServerSource)).call(this));
 
-  Object.defineProperties(this, {
-    // This Promise represents the current invocation of `poll`. `start` sets it
-    // and `stop` clears it out.
-    _currentPoll: {
-      value: null,
-      writable: true
-    },
-    // In the event that ECS or NTS fail to return ICE servers in a timely
-    // manner, NTSIceServerSource falls back to these servers.
-    _defaultIceServers: {
-      value: defaultIceServers
-    },
-    _defaultTTL: {
-      value: options.defaultTTL
-    },
-    // This is the ECS server NTSIceServerSource communicates with.
-    _ecsServer: {
-      value: ecsServer
-    },
-    _getConfiguration: {
-      value: options.getConfiguration
-    },
-    _instance: {
-      value: ++instances
-    },
-    // This timer ID represents the next invocation of `poll`.
-    _nextPoll: {
-      value: null,
-      writable: true
-    },
-    _log: {
-      value: log
-    },
-    // This Deferred remains unresolved until `stop` is called. We use it to
-    // short-circuit in `poll`.
-    _stopped: {
-      value: util.defer(),
-      writable: true
-    },
-    // This value configures the amount of time NTSIceServerSource will wait
-    // when fetching ICE servers.
-    _timeout: {
-      value: options.timeout
-    },
-    // This is the Access Token NTSIceServerSource makes requests to ECS with.
-    _token: {
-      value: token
-    },
-    isStarted: {
-      enumerable: true,
-      get: function() {
-        return !!this._currentPoll;
+    options = Object.assign({
+      abortOnTimeout: false,
+      defaultTTL: constants.ICE_SERVERS_DEFAULT_TTL,
+      environment: constants.DEFAULT_ENVIRONMENT,
+      getConfiguration: ECS.getConfiguration,
+      realm: constants.DEFAULT_REALM,
+      timeout: constants.ICE_SERVERS_TIMEOUT_MS
+    }, options);
+
+    /* eslint-disable new-cap */
+    var defaultIceServers = constants.DEFAULT_ICE_SERVERS(options.environment);
+    var ecsServer = options.ecsServer || constants.ECS_SERVER(options.environment, options.realm);
+    /* eslint-enable new-cap */
+
+    var log = options.log ? options.log.createLog('default', _this) : new Log('default', _this, util.buildLogLevels('off'));
+
+    Object.defineProperties(_this, {
+      _abortOnTimeout: {
+        value: options.abortOnTimeout
+      },
+      // This Promise represents the current invocation of `poll`. `start` sets it
+      // and `stop` clears it out.
+      _currentPoll: {
+        value: null,
+        writable: true
+      },
+      // In the event that ECS or NTS fail to return ICE servers in a timely
+      // manner, NTSIceServerSource falls back to these servers.
+      _defaultIceServers: {
+        value: defaultIceServers
+      },
+      _defaultTTL: {
+        value: options.defaultTTL
+      },
+      // This is the ECS server NTSIceServerSource communicates with.
+      _ecsServer: {
+        value: ecsServer
+      },
+      _getConfiguration: {
+        value: options.getConfiguration
+      },
+      _instance: {
+        value: ++instances
+      },
+      // This timer ID represents the next invocation of `poll`.
+      _nextPoll: {
+        value: null,
+        writable: true
+      },
+      _log: {
+        value: log
+      },
+      // This Deferred remains unresolved until `stop` is called. We use it to
+      // short-circuit in `poll`.
+      _stopped: {
+        value: util.defer(),
+        writable: true
+      },
+      // This value configures the amount of time NTSIceServerSource will wait
+      // when fetching ICE servers.
+      _timeout: {
+        value: options.timeout
+      },
+      // This is the Access Token NTSIceServerSource makes requests to ECS with.
+      _token: {
+        value: token
+      },
+      isStarted: {
+        enumerable: true,
+        get: function get() {
+          return !!this._currentPoll;
+        }
       }
+    });
+
+    _this._log.info('Created a new NTSIceServerSource');
+    _this._log.debug('ECS server:', _this._ecsServer);
+    return _this;
+  }
+
+  _createClass(NTSIceServerSource, [{
+    key: 'start',
+    value: function start() {
+      if (!this.isStarted) {
+        this._log.info('Starting');
+        this._currentPoll = poll(this);
+      } else {
+        this._log.warn('Already started');
+      }
+      return this._currentPoll;
     }
-  });
+  }, {
+    key: 'stop',
+    value: function stop() {
+      if (!this.isStarted) {
+        this._log.warn('Already stopped');
+        return;
+      }
+      this._log.info('Stopping');
+      this._currentPoll = null;
+      clearTimeout(this._nextPoll);
+      this._stopped.resolve();
+      this._stopped = util.defer();
+      this._log.debug('Stopped');
+    }
+  }, {
+    key: 'toString',
+    value: function toString() {
+      return '[NTSIceServerSource #' + this._instance + ']';
+    }
+  }]);
 
-  this._log.info('Created a new NTSIceServerSource');
-  this._log.debug('ECS server:', this._ecsServer);
-}
-
-inherits(NTSIceServerSource, EventEmitter);
-
-NTSIceServerSource.prototype.start = function start() {
-  if (!this.isStarted) {
-    this._log.info('Starting');
-    this._currentPoll = poll(this);
-  } else {
-    this._log.warn('Already started');
-  }
-  return this._currentPoll;
-};
-
-NTSIceServerSource.prototype.stop = function stop() {
-  if (!this.isStarted) {
-    this._log.warn('Already stopped');
-    return;
-  }
-  this._log.info('Stopping');
-  this._currentPoll = null;
-  clearTimeout(this._nextPoll);
-  this._stopped.resolve();
-  this._stopped = util.defer();
-  this._log.debug('Stopped');
-};
-
-NTSIceServerSource.prototype.toString = function toString() {
-  return '[NTSIceServerSource #' + this._instance + ']';
-};
+  return NTSIceServerSource;
+}(EventEmitter);
 
 /**
  * Parse an ECS configuration value, log any warnings, and return a tuple of
@@ -15890,6 +15670,8 @@ NTSIceServerSource.prototype.toString = function toString() {
  * @returns {Array<Array<RTCIceServerInit>|Number>} iceServersAndTTL
  * @throws {Error}
  */
+
+
 function parseECSConfig(client, config) {
   var nts = util.getOrNull(config, 'video.network_traversal_service');
   if (!nts) {
@@ -15921,7 +15703,7 @@ function poll(client) {
   client._log.debug('Getting ECS configuration');
 
   var options = {
-    configUrl: client._ecsServer + '/v1/Configuration',
+    configUrl: client._ecsServer + '/v2/Configuration',
     body: {
       service: 'video',
       /* eslint-disable camelcase */
@@ -15934,18 +15716,19 @@ function poll(client) {
   var config = client._getConfiguration(client._token, options);
   var configWithTimeout = new TimeoutPromise(config, client._timeout);
 
-  return Promise.race([
-    configWithTimeout,
-    client._stopped.promise
-  ]).then(function(config) {
+  return Promise.race([configWithTimeout, client._stopped.promise]).then(function (config) {
     if (!config) {
       throw alreadyStopped;
     }
     return parseECSConfig(client, config);
-  }).catch(function(error) {
+  }).catch(function (error) {
     if (!client.isStarted) {
       throw alreadyStopped;
     } else if (configWithTimeout.isTimedOut) {
+      if (client._abortOnTimeout) {
+        client._log.warn('Getting ICE servers took too long');
+        throw new ConfigurationAcquireFailedError();
+      }
       client._log.warn('Getting ICE servers took too long (using defaults)');
     } else {
       // NOTE(mroberts): Stop if we get an Access Token error (2xxxx)
@@ -15955,7 +15738,7 @@ function poll(client) {
       client._log.warn('Failed to get ICE servers (using defaults):', error);
     }
     return [client._defaultIceServers, client._defaultTTL];
-  }).then(function(iceServersAndTTL) {
+  }).then(function (iceServersAndTTL) {
     var iceServers = iceServersAndTTL[0];
     var ttl = iceServersAndTTL[1];
 
@@ -15979,8 +15762,7 @@ function poll(client) {
 }
 
 module.exports = NTSIceServerSource;
-
-},{"../../package.json":144,"../ecs":63,"../util":129,"../util/constants":127,"../util/log":132,"../util/timeoutpromise":140,"events":54,"util":149}],67:[function(require,module,exports){
+},{"../../package.json":146,"../ecs":62,"../util":131,"../util/constants":129,"../util/log":134,"../util/timeoutpromise":142,"../util/twilio-video-errors":143,"events":152}],66:[function(require,module,exports){
 'use strict';
 
 var version = require('../package.json').version;
@@ -16009,15 +15791,15 @@ Object.defineProperties(Video, {
   },
   LocalAudioTrack: {
     enumerable: true,
-    value: require('./media/track/localaudiotrack')
+    value: require('./media/track/es5/localaudiotrack')
   },
   LocalDataTrack: {
     enumerable: true,
-    value: require('./media/track/localdatatrack')
+    value: require('./media/track/es5/localdatatrack')
   },
   LocalVideoTrack: {
     enumerable: true,
-    value: require('./media/track/localvideotrack')
+    value: require('./media/track/es5/localvideotrack')
   },
   version: {
     enumerable: true,
@@ -16026,16 +15808,26 @@ Object.defineProperties(Video, {
 });
 
 module.exports = Video;
-
-},{"../package.json":144,"./connect":57,"./createlocaltrack":58,"./createlocaltracks":59,"./media/track/localaudiotrack":71,"./media/track/localdatatrack":73,"./media/track/localvideotrack":77,"./util/support":139}],68:[function(require,module,exports){
+},{"../package.json":146,"./connect":56,"./createlocaltrack":57,"./createlocaltracks":58,"./media/track/es5/localaudiotrack":69,"./media/track/es5/localdatatrack":70,"./media/track/es5/localvideotrack":71,"./util/support":141}],67:[function(require,module,exports){
 'use strict';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var util = require('./util');
-var inherits = require('util').inherits;
 var E = require('./util/constants').typeErrors;
-var LocalAudioTrack = require('./media/track/localaudiotrack');
-var LocalDataTrack = require('./media/track/localdatatrack');
-var LocalVideoTrack = require('./media/track/localvideotrack');
+var LocalAudioTrack = require('./media/track/es5/localaudiotrack');
+var LocalDataTrack = require('./media/track/es5/localdatatrack');
+var LocalVideoTrack = require('./media/track/es5/localvideotrack');
 var MediaStreamTrack = require('@twilio/webrtc').MediaStreamTrack;
 var Participant = require('./participant');
 var LocalAudioTrackPublication = require('./media/track/localaudiotrackpublication');
@@ -16043,14 +15835,9 @@ var LocalDataTrackPublication = require('./media/track/localdatatrackpublication
 var LocalVideoTrackPublication = require('./media/track/localvideotrackpublication');
 
 /**
- * Construct a {@link LocalParticipant}.
- * @class
- * @classdesc A {@link LocalParticipant} represents the local {@link Participant}
- * in a {@link Room}.
+ * A {@link LocalParticipant} represents the local {@link Participant} in a
+ * {@link Room}.
  * @extends Participant
- * @param {ParticipantSignaling} signaling
- * @param {Array<LocalTrack>} localTracks
- * @param {Object} options
  * @property {Map<Track.SID, LocalAudioTrackPublication>} audioTrackPublications -
  *    The {@link LocalParticipant}'s {@link LocalAudioTrackPublication}s
  * @property {Map<Track.ID, LocalAudioTrack>} audioTracks -
@@ -16067,537 +15854,578 @@ var LocalVideoTrackPublication = require('./media/track/localvideotrackpublicati
  *    The {@link LocalParticipant}'s {@link LocalVideoTrackPublication}s
  * @property {Map<Track.ID, LocalVideoTrack>} videoTracks -
  *   The {@link LocalParticipant}'s {@link LocalVideoTrack}s
- * @fires LocalParticipant#trackAdded
- * @fires LocalParticipant#trackDimensionsChanged
- * @fires LocalParticipant#trackDisabled
- * @fires LocalParticipant#trackEnabled
- * @fires LocalParticipant#trackPublicationFailed
- * @fires LocalParticipant#trackPublished
- * @fires LocalParticipant#trackRemoved
- * @fires LocalParticipant#trackStarted
- * @fires LocalParticipant#trackStopped
+ * @emits LocalParticipant#trackAdded
+ * @emits LocalParticipant#trackDimensionsChanged
+ * @emits LocalParticipant#trackDisabled
+ * @emits LocalParticipant#trackEnabled
+ * @emits LocalParticipant#trackPublicationFailed
+ * @emits LocalParticipant#trackPublished
+ * @emits LocalParticipant#trackRemoved
+ * @emits LocalParticipant#trackStarted
+ * @emits LocalParticipant#trackStopped
  */
-function LocalParticipant(signaling, localTracks, options) {
-  if (!(this instanceof LocalParticipant)) {
-    return new LocalParticipant(signaling, localTracks, options);
-  }
 
-  options = Object.assign({
-    LocalAudioTrack: LocalAudioTrack,
-    LocalVideoTrack: LocalVideoTrack,
-    LocalDataTrack: LocalDataTrack,
-    MediaStreamTrack: MediaStreamTrack,
-    LocalAudioTrackPublication: LocalAudioTrackPublication,
-    LocalVideoTrackPublication: LocalVideoTrackPublication,
-    LocalDataTrackPublication: LocalDataTrackPublication,
-    shouldStopLocalTracks: false,
-    tracks: localTracks
-  }, options);
+var LocalParticipant = function (_Participant) {
+  _inherits(LocalParticipant, _Participant);
 
-  var tracksToStop = options.shouldStopLocalTracks
-    ? new Set(localTracks.filter(function(localTrack) {
-        return localTrack.kind !== 'data';
-      }))
-    : new Set();
+  /**
+   * Construct a {@link LocalParticipant}.
+   * @param {ParticipantSignaling} signaling
+   * @param {Array<LocalTrack>} localTracks
+   * @param {Object} options
+   */
+  function LocalParticipant(signaling, localTracks, options) {
+    _classCallCheck(this, LocalParticipant);
 
-  Object.defineProperties(this, {
-    _LocalAudioTrack: {
-      value: options.LocalAudioTrack
-    },
-    _LocalDataTrack: {
-      value: options.LocalDataTrack
-    },
-    _LocalVideoTrack: {
-      value: options.LocalVideoTrack
-    },
-    _MediaStreamTrack: {
-      value: options.MediaStreamTrack
-    },
-    _LocalAudioTrackPublication: {
-      value: options.LocalAudioTrackPublication
-    },
-    _LocalDataTrackPublication: {
-      value: options.LocalDataTrackPublication
-    },
-    _LocalVideoTrackPublication: {
-      value: options.LocalVideoTrackPublication
-    },
-    _tracksToStop: {
-      value: tracksToStop
-    },
-    audioTrackPublications: {
-      value: new Map()
-    },
-    dataTrackPublications: {
-      value: new Map()
-    },
-    trackPublications: {
-      value: new Map()
-    },
-    videoTrackPublications: {
-      value: new Map()
-    }
-  });
+    options = Object.assign({
+      LocalAudioTrack: LocalAudioTrack,
+      LocalVideoTrack: LocalVideoTrack,
+      LocalDataTrack: LocalDataTrack,
+      MediaStreamTrack: MediaStreamTrack,
+      LocalAudioTrackPublication: LocalAudioTrackPublication,
+      LocalVideoTrackPublication: LocalVideoTrackPublication,
+      LocalDataTrackPublication: LocalDataTrackPublication,
+      shouldStopLocalTracks: false,
+      tracks: localTracks
+    }, options);
 
-  Participant.call(this, signaling, options);
-}
+    var tracksToStop = options.shouldStopLocalTracks ? new Set(localTracks.filter(function (localTrack) {
+      return localTrack.kind !== 'data';
+    })) : new Set();
 
-inherits(LocalParticipant, Participant);
+    var _this = _possibleConstructorReturn(this, (LocalParticipant.__proto__ || Object.getPrototypeOf(LocalParticipant)).call(this, signaling, options));
 
-/**
- * Get the {@link LocalTrack} events to re-emit.
- * @private
- * @returns {Array<Array<string>>} events
- */
-LocalParticipant.prototype._getTrackEvents = function _getTrackEvents() {
-  return Participant.prototype._getTrackEvents.call(this).concat([
-    ['disabled', 'trackDisabled'],
-    ['enabled', 'trackEnabled'],
-    ['stopped', 'trackStopped']
-  ]);
-};
-
-LocalParticipant.prototype.toString = function toString() {
-  return '[LocalParticipant #' + this._instanceId
-    + (this.sid ? ': ' + this.sid : '')
-    + ']';
-};
-
-LocalParticipant.prototype._handleTrackSignalingEvents = function _handleTrackSignalingEvents() {
-  var log = this._log;
-
-  if (this.state === 'disconnected') {
-    return;
-  }
-
-  var signaling = this._signaling;
-
-  function localTrackAdded(localTrack) {
-    signaling.addTrack(localTrack._trackSender, localTrack.name);
-    log.info('Added a new ' + util.trackClass(localTrack, true) + ':', localTrack.id);
-    log.debug(util.trackClass(localTrack, true) + ':', localTrack);
-  }
-
-  function localTrackDisabled(localTrack) {
-    var trackSignaling = signaling.tracks.get(localTrack.id);
-    trackSignaling.disable();
-    log.debug('Disabled the ' + util.trackClass(localTrack, true) + ':', localTrack.id);
-  }
-
-  function localTrackEnabled(localTrack) {
-    var trackSignaling = signaling.tracks.get(localTrack.id);
-    trackSignaling.enable();
-    log.debug('Enabled the ' + util.trackClass(localTrack, true) + ':', localTrack.id);
-  }
-
-  function localTrackRemoved(localTrack) {
-    signaling.removeTrack(localTrack._trackSender);
-    log.info('Removed a ' + util.trackClass(localTrack, true) + ':', localTrack.id);
-    log.debug(util.trackClass(localTrack, true) + ':', localTrack);
-  }
-
-  this.on('trackAdded', localTrackAdded);
-  this.on('trackDisabled', localTrackDisabled);
-  this.on('trackEnabled', localTrackEnabled);
-  this.on('trackRemoved', localTrackRemoved);
-
-  this.tracks.forEach(function(track) {
-    localTrackAdded(track);
-    this._getOrCreateLocalTrackPublication(track).catch(function() {
-      // Do nothing for now.
+    Object.defineProperties(_this, {
+      _LocalAudioTrack: {
+        value: options.LocalAudioTrack
+      },
+      _LocalDataTrack: {
+        value: options.LocalDataTrack
+      },
+      _LocalVideoTrack: {
+        value: options.LocalVideoTrack
+      },
+      _MediaStreamTrack: {
+        value: options.MediaStreamTrack
+      },
+      _LocalAudioTrackPublication: {
+        value: options.LocalAudioTrackPublication
+      },
+      _LocalDataTrackPublication: {
+        value: options.LocalDataTrackPublication
+      },
+      _LocalVideoTrackPublication: {
+        value: options.LocalVideoTrackPublication
+      },
+      _tracksToStop: {
+        value: tracksToStop
+      },
+      audioTrackPublications: {
+        value: new Map()
+      },
+      dataTrackPublications: {
+        value: new Map()
+      },
+      trackPublications: {
+        value: new Map()
+      },
+      videoTrackPublications: {
+        value: new Map()
+      }
     });
-  }, this);
 
-  var self = this;
-  signaling.on('stateChanged', function stateChanged(state) {
-    log.debug('Transitioned to state:', state);
-    if (state === 'disconnected') {
-      log.debug('Removing LocalTrack event listeners');
-      signaling.removeListener('stateChanged', stateChanged);
-      self.removeListener('trackAdded', localTrackAdded);
-      self.removeListener('trackDisabled', localTrackDisabled);
-      self.removeListener('trackEnabled', localTrackEnabled);
-      self.removeListener('trackRemoved', localTrackRemoved);
+    _this._handleTrackSignalingEvents();
+    return _this;
+  }
 
-      log.info('LocalParticipant disconnected. Stopping ' +
-        self._tracksToStop.size + ' automatically-acquired LocalTracks');
-      self._tracksToStop.forEach(function(track) {
-        track.stop();
+  /**
+   * Get the {@link LocalTrack} events to re-emit.
+   * @private
+   * @returns {Array<Array<string>>} events
+   */
+
+
+  _createClass(LocalParticipant, [{
+    key: '_getTrackEvents',
+    value: function _getTrackEvents() {
+      return _get(LocalParticipant.prototype.__proto__ || Object.getPrototypeOf(LocalParticipant.prototype), '_getTrackEvents', this).call(this).concat([['disabled', 'trackDisabled'], ['enabled', 'trackEnabled'], ['stopped', 'trackStopped']]);
+    }
+  }, {
+    key: 'toString',
+    value: function toString() {
+      return '[LocalParticipant #' + this._instanceId + (this.sid ? ': ' + this.sid : '') + ']';
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_handleTrackSignalingEvents',
+    value: function _handleTrackSignalingEvents() {
+      var log = this._log;
+
+      if (this.state === 'disconnected') {
+        return;
+      }
+
+      var signaling = this._signaling;
+
+      function localTrackAdded(localTrack) {
+        signaling.addTrack(localTrack._trackSender, localTrack.name);
+        log.info('Added a new ' + util.trackClass(localTrack, true) + ':', localTrack.id);
+        log.debug(util.trackClass(localTrack, true) + ':', localTrack);
+      }
+
+      function localTrackDisabled(localTrack) {
+        var trackSignaling = signaling.tracks.get(localTrack.id);
+        trackSignaling.disable();
+        log.debug('Disabled the ' + util.trackClass(localTrack, true) + ':', localTrack.id);
+      }
+
+      function localTrackEnabled(localTrack) {
+        var trackSignaling = signaling.tracks.get(localTrack.id);
+        trackSignaling.enable();
+        log.debug('Enabled the ' + util.trackClass(localTrack, true) + ':', localTrack.id);
+      }
+
+      function localTrackRemoved(localTrack) {
+        signaling.removeTrack(localTrack._trackSender);
+        log.info('Removed a ' + util.trackClass(localTrack, true) + ':', localTrack.id);
+        log.debug(util.trackClass(localTrack, true) + ':', localTrack);
+      }
+
+      this.on('trackAdded', localTrackAdded);
+      this.on('trackDisabled', localTrackDisabled);
+      this.on('trackEnabled', localTrackEnabled);
+      this.on('trackRemoved', localTrackRemoved);
+
+      this.tracks.forEach(function (track) {
+        localTrackAdded(track);
+        this._getOrCreateLocalTrackPublication(track).catch(function () {
+          // Do nothing for now.
+        });
+      }, this);
+
+      var self = this;
+      signaling.on('stateChanged', function stateChanged(state) {
+        log.debug('Transitioned to state:', state);
+        if (state === 'disconnected') {
+          log.debug('Removing LocalTrack event listeners');
+          signaling.removeListener('stateChanged', stateChanged);
+          self.removeListener('trackAdded', localTrackAdded);
+          self.removeListener('trackDisabled', localTrackDisabled);
+          self.removeListener('trackEnabled', localTrackEnabled);
+          self.removeListener('trackRemoved', localTrackRemoved);
+
+          log.info('LocalParticipant disconnected. Stopping ' + self._tracksToStop.size + ' automatically-acquired LocalTracks');
+          self._tracksToStop.forEach(function (track) {
+            track.stop();
+          });
+        }
       });
     }
-  });
-};
 
-LocalParticipant.prototype._getOrCreateLocalTrackPublication = function _getOrCreateLocalTrackPublication(localTrack) {
-  var localTrackPublication = getTrackPublication(this.trackPublications, localTrack);
-  if (localTrackPublication) {
-    return localTrackPublication;
-  }
+    /**
+     * @private
+     */
 
-  var log = this._log;
-  var self = this;
+  }, {
+    key: '_getOrCreateLocalTrackPublication',
+    value: function _getOrCreateLocalTrackPublication(localTrack) {
+      var localTrackPublication = getTrackPublication(this.trackPublications, localTrack);
+      if (localTrackPublication) {
+        return localTrackPublication;
+      }
 
-  var trackSignaling = this._signaling.tracks.get(localTrack.id);
-  if (!trackSignaling) {
-    return Promise.reject(new Error('Unexpected error: The ' + localTrack
-      + ' cannot be published'));
-  }
+      var log = this._log;
+      var self = this;
 
-  function unpublish(publication) {
-    self.unpublishTrack(publication.track);
-  }
+      var trackSignaling = this._signaling.tracks.get(localTrack.id);
+      if (!trackSignaling) {
+        return Promise.reject(new Error('Unexpected error: The ' + localTrack + ' cannot be published'));
+      }
 
-  return new Promise(function(resolve, reject) {
-    function updated() {
-      var error = trackSignaling.error;
-      if (error) {
-        trackSignaling.removeListener('updated', updated);
-        log.warn('Failed to publish the ' + util.trackClass(localTrack, true) + ': ' + error.message);
-        self._removeTrack(localTrack);
-        setTimeout(function() {
-          self.emit('trackPublicationFailed', error, localTrack);
+      function unpublish(publication) {
+        self.unpublishTrack(publication.track);
+      }
+
+      return new Promise(function (resolve, reject) {
+        function updated() {
+          var error = trackSignaling.error;
+          if (error) {
+            trackSignaling.removeListener('updated', updated);
+            log.warn('Failed to publish the ' + util.trackClass(localTrack, true) + ': ' + error.message);
+            self._removeTrack(localTrack);
+            setTimeout(function () {
+              self.emit('trackPublicationFailed', error, localTrack);
+            });
+            reject(error);
+            return;
+          }
+
+          if (!self.tracks.has(localTrack.id)) {
+            trackSignaling.removeListener('updated', updated);
+            reject(new Error('The ' + localTrack + ' was unpublished'));
+            return;
+          }
+
+          var sid = trackSignaling.sid;
+          if (!sid) {
+            return;
+          }
+
+          trackSignaling.removeListener('updated', updated);
+
+          var options = {
+            log: log,
+            LocalAudioTrackPublication: self._LocalAudioTrackPublication,
+            LocalDataTrackPublication: self._LocalDataTrackPublication,
+            LocalVideoTrackPublication: self._LocalVideoTrackPublication
+          };
+
+          var publishedKindTracks = {
+            audio: self.audioTrackPublications,
+            video: self.videoTrackPublications,
+            data: self.dataTrackPublications
+          }[localTrack.kind];
+
+          localTrackPublication = getTrackPublication(self.trackPublications, localTrack);
+
+          if (!localTrackPublication) {
+            localTrackPublication = util.asLocalTrackPublication(localTrack, sid, unpublish, options);
+            self.trackPublications.set(sid, localTrackPublication);
+            publishedKindTracks.set(sid, localTrackPublication);
+            log.info('Created a new ' + util.trackClass(localTrack) + 'Publication:', sid);
+          }
+
+          if (self._signaling.state === 'connected') {
+            setTimeout(function () {
+              self.emit('trackPublished', localTrackPublication);
+            });
+          }
+          resolve(localTrackPublication);
+        }
+
+        trackSignaling.on('updated', updated);
+      });
+    }
+
+    /**
+     * Adds a {@link LocalTrack} to the {@link LocalParticipant}.
+     * @deprecated Use {@link LocalParticipant#publishTrack} instead
+     * @param {LocalTrack|MediaStreamTrack} track - The {@link LocalTrack} to add;
+     *   if a MediaStreamTrack is provided, and a corresponding {@link LocalTrack}
+     *   has not yet been added, this method will construct one
+     * @returns {?LocalTrack} - The {@link LocalTrack} if added, null if already
+     *   present
+     * @fires Participant#trackAdded
+     * @throws {TypeError}
+     */
+
+  }, {
+    key: 'addTrack',
+    value: function addTrack(track) {
+      this._log.deprecated('LocalParticipant#addTrack has been deprecated. ' + 'Use LocalParticipant#publishTrack instead.');
+      util.validateLocalTrack(track, {
+        LocalAudioTrack: this._LocalAudioTrack,
+        LocalDataTrack: this._LocalDataTrack,
+        LocalVideoTrack: this._LocalVideoTrack,
+        MediaStreamTrack: this._MediaStreamTrack
+      });
+      if (this.tracks.has(track.id)) {
+        return null;
+      }
+      this.publishTrack(track).catch(function () {
+        // Do nothing.
+      });
+      return this.tracks.get(track.id);
+    }
+
+    /**
+     * Adds multiple {@link LocalTrack}s to the {@link LocalParticipant}.
+     * @deprecated Use {@link LocalParticipant#publishTracks} instead
+     * @param {Array<LocalTrack|MediaStreamTrack>} tracks - The {@link LocalTrack}s
+     *   to add; for any MediaStreamTracks provided, if a corresponding
+     *   {@link LocalAudioTrack} or {@link LocalVideoTrack} has not yet been added,
+     *   this method will construct one
+     * @returns {Array<LocalTrack>} - The {@link LocalTrack}s that were successfully
+     *   added; if the {@link LocalParticipant} already has a {@link LocalTrack},
+     *   it won't be included in the Array
+     * @fires Participant#trackAdded
+     * @throws {TypeError}
+     */
+
+  }, {
+    key: 'addTracks',
+    value: function addTracks(tracks) {
+      this._log.deprecated('LocalParticipant#addTracks has been deprecated. ' + 'Use LocalParticipant#publishTracks instead.');
+      if (!Array.isArray(tracks)) {
+        // eslint-disable-next-line new-cap
+        throw E.INVALID_TYPE('tracks', 'Array of LocalAudioTrack, LocalVideoTrack, LocalDataTrack, or MediaStreamTrack');
+      }
+      tracks = tracks.filter(function (track) {
+        return !this.tracks.has(track.id);
+      }, this);
+      this.publishTracks(tracks).catch(function () {
+        // Do nothing.
+      });
+      return tracks.map(function (track) {
+        return this.tracks.get(track.id);
+      }, this);
+    }
+
+    /**
+     * Publishes a {@link LocalTrack} to the {@link Room}.
+     * @param {LocalTrack} localTrack - The {@link LocalTrack} to publish
+     * @returns {Promise<LocalTrackPublication>} - Resolves with the corresponding
+     *   {@link LocalTrackPublication} if successful
+     * @fires Participant#trackAdded
+    */ /**
+       * Publishes a MediaStreamTrack to the {@link Room}.
+       * @param {MediaStreamTrack} mediaStreamTrack - The MediaStreamTrack
+       *   to publish; if a corresponding {@link LocalAudioTrack} or
+       *   {@link LocalVideoTrack} has not yet been published, this method will
+       *   construct one
+       * @param {LocalTrackOptions} [options] - The {@link LocalTrackOptions} for
+       *   constructing the  MediaStreamTrack's corresponding {@link LocalAudioTrack}
+       *   or {@link LocalVideoTrack}
+       * @returns {Promise<LocalTrackPublication>} - Resolves with the corresponding
+       *   {@link LocalTrackPublication} if successful
+       * @fires Participant#trackAdded
+       * @example
+       * var Video = require('twilio-video');
+       *
+       * Video.connect(token, {
+       *   name: 'my-cool-room',
+       *   audio: true
+       * }).then(function(room) {
+       *   // Publish a video MediaStreamTrack with a custom name
+       *   return room.localParticipant.publishTrack(mediaStreamTrack, {
+       *     name: 'camera'
+       *   });
+       * }).then(function(publication) {
+       *   console.log('The LocalTrack "' + publication.trackName + '" was successfully published');
+       * });
+       */
+
+  }, {
+    key: 'publishTrack',
+    value: function publishTrack(localTrackOrMediaStreamTrack, options) {
+      var trackPublication = getTrackPublication(this.trackPublications, localTrackOrMediaStreamTrack);
+      if (trackPublication) {
+        return Promise.resolve(trackPublication);
+      }
+
+      options = Object.assign({
+        log: this._log,
+        LocalAudioTrack: this._LocalAudioTrack,
+        LocalDataTrack: this._LocalDataTrack,
+        LocalVideoTrack: this._LocalVideoTrack,
+        MediaStreamTrack: this._MediaStreamTrack
+      }, options);
+
+      var localTrack = void 0;
+      try {
+        localTrack = util.asLocalTrack(localTrackOrMediaStreamTrack, options);
+      } catch (error) {
+        return Promise.reject(error);
+      }
+
+      localTrack = this._addTrack(localTrack) || this.tracks.get(localTrack.id);
+      return this._getOrCreateLocalTrackPublication(localTrack);
+    }
+
+    /**
+     * Publishes multiple {@link LocalTrack}s to the {@link Room}.
+     * @param {Array<LocalTrack|MediaStreamTrack>} tracks - The {@link LocalTrack}s
+     *   to publish; for any MediaStreamTracks provided, if a corresponding
+     *   {@link LocalAudioTrack} or {@link LocalVideoTrack} has not yet been
+     *   published, this method will construct one
+     * @returns {Promise<Array<LocalTrackPublication>>} - The resulting
+     *   {@link LocalTrackPublication}s
+     * @fires Participant#trackAdded
+     * @throws {TypeError}
+     */
+
+  }, {
+    key: 'publishTracks',
+    value: function publishTracks(tracks) {
+      if (!Array.isArray(tracks)) {
+        // eslint-disable-next-line new-cap
+        throw E.INVALID_TYPE('tracks', 'Array of LocalAudioTrack, LocalVideoTrack, LocalDataTrack, or MediaStreamTrack');
+      }
+      return Promise.all(tracks.map(this.publishTrack, this));
+    }
+
+    /**
+     * Removes a {@link LocalTrack} from the {@link LocalParticipant}.
+     * @deprecated Use {@link LocalParticipant#unpublishTrack} instead
+     * @param {LocalTrack|MediaStreamTrack} track - The {@link LocalTrack}
+     *   to remove; if a MediaStreamTrack is provided, this method looks up the
+     *   corresponding {@link LocalAudioTrack} or {@link LocalVideoTrack} to remove
+     * @param {?boolean} [stop=true] - Whether or not to call
+     *   {@link LocalAudioTrack#stop} or {@link LocalVideoTrack#stop}
+     * @returns {?LocalTrack} - The {@link LocalTrack} removed, otherwise null
+     * @fires Participant#trackRemoved
+     * @throws {TypeError}
+    */
+
+  }, {
+    key: 'removeTrack',
+    value: function removeTrack(track, stop) {
+      this._log.deprecated('LocalParticipant#removeTrack has been deprecated. ' + 'Use LocalParticipant#unpublishTrack instead.');
+      var publication = this.unpublishTrack(track);
+      track = publication && publication.track;
+      stop = typeof stop === 'boolean' ? stop : true;
+      if (track && stop) {
+        track.stop();
+        this._log.info('Stopped LocalTrack:', track);
+      }
+      return track;
+    }
+
+    /**
+     * Removes multiple {@link LocalTrack}s from the {@link LocalParticipant}.
+     * @deprecated Use {@link LocalParticipant#unpublishTracks} instead
+     * @param {Array<LocalTrack|MediaStreamTrack>} tracks - The {@link LocalTrack}s
+     *   to remove; for any MediaStreamTracks provided, this method looks up the
+     *   corresponding {@link LocalAudioTrack} or {@link LocalVideoTrack} to remove
+     * @param {?boolean} [stop=true] - Whether or not to call
+     *   {@link LocalAudioTrack#stop} or {@link LocalVideoTrack#stop} on each
+     *   {@link LocalAudioTrack} or {@link LocalVideoTrack} that was successfully
+     *   removed
+     * @returns {Array<LocalTrack>} - The {@link LocalTrack}s that were successfully
+     *   removed
+     * @fires Participant#trackRemoved
+     * @throws {TypeError}
+     */
+
+  }, {
+    key: 'removeTracks',
+    value: function removeTracks(tracks, stop) {
+      this._log.deprecated('LocalParticipant#removeTracks has been deprecated. ' + 'Use LocalParticipant#unpublishTracks instead.');
+      stop = typeof stop === 'boolean' ? stop : true;
+      return this.unpublishTracks(tracks).map(function (publication) {
+        var track = publication.track;
+        if (stop) {
+          track.stop();
+        }
+        return track;
+      });
+    }
+
+    /**
+     * Set the {@link LocalParticipant}'s {@link EncodingParameters}.
+     * @param {?EncodingParameters} [encodingParameters] - The new
+     *   {@link EncodingParameters}; If null, then the bitrate limits are removed;
+     *   If not specified, then the existing bitrate limits are preserved
+     * @returns {this}
+     * @throws {TypeError}
+     */
+
+  }, {
+    key: 'setParameters',
+    value: function setParameters(encodingParameters) {
+      if (typeof encodingParameters !== 'undefined' && (typeof encodingParameters === 'undefined' ? 'undefined' : _typeof(encodingParameters)) !== 'object') {
+        // eslint-disable-next-line new-cap
+        throw E.INVALID_TYPE('encodingParameters', 'EncodingParameters, null or undefined');
+      }
+
+      if (encodingParameters) {
+        ['maxAudioBitrate', 'maxVideoBitrate'].forEach(function (prop) {
+          if (typeof encodingParameters[prop] !== 'undefined' && typeof encodingParameters[prop] !== 'number' && encodingParameters[prop] !== null) {
+            // eslint-disable-next-line new-cap
+            throw E.INVALID_TYPE('encodingParameters.' + prop, 'number, null or undefined');
+          }
         });
-        reject(error);
-        return;
+      } else if (encodingParameters === null) {
+        encodingParameters = { maxAudioBitrate: null, maxVideoBitrate: null };
       }
 
-      if (!self.tracks.has(localTrack.id)) {
-        trackSignaling.removeListener('updated', updated);
-        reject(new Error('The ' + localTrack + ' was unpublished'));
-        return;
+      this._signaling.setParameters(encodingParameters);
+      return this;
+    }
+
+    /**
+     * Stops publishing a {@link LocalTrack} to the {@link Room}.
+     * @param {LocalTrack|MediaStreamTrack} track - The {@link LocalTrack}
+     *   to stop publishing; if a MediaStreamTrack is provided, this method
+     *   looks up the corresponding {@link LocalAudioTrack} or
+     *   {@link LocalVideoTrack} to stop publishing
+     * @returns {?LocalTrackPublication} - The corresponding
+     *   {@link LocalTrackPublication} if the {@link LocalTrack} was previously
+     *   published, null otherwise
+     * @fires Participant#trackRemoved
+     * @throws {TypeError}
+    */
+
+  }, {
+    key: 'unpublishTrack',
+    value: function unpublishTrack(track) {
+      util.validateLocalTrack(track, {
+        LocalAudioTrack: this._LocalAudioTrack,
+        LocalDataTrack: this._LocalDataTrack,
+        LocalVideoTrack: this._LocalVideoTrack,
+        MediaStreamTrack: this._MediaStreamTrack
+      });
+
+      var localTrack = this.tracks.get(track.id);
+      if (!localTrack) {
+        return null;
       }
 
-      var sid = trackSignaling.sid;
-      if (!sid) {
-        return;
-      }
-
-      trackSignaling.removeListener('updated', updated);
-
-      var options = {
-        log: log,
-        LocalAudioTrackPublication: self._LocalAudioTrackPublication,
-        LocalDataTrackPublication: self._LocalDataTrackPublication,
-        LocalVideoTrackPublication: self._LocalVideoTrackPublication
-      };
+      var trackSignaling = this._signaling.tracks.get(localTrack.id);
+      trackSignaling.publishFailed(new Error('The ' + localTrack + ' was unpublished'));
 
       var publishedKindTracks = {
-        audio: self.audioTrackPublications,
-        video: self.videoTrackPublications,
-        data: self.dataTrackPublications
+        audio: this.audioTrackPublications,
+        video: this.videoTrackPublications,
+        data: this.dataTrackPublications
       }[localTrack.kind];
+      var localTrackPublication = getTrackPublication(this.trackPublications, localTrack);
 
-      localTrackPublication = getTrackPublication(self.trackPublications, localTrack);
-
-      if (!localTrackPublication) {
-        localTrackPublication = util.asLocalTrackPublication(localTrack, sid, unpublish, options);
-        self.trackPublications.set(sid, localTrackPublication);
-        publishedKindTracks.set(sid, localTrackPublication);
-        log.info('Created a new ' + util.trackClass(localTrack) + 'Publication:', sid);
+      if (localTrackPublication) {
+        publishedKindTracks.delete(localTrackPublication.trackSid);
+        this.trackPublications.delete(localTrackPublication.trackSid);
       }
 
-      if (self._signaling.state === 'connected') {
-        setTimeout(function() {
-          self.emit('trackPublished', localTrackPublication);
-        });
-      }
-      resolve(localTrackPublication);
+      this._removeTrack(localTrack);
+
+      return localTrackPublication;
     }
 
-    trackSignaling.on('updated', updated);
-  });
-};
+    /**
+     * Stops publishing multiple {@link LocalTrack}s to the {@link Room}.
+     * @param {Array<LocalTrack|MediaStreamTrack>} tracks - The {@link LocalTrack}s
+     *   to stop publishing; for any MediaStreamTracks provided, this method looks
+     *   up the corresponding {@link LocalAudioTrack} or {@link LocalVideoTrack} to
+     *   stop publishing
+     * @returns {Array<LocalTrackPublication>} - The corresponding
+     *   {@link LocalTrackPublication}s that were successfully unpublished
+     * @fires Participant#trackRemoved
+     * @throws {TypeError}
+     */
 
-/**
- * Adds a {@link LocalTrack} to the {@link LocalParticipant}.
- * @deprecated Use {@link LocalParticipant#publishTrack} instead
- * @param {LocalTrack|MediaStreamTrack} track - The {@link LocalTrack} to add;
- *   if a MediaStreamTrack is provided, and a corresponding {@link LocalTrack}
- *   has not yet been added, this method will construct one
- * @returns {?LocalTrack} - The {@link LocalTrack} if added, null if already
- *   present
- * @fires Participant#trackAdded
- * @throws {TypeError}
- */
-LocalParticipant.prototype.addTrack = function addTrack(track) {
-  this._log.deprecated('LocalParticipant#addTrack has been deprecated. '
-    + 'Use LocalParticipant#publishTrack instead.');
-  util.validateLocalTrack(track, {
-    LocalAudioTrack: this._LocalAudioTrack,
-    LocalDataTrack: this._LocalDataTrack,
-    LocalVideoTrack: this._LocalVideoTrack,
-    MediaStreamTrack: this._MediaStreamTrack
-  });
-  if (this.tracks.has(track.id)) {
-    return null;
-  }
-  this.publishTrack(track).catch(function() {
-    // Do nothing.
-  });
-  return this.tracks.get(track.id);
-};
+  }, {
+    key: 'unpublishTracks',
+    value: function unpublishTracks(tracks) {
+      var _this2 = this;
 
-/**
- * Adds multiple {@link LocalTrack}s to the {@link LocalParticipant}.
- * @deprecated Use {@link LocalParticipant#publishTracks} instead
- * @param {Array<LocalTrack|MediaStreamTrack>} tracks - The {@link LocalTrack}s
- *   to add; for any MediaStreamTracks provided, if a corresponding
- *   {@link LocalAudioTrack} or {@link LocalVideoTrack} has not yet been added,
- *   this method will construct one
- * @returns {Array<LocalTrack>} - The {@link LocalTrack}s that were successfully
- *   added; if the {@link LocalParticipant} already has a {@link LocalTrack},
- *   it won't be included in the Array
- * @fires Participant#trackAdded
- * @throws {TypeError}
- */
-LocalParticipant.prototype.addTracks = function addTracks(tracks) {
-  this._log.deprecated('LocalParticipant#addTracks has been deprecated. '
-    + 'Use LocalParticipant#publishTracks instead.');
-  if (!Array.isArray(tracks)) {
-    throw new E.INVALID_TYPE('tracks',
-      'Array of LocalAudioTrack, LocalVideoTrack, LocalDataTrack, or MediaStreamTrack');
-  }
-  tracks = tracks.filter(function(track) {
-    return !this.tracks.has(track.id);
-  }, this);
-  this.publishTracks(tracks).catch(function() {
-    // Do nothing.
-  });
-  return tracks.map(function(track) {
-    return this.tracks.get(track.id);
-  }, this);
-};
-
-/**
- * Publishes a {@link LocalTrack} to the {@link Room}.
- * @param {LocalTrack} localTrack - The {@link LocalTrack} to publish
- * @returns {Promise<LocalTrackPublication>} - Resolves with the corresponding
- *   {@link LocalTrackPublication} if successful
- * @fires Participant#trackAdded
-*//**
- * Publishes a MediaStreamTrack to the {@link Room}.
- * @param {MediaStreamTrack} mediaStreamTrack - The MediaStreamTrack
- *   to publish; if a corresponding {@link LocalAudioTrack} or
- *   {@link LocalVideoTrack} has not yet been published, this method will
- *   construct one
- * @param {LocalTrackOptions} [options] - The {@link LocalTrackOptions} for
- *   constructing the  MediaStreamTrack's corresponding {@link LocalAudioTrack}
- *   or {@link LocalVideoTrack}
- * @returns {Promise<LocalTrackPublication>} - Resolves with the corresponding
- *   {@link LocalTrackPublication} if successful
- * @fires Participant#trackAdded
- * @example
- * var Video = require('twilio-video');
- *
- * Video.connect(token, {
- *   name: 'my-cool-room',
- *   audio: true
- * }).then(function(room) {
- *   // Publish a video MediaStreamTrack with a custom name
- *   return room.localParticipant.publishTrack(mediaStreamTrack, {
- *     name: 'camera'
- *   });
- * }).then(function(publication) {
- *   console.log('The LocalTrack "' + publication.trackName + '" was successfully published');
- * });
- */
-LocalParticipant.prototype.publishTrack = function publishTrack(localTrackOrMediaStreamTrack, options) {
-  var trackPublication = getTrackPublication(this.trackPublications, localTrackOrMediaStreamTrack);
-  if (trackPublication) {
-    return Promise.resolve(trackPublication);
-  }
-
-  options = Object.assign({
-    log: this._log,
-    LocalAudioTrack: this._LocalAudioTrack,
-    LocalDataTrack: this._LocalDataTrack,
-    LocalVideoTrack: this._LocalVideoTrack,
-    MediaStreamTrack: this._MediaStreamTrack
-  }, options);
-
-  var localTrack;
-  try {
-    localTrack = util.asLocalTrack(localTrackOrMediaStreamTrack, options);
-  } catch (error) {
-    return Promise.reject(error);
-  }
-
-  localTrack = this._addTrack(localTrack) || this.tracks.get(localTrack.id);
-  return this._getOrCreateLocalTrackPublication(localTrack);
-};
-
-/**
- * Publishes multiple {@link LocalTrack}s to the {@link Room}.
- * @param {Array<LocalTrack|MediaStreamTrack>} tracks - The {@link LocalTrack}s
- *   to publish; for any MediaStreamTracks provided, if a corresponding
- *   {@link LocalAudioTrack} or {@link LocalVideoTrack} has not yet been
- *   published, this method will construct one
- * @returns {Promise<Array<LocalTrackPublication>>} - The resulting
- *   {@link LocalTrackPublication}s
- * @fires Participant#trackAdded
- * @throws {TypeError}
- */
-LocalParticipant.prototype.publishTracks = function publishTracks(tracks) {
-  if (!Array.isArray(tracks)) {
-    throw new E.INVALID_TYPE('tracks',
-      'Array of LocalAudioTrack, LocalVideoTrack, LocalDataTrack, or MediaStreamTrack');
-  }
-  return Promise.all(tracks.map(this.publishTrack, this));
-};
-
-/**
- * Removes a {@link LocalTrack} from the {@link LocalParticipant}.
- * @deprecated Use {@link LocalParticipant#unpublishTrack} instead
- * @param {LocalTrack|MediaStreamTrack} track - The {@link LocalTrack}
- *   to remove; if a MediaStreamTrack is provided, this method looks up the
- *   corresponding {@link LocalAudioTrack} or {@link LocalVideoTrack} to remove
- * @param {?boolean} [stop=true] - Whether or not to call
- *   {@link LocalAudioTrack#stop} or {@link LocalVideoTrack#stop}
- * @returns {?LocalTrack} - The {@link LocalTrack} removed, otherwise null
- * @fires Participant#trackRemoved
- * @throws {TypeError}
-*/
-LocalParticipant.prototype.removeTrack = function removeTrack(track, stop) {
-  this._log.deprecated('LocalParticipant#removeTrack has been deprecated. '
-    + 'Use LocalParticipant#unpublishTrack instead.');
-  var publication = this.unpublishTrack(track);
-  track = publication && publication.track;
-  stop = typeof stop === 'boolean' ? stop : true;
-  if (track && stop) {
-    track.stop();
-    this._log.info('Stopped LocalTrack:', track);
-  }
-  return track;
-};
-
-/**
- * Removes multiple {@link LocalTrack}s from the {@link LocalParticipant}.
- * @deprecated Use {@link LocalParticipant#unpublishTracks} instead
- * @param {Array<LocalTrack|MediaStreamTrack>} tracks - The {@link LocalTrack}s
- *   to remove; for any MediaStreamTracks provided, this method looks up the
- *   corresponding {@link LocalAudioTrack} or {@link LocalVideoTrack} to remove
- * @param {?boolean} [stop=true] - Whether or not to call
- *   {@link LocalAudioTrack#stop} or {@link LocalVideoTrack#stop} on each
- *   {@link LocalAudioTrack} or {@link LocalVideoTrack} that was successfully
- *   removed
- * @returns {Array<LocalTrack>} - The {@link LocalTrack}s that were successfully
- *   removed
- * @fires Participant#trackRemoved
- * @throws {TypeError}
- */
-LocalParticipant.prototype.removeTracks = function removeTracks(tracks, stop) {
-  this._log.deprecated('LocalParticipant#removeTracks has been deprecated. '
-    + 'Use LocalParticipant#unpublishTracks instead.');
-  stop = typeof stop === 'boolean' ? stop : true;
-  return this.unpublishTracks(tracks).map(function(publication) {
-    var track = publication.track;
-    if (stop) {
-      track.stop();
-    }
-    return track;
-  });
-};
-
-
-/**
- * Set the {@link LocalParticipant}'s {@link EncodingParameters}.
- * @param {?EncodingParameters} [encodingParameters] - The new
- *   {@link EncodingParameters}; If null, then the bitrate limits are removed;
- *   If not specified, then the existing bitrate limits are preserved
- * @returns {this}
- * @throws {TypeError}
- */
-LocalParticipant.prototype.setParameters = function setParameters(encodingParameters) {
-  if (typeof encodingParameters !== 'undefined'
-    && typeof encodingParameters !== 'object') {
-    throw new E.INVALID_TYPE('encodingParameters',
-      'EncodingParameters, null or undefined');
-  }
-
-  if (encodingParameters) {
-    ['maxAudioBitrate', 'maxVideoBitrate'].forEach(function(prop) {
-      if (typeof encodingParameters[prop] !== 'undefined'
-        && typeof encodingParameters[prop] !== 'number'
-        && encodingParameters[prop] !== null) {
-        throw new E.INVALID_TYPE('encodingParameters.' + prop, 'number, null or undefined');
+      if (!Array.isArray(tracks)) {
+        // eslint-disable-next-line new-cap
+        throw E.INVALID_TYPE('tracks', 'Array of LocalAudioTrack, LocalVideoTrack, LocalDataTrack, or MediaStreamTrack');
       }
-    });
-  } else if (encodingParameters === null) {
-    encodingParameters = { maxAudioBitrate: null, maxVideoBitrate: null };
-  }
 
-  this._signaling.setParameters(encodingParameters);
-  return this;
-};
+      return tracks.reduce(function (unpublishedTracks, track) {
+        var unpublishedTrack = _this2.unpublishTrack(track);
+        return unpublishedTrack ? unpublishedTracks.concat(unpublishedTrack) : unpublishedTracks;
+      }, []);
+    }
+  }]);
 
-/**
- * Stops publishing a {@link LocalTrack} to the {@link Room}.
- * @param {LocalTrack|MediaStreamTrack} track - The {@link LocalTrack}
- *   to stop publishing; if a MediaStreamTrack is provided, this method
- *   looks up the corresponding {@link LocalAudioTrack} or
- *   {@link LocalVideoTrack} to stop publishing
- * @returns {?LocalTrackPublication} - The corresponding
- *   {@link LocalTrackPublication} if the {@link LocalTrack} was previously
- *   published, null otherwise
- * @fires Participant#trackRemoved
- * @throws {TypeError}
-*/
-LocalParticipant.prototype.unpublishTrack = function unpublishTrack(track) {
-  util.validateLocalTrack(track, {
-    LocalAudioTrack: this._LocalAudioTrack,
-    LocalDataTrack: this._LocalDataTrack,
-    LocalVideoTrack: this._LocalVideoTrack,
-    MediaStreamTrack: this._MediaStreamTrack
-  });
-
-  var localTrack = this.tracks.get(track.id);
-  if (!localTrack) {
-    return null;
-  }
-
-  var trackSignaling = this._signaling.tracks.get(localTrack.id);
-  trackSignaling.publishFailed(new Error('The ' + localTrack + ' was unpublished'));
-
-  var publishedKindTracks = {
-    audio: this.audioTrackPublications,
-    video: this.videoTrackPublications,
-    data: this.dataTrackPublications
-  }[localTrack.kind];
-  var localTrackPublication = getTrackPublication(this.trackPublications, localTrack);
-
-  if (localTrackPublication) {
-    publishedKindTracks.delete(localTrackPublication.trackSid);
-    this.trackPublications.delete(localTrackPublication.trackSid);
-  }
-
-  this._removeTrack(localTrack);
-
-  return localTrackPublication;
-};
-
-/**
- * Stops publishing multiple {@link LocalTrack}s to the {@link Room}.
- * @param {Array<LocalTrack|MediaStreamTrack>} tracks - The {@link LocalTrack}s
- *   to stop publishing; for any MediaStreamTracks provided, this method looks
- *   up the corresponding {@link LocalAudioTrack} or {@link LocalVideoTrack} to
- *   stop publishing
- * @returns {Array<LocalTrackPublication>} - The corresponding
- *   {@link LocalTrackPublication}s that were successfully unpublished
- * @fires Participant#trackRemoved
- * @throws {TypeError}
- */
-LocalParticipant.prototype.unpublishTracks = function unpublishTracks(tracks) {
-  if (!Array.isArray(tracks)) {
-    throw new E.INVALID_TYPE('tracks',
-      'Array of LocalAudioTrack, LocalVideoTrack, LocalDataTrack, or MediaStreamTrack');
-  }
-
-  var self = this;
-  return tracks.reduce(function(unpublishedTracks, track) {
-    var unpublishedTrack = self.unpublishTrack(track);
-    return unpublishedTrack ? unpublishedTracks.concat(unpublishedTrack) : unpublishedTracks;
-  }, []);
-};
+  return LocalParticipant;
+}(Participant);
 
 /**
  * A {@link LocalTrack} was added by the {@link LocalParticipant}.
@@ -16677,28 +16505,33 @@ LocalParticipant.prototype.unpublishTracks = function unpublishTracks(tracks) {
  * @param {LocalTrack|MediaStreamTrack} track
  * @returns {LocalTrackPublication?} trackPublication
  */
+
+
 function getTrackPublication(trackPublications, track) {
-  return Array.from(trackPublications.values()).find(function(trackPublication) {
-    return trackPublication.track === track
-      || trackPublication.track.mediaStreamTrack === track;
+  return Array.from(trackPublications.values()).find(function (trackPublication) {
+    return trackPublication.track === track || trackPublication.track.mediaStreamTrack === track;
   }) || null;
 }
 
 module.exports = LocalParticipant;
-
-},{"./media/track/localaudiotrack":71,"./media/track/localaudiotrackpublication":72,"./media/track/localdatatrack":73,"./media/track/localdatatrackpublication":74,"./media/track/localvideotrack":77,"./media/track/localvideotrackpublication":78,"./participant":89,"./util":129,"./util/constants":127,"@twilio/webrtc":37,"util":149}],69:[function(require,module,exports){
+},{"./media/track/es5/localaudiotrack":69,"./media/track/es5/localdatatrack":70,"./media/track/es5/localvideotrack":71,"./media/track/localaudiotrackpublication":74,"./media/track/localdatatrackpublication":76,"./media/track/localvideotrackpublication":80,"./participant":91,"./util":131,"./util/constants":129,"@twilio/webrtc":37}],68:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var MediaTrack = require('./mediatrack');
 
 /**
- * Construct an {@link AudioTrack}.
- * @class
- * @classdesc An {@link AudioTrack} is a {@link Track} representing audio.
+ * An {@link AudioTrack} is a {@link Track} representing audio.
  * @extends Track
- * @param {MediaTrackTransceiver} mediaTrackTransceiver
- * @param {{log: Log}} options
  * @property {boolean} isStarted - Whether or not the {@link AudioTrack} has
  *   started; if the {@link AudioTrack} started, there is enough audio data to
  *   begin playback
@@ -16706,110 +16539,128 @@ var MediaTrack = require('./mediatrack');
  *   enabled; if the {@link AudioTrack} is not enabled, it is "muted"
  * @property {Track.Kind} kind - "audio"
  * @property {MediaStreamTrack} mediaStreamTrack - An audio MediaStreamTrack
- * @fires AudioTrack#disabled
- * @fires AudioTrack#enabled
- * @fires AudioTrack#started
+ * @emits AudioTrack#disabled
+ * @emits AudioTrack#enabled
+ * @emits AudioTrack#started
  */
-function AudioTrack(mediaTrackTransceiver, options) {
-  MediaTrack.call(this, mediaTrackTransceiver, options);
-}
 
-inherits(AudioTrack, MediaTrack);
+var AudioTrack = function (_MediaTrack) {
+  _inherits(AudioTrack, _MediaTrack);
 
-/**
- * Create an HTMLAudioElement and attach the {@link AudioTrack} to it.
- *
- * The HTMLAudioElement's <code>srcObject</code> will be set to a new
- * MediaStream containing the {@link AudioTrack}'s MediaStreamTrack.
- *
- * @method
- * @returns {HTMLAudioElement} audioElement
- * @example
- * const Video = require('twilio-video');
- *
- * Video.createLocalAudioTrack().then(function(audioTrack) {
- *   const audioElement = audioTrack.attach();
- *   document.body.appendChild(audioElement);
- * });
-*//**
- * Attach the {@link AudioTrack} to an existing HTMLMediaElement. The
- * HTMLMediaElement could be an HTMLAudioElement or an HTMLVideoElement.
- *
- * If the HTMLMediaElement's <code>srcObject</code> is not set to a MediaStream,
- * this method sets it to a new MediaStream containing the {@link AudioTrack}'s
- * MediaStreamTrack; otherwise, it adds the {@link MediaTrack}'s
- * MediaStreamTrack to the existing MediaStream. Finally, if there are any other
- * MediaStreamTracks of the same kind on the MediaStream, this method removes
- * them.
- *
- * @method
- * @param {HTMLMediaElement} mediaElement - The HTMLMediaElement to attach to
- * @returns {HTMLMediaElement} mediaElement
- * @example
- * const Video = require('twilio-video');
- *
- * const videoElement = document.createElement('video');
- * document.body.appendChild(videoElement);
- *
- * Video.createLocalAudioTrack().then(function(audioTrack) {
- *   audioTrack.attach(videoElement);
- * });
-*//**
- * Attach the {@link AudioTrack} to an HTMLMediaElement selected by
- * <code>document.querySelector</code>. The HTMLMediaElement could be an
- * HTMLAudioElement or an HTMLVideoElement.
- *
- * If the HTMLMediaElement's <code>srcObject</code> is not set to a MediaStream,
- * this method sets it to a new MediaStream containing the {@link AudioTrack}'s
- * MediaStreamTrack; otherwise, it adds the {@link AudioTrack}'s
- * MediaStreamTrack to the existing MediaStream. Finally, if there are any other
- * MediaStreamTracks of the same kind on the MediaStream, this method removes
- * them.
- *
- * @method
- * @param {string} selector - A query selector for the HTMLMediaElement to
- *   attach to
- * @returns {HTMLMediaElement} mediaElement
- * @example
- * const Video = require('twilio-video');
- *
- * const videoElement = document.createElement('video');
- * videoElement.id = 'my-video-element';
- * document.body.appendChild(videoElement);
- *
- * Video.createLocalAudioTrack().then(function(track) {
- *   track.attach('#my-video-element');
- * });
- */
-AudioTrack.prototype.attach = MediaTrack.prototype.attach;
+  /**
+   * Construct an {@link AudioTrack}.
+   * @param {MediaTrackTransceiver} mediaTrackTransceiver
+   * @param {{log: Log}} options
+   */
+  function AudioTrack(mediaTrackTransceiver, options) {
+    _classCallCheck(this, AudioTrack);
 
-/**
- * Detach the {@link AudioTrack} from all previously attached HTMLMediaElements.
- * @method
- * @returns {Array<HTMLMediaElement>} mediaElements
- * @example
- * const mediaElements = audioTrack.detach();
- * mediaElements.forEach(mediaElement => mediaElement.remove());
-*//**
- * Detach the {@link AudioTrack} from a previously attached HTMLMediaElement.
- * @method
- * @param {HTMLMediaElement} mediaElement - One of the HTMLMediaElements to
- *   which the {@link AudioTrack} is attached
- * @returns {HTMLMediaElement} mediaElement
- * @example
- * const videoElement = document.getElementById('my-video-element');
- * audioTrack.detach(videoElement).remove();
-*//**
- * Detach the {@link AudioTrack} from a previously attached HTMLMediaElement
- *   specified by <code>document.querySelector</code>.
- * @method
- * @param {string} selector - The query selector of HTMLMediaElement to which
- *    the {@link AudioTrack} is attached
- * @returns {HTMLMediaElement} mediaElement
- * @example
- * audioTrack.detach('#my-video-element').remove();
- */
-AudioTrack.prototype.detach = MediaTrack.prototype.detach;
+    return _possibleConstructorReturn(this, (AudioTrack.__proto__ || Object.getPrototypeOf(AudioTrack)).call(this, mediaTrackTransceiver, options));
+  }
+
+  /**
+   * Create an HTMLAudioElement and attach the {@link AudioTrack} to it.
+   *
+   * The HTMLAudioElement's <code>srcObject</code> will be set to a new
+   * MediaStream containing the {@link AudioTrack}'s MediaStreamTrack.
+   *
+   * @returns {HTMLAudioElement} audioElement
+   * @example
+   * const Video = require('twilio-video');
+   *
+   * Video.createLocalAudioTrack().then(function(audioTrack) {
+   *   const audioElement = audioTrack.attach();
+   *   document.body.appendChild(audioElement);
+   * });
+  */ /**
+     * Attach the {@link AudioTrack} to an existing HTMLMediaElement. The
+     * HTMLMediaElement could be an HTMLAudioElement or an HTMLVideoElement.
+     *
+     * If the HTMLMediaElement's <code>srcObject</code> is not set to a MediaStream,
+     * this method sets it to a new MediaStream containing the {@link AudioTrack}'s
+     * MediaStreamTrack; otherwise, it adds the {@link MediaTrack}'s
+     * MediaStreamTrack to the existing MediaStream. Finally, if there are any other
+     * MediaStreamTracks of the same kind on the MediaStream, this method removes
+     * them.
+     *
+     * @param {HTMLMediaElement} mediaElement - The HTMLMediaElement to attach to
+     * @returns {HTMLMediaElement} mediaElement
+     * @example
+     * const Video = require('twilio-video');
+     *
+     * const videoElement = document.createElement('video');
+     * document.body.appendChild(videoElement);
+     *
+     * Video.createLocalAudioTrack().then(function(audioTrack) {
+     *   audioTrack.attach(videoElement);
+     * });
+     */ /**
+        * Attach the {@link AudioTrack} to an HTMLMediaElement selected by
+        * <code>document.querySelector</code>. The HTMLMediaElement could be an
+        * HTMLAudioElement or an HTMLVideoElement.
+        *
+        * If the HTMLMediaElement's <code>srcObject</code> is not set to a MediaStream,
+        * this method sets it to a new MediaStream containing the {@link AudioTrack}'s
+        * MediaStreamTrack; otherwise, it adds the {@link AudioTrack}'s
+        * MediaStreamTrack to the existing MediaStream. Finally, if there are any other
+        * MediaStreamTracks of the same kind on the MediaStream, this method removes
+        * them.
+        *
+        * @param {string} selector - A query selector for the HTMLMediaElement to
+        *   attach to
+        * @returns {HTMLMediaElement} mediaElement
+        * @example
+        * const Video = require('twilio-video');
+        *
+        * const videoElement = document.createElement('video');
+        * videoElement.id = 'my-video-element';
+        * document.body.appendChild(videoElement);
+        *
+        * Video.createLocalAudioTrack().then(function(track) {
+        *   track.attach('#my-video-element');
+        * });
+        */
+
+
+  _createClass(AudioTrack, [{
+    key: 'attach',
+    value: function attach() {
+      return _get(AudioTrack.prototype.__proto__ || Object.getPrototypeOf(AudioTrack.prototype), 'attach', this).apply(this, arguments);
+    }
+
+    /**
+     * Detach the {@link AudioTrack} from all previously attached HTMLMediaElements.
+     * @returns {Array<HTMLMediaElement>} mediaElements
+     * @example
+     * const mediaElements = audioTrack.detach();
+     * mediaElements.forEach(mediaElement => mediaElement.remove());
+    */ /**
+       * Detach the {@link AudioTrack} from a previously attached HTMLMediaElement.
+       * @param {HTMLMediaElement} mediaElement - One of the HTMLMediaElements to
+       *   which the {@link AudioTrack} is attached
+       * @returns {HTMLMediaElement} mediaElement
+       * @example
+       * const videoElement = document.getElementById('my-video-element');
+       * audioTrack.detach(videoElement).remove();
+       */ /**
+          * Detach the {@link AudioTrack} from a previously attached HTMLMediaElement
+          *   specified by <code>document.querySelector</code>.
+          * @param {string} selector - The query selector of HTMLMediaElement to which
+          *    the {@link AudioTrack} is attached
+          * @returns {HTMLMediaElement} mediaElement
+          * @example
+          * audioTrack.detach('#my-video-element').remove();
+          */
+
+  }, {
+    key: 'detach',
+    value: function detach() {
+      return _get(AudioTrack.prototype.__proto__ || Object.getPrototypeOf(AudioTrack.prototype), 'detach', this).apply(this, arguments);
+    }
+  }]);
+
+  return AudioTrack;
+}(MediaTrack);
 
 /**
  * The {@link AudioTrack} was disabled, i.e. "muted".
@@ -16831,57 +16682,137 @@ AudioTrack.prototype.detach = MediaTrack.prototype.detach;
  */
 
 module.exports = AudioTrack;
-
-},{"./mediatrack":79,"util":149}],70:[function(require,module,exports){
+},{"./mediatrack":81}],69:[function(require,module,exports){
+// TODO(mroberts): Remove this when we go to the next major version. This is
+// only in place so that we can support ES6 classes without requiring `new`.
 'use strict';
 
+var _require = require('util'),
+    inherits = _require.inherits;
+
+var LocalAudioTrackClass = require('../localaudiotrack');
+
+function LocalAudioTrack(mediaStreamTrack, options) {
+  var track = new LocalAudioTrackClass(mediaStreamTrack, options);
+  Object.setPrototypeOf(track, LocalAudioTrack.prototype);
+  return track;
+}
+
+inherits(LocalAudioTrack, LocalAudioTrackClass);
+
+module.exports = LocalAudioTrack;
+},{"../localaudiotrack":73,"util":151}],70:[function(require,module,exports){
+// TODO(mroberts): Remove this when we go to the next major version. This is
+// only in place so that we can support ES6 classes without requiring `new`.
+'use strict';
+
+var _require = require('util'),
+    inherits = _require.inherits;
+
+var LocalDataTrackClass = require('../localdatatrack');
+
+function LocalDataTrack(options) {
+  var track = new LocalDataTrackClass(options);
+  Object.setPrototypeOf(track, LocalDataTrack.prototype);
+  return track;
+}
+
+inherits(LocalDataTrack, LocalDataTrackClass);
+
+module.exports = LocalDataTrack;
+},{"../localdatatrack":75,"util":151}],71:[function(require,module,exports){
+// TODO(mroberts): Remove this when we go to the next major version. This is
+// only in place so that we can support ES6 classes without requiring `new`.
+'use strict';
+
+var _require = require('util'),
+    inherits = _require.inherits;
+
+var LocalVideoTrackClass = require('../localvideotrack');
+
+function LocalVideoTrack(mediaStreamTrack, options) {
+  var track = new LocalVideoTrackClass(mediaStreamTrack, options);
+  Object.setPrototypeOf(track, LocalVideoTrack.prototype);
+  return track;
+}
+
+inherits(LocalVideoTrack, LocalVideoTrackClass);
+
+module.exports = LocalVideoTrack;
+},{"../localvideotrack":79,"util":151}],72:[function(require,module,exports){
+'use strict';
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var EventEmitter = require('events').EventEmitter;
-var inherits = require('util').inherits;
+var buildLogLevels = require('../../util').buildLogLevels;
+var DEFAULT_LOG_LEVEL = require('../../util/constants').DEFAULT_LOG_LEVEL;
+var Log = require('../../util/log');
+
 var nInstances = 0;
 
 /**
- * Construct a {@link Track}.
- * @class
- * @classdesc A {@link Track} represents a stream of audio, video, or data.
- * @param {Track.ID} id - The {@link Track}'s ID
- * @param {Track.Kind} kind - The {@link Track}'s kind
- * @param {{ log: Log, name: ?string }} options
+ * A {@link Track} represents a stream of audio, video, or data.
+ * @extends EventEmitter
  * @property {Track.ID} id - The {@link Track}'s ID
  * @property {Track.Kind} kind - The {@link Track}'s kind
  * @property {string} name - The {@link Track}'s name
  */
-function Track(id, kind, options) {
-  options = Object.assign({
-    name: id
-  }, options);
 
-  EventEmitter.call(this);
+var Track = function (_EventEmitter) {
+  _inherits(Track, _EventEmitter);
 
-  var name = String(options.name);
+  /**
+   * Construct a {@link Track}.
+   * @param {Track.ID} id - The {@link Track}'s ID
+   * @param {Track.Kind} kind - The {@link Track}'s kind
+   * @param {{ log: Log, name: ?string }} options
+   */
+  function Track(id, kind, options) {
+    _classCallCheck(this, Track);
 
-  Object.defineProperties(this, {
-    _instanceId: {
-      value: ++nInstances
-    },
-    _log: {
-      value: options.log.createLog('media', this)
-    },
-    id: {
-      enumerable: true,
-      value: id
-    },
-    kind: {
-      enumerable: true,
-      value: kind
-    },
-    name: {
-      enumerable: true,
-      value: name
-    }
-  });
-}
+    options = Object.assign({
+      name: id,
+      log: null,
+      logLevel: DEFAULT_LOG_LEVEL
+    }, options);
 
-inherits(Track, EventEmitter);
+    var _this = _possibleConstructorReturn(this, (Track.__proto__ || Object.getPrototypeOf(Track)).call(this));
+
+    var name = String(options.name);
+
+    var logLevels = buildLogLevels(options.logLevel);
+    var log = options.log ? options.log.createLog('media', _this) : new Log('media', _this, logLevels);
+
+    Object.defineProperties(_this, {
+      _instanceId: {
+        value: ++nInstances
+      },
+      _log: {
+        value: log
+      },
+      id: {
+        enumerable: true,
+        value: id
+      },
+      kind: {
+        enumerable: true,
+        value: kind
+      },
+      name: {
+        enumerable: true,
+        value: name
+      }
+    });
+    return _this;
+  }
+
+  return Track;
+}(EventEmitter);
 
 /**
  * The {@link Track} ID is a string identifier for the {@link Track}.
@@ -16931,85 +16862,124 @@ inherits(Track, EventEmitter);
  */
 
 module.exports = Track;
-
-},{"events":54,"util":149}],71:[function(require,module,exports){
+},{"../../util":131,"../../util/constants":129,"../../util/log":134,"events":152}],73:[function(require,module,exports){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var AudioTrack = require('./audiotrack');
-var inherits = require('util').inherits;
-var LocalMediaTrack = require('./localmediatrack');
+var mixinLocalMediaTrack = require('./localmediatrack');
+
+var LocalMediaAudioTrack = mixinLocalMediaTrack(AudioTrack);
 
 /**
- * Construct a {@link LocalAudioTrack} from a MediaStreamTrack.
- * @class
- * @classdesc A {@link LocalAudioTrack} is an {@link AudioTrack} representing
- *   audio that your {@link LocalParticipant} can publish to a {@link Room}. It
- *   can be enabled and disabled with {@link LocalAudioTrack#enable} and
- *   {@link LocalAudioTrack#disable} or stopped completely with
- *   {@link LocalAudioTrack#stop}.
- * @extends {AudioTrack}
- * @param {MediaStreamTrack} mediaStreamTrack - An audio MediaStreamTrack
- * @param {LocalTrackOptions} [options] - {@link LocalTrack} options
+ * A {@link LocalAudioTrack} is an {@link AudioTrack} representing audio that
+ * your {@link LocalParticipant} can publish to a {@link Room}. It can be
+ * enabled and disabled with {@link LocalAudioTrack#enable} and
+ * {@link LocalAudioTrack#disable} or stopped completely with
+ * {@link LocalAudioTrack#stop}.
+ * @extends AudioTrack
  * @property {boolean} isStopped - Whether or not the {@link LocalAudioTrack} is
  *   stopped
- * @fires LocalAudioTrack#disabled
- * @fires LocalAudioTrack#enabled
- * @fires LocalAudioTrack#started
- * @fires LocalAudioTrack#stopped
+ * @emits LocalAudioTrack#disabled
+ * @emits LocalAudioTrack#enabled
+ * @emits LocalAudioTrack#started
+ * @emits LocalAudioTrack#stopped
  */
-function LocalAudioTrack(mediaStreamTrack, options) {
-  if (!(this instanceof LocalAudioTrack)) {
-    return new LocalAudioTrack(mediaStreamTrack, options);
+
+var LocalAudioTrack = function (_LocalMediaAudioTrack) {
+  _inherits(LocalAudioTrack, _LocalMediaAudioTrack);
+
+  /**
+   * Construct a {@link LocalAudioTrack} from a MediaStreamTrack.
+   * @param {MediaStreamTrack} mediaStreamTrack - An audio MediaStreamTrack
+   * @param {LocalTrackOptions} [options] - {@link LocalTrack} options
+   */
+  function LocalAudioTrack(mediaStreamTrack, options) {
+    _classCallCheck(this, LocalAudioTrack);
+
+    return _possibleConstructorReturn(this, (LocalAudioTrack.__proto__ || Object.getPrototypeOf(LocalAudioTrack)).call(this, mediaStreamTrack, options));
   }
-  LocalMediaTrack.call(this, AudioTrack, mediaStreamTrack, options);
-}
 
-inherits(LocalAudioTrack, AudioTrack);
+  _createClass(LocalAudioTrack, [{
+    key: 'toString',
+    value: function toString() {
+      return '[LocalAudioTrack #' + this._instanceId + ': ' + this.id + ']';
+    }
+  }, {
+    key: 'attach',
+    value: function attach(el) {
+      el = _get(LocalAudioTrack.prototype.__proto__ || Object.getPrototypeOf(LocalAudioTrack.prototype), 'attach', this).call(this, el);
+      el.muted = true;
+      return el;
+    }
 
-LocalAudioTrack.prototype._end = LocalMediaTrack.prototype._end;
+    /**
+     * @private
+     */
 
-LocalAudioTrack.prototype.toString = function toString() {
-  return '[LocalAudioTrack #' + this._instanceId + ': ' + this.id + ']';
-};
+  }, {
+    key: '_end',
+    value: function _end() {
+      return _get(LocalAudioTrack.prototype.__proto__ || Object.getPrototypeOf(LocalAudioTrack.prototype), '_end', this).apply(this, arguments);
+    }
 
-LocalAudioTrack.prototype.attach = function attach(el) {
-  el = AudioTrack.prototype.attach.call(this, el);
-  el.muted = true;
-  return el;
-};
+    /**
+     * Disable the {@link LocalAudioTrack}. This is effectively "mute".
+     * @returns {this}
+     * @fires LocalAudioTrack#disabled
+     */
 
-/**
- * Disable the {@link LocalAudioTrack}. This is effectively "mute".
- * @method
- * @returns {this}
- * @fires LocalAudioTrack#disabled
- */
-LocalAudioTrack.prototype.disable = LocalMediaTrack.prototype.disable;
+  }, {
+    key: 'disable',
+    value: function disable() {
+      return _get(LocalAudioTrack.prototype.__proto__ || Object.getPrototypeOf(LocalAudioTrack.prototype), 'disable', this).apply(this, arguments);
+    }
 
-/**
- * Enable the {@link LocalAudioTrack}. This is effectively "unmute".
- * @method
- * @returns {this}
- * @fires LocalAudioTrack#enabled
-*//**
- * Enable or disable the {@link LocalAudioTrack}. This is effectively "unmute"
- * or "mute".
- * @method
- * @param {boolean} [enabled] - Specify false to mute the
- *   {@link LocalAudioTrack}
- * @returns {this}
- * @fires LocalAudioTrack#disabled
- * @fires LocalAudioTrack#enabled
- */
-LocalAudioTrack.prototype.enable = LocalMediaTrack.prototype.enable;
+    /**
+     * Enable the {@link LocalAudioTrack}. This is effectively "unmute".
+     * @returns {this}
+     * @fires LocalAudioTrack#enabled
+    */ /**
+       * Enable or disable the {@link LocalAudioTrack}. This is effectively "unmute"
+       * or "mute".
+       * @param {boolean} [enabled] - Specify false to mute the
+       *   {@link LocalAudioTrack}
+       * @returns {this}
+       * @fires LocalAudioTrack#disabled
+       * @fires LocalAudioTrack#enabled
+       */
 
-/**
- * Calls stop on the underlying MediaStreamTrack. If you choose to stop a
- * {@link LocalAudioTrack}, you should unpublish it after stopping.
- * @returns {this}
- * @fires LocalAudioTrack#stopped
- */
-LocalAudioTrack.prototype.stop = LocalMediaTrack.prototype.stop;
+  }, {
+    key: 'enable',
+    value: function enable() {
+      return _get(LocalAudioTrack.prototype.__proto__ || Object.getPrototypeOf(LocalAudioTrack.prototype), 'enable', this).apply(this, arguments);
+    }
+
+    /**
+     * Calls stop on the underlying MediaStreamTrack. If you choose to stop a
+     * {@link LocalAudioTrack}, you should unpublish it after stopping.
+     * @returns {this}
+     * @fires LocalAudioTrack#stopped
+     */
+
+  }, {
+    key: 'stop',
+    value: function stop() {
+      return _get(LocalAudioTrack.prototype.__proto__ || Object.getPrototypeOf(LocalAudioTrack.prototype), 'stop', this).apply(this, arguments);
+    }
+  }]);
+
+  return LocalAudioTrack;
+}(LocalMediaAudioTrack);
 
 /**
  * The {@link LocalAudioTrack} was disabled, i.e. "muted".
@@ -17040,59 +17010,73 @@ LocalAudioTrack.prototype.stop = LocalMediaTrack.prototype.stop;
  */
 
 module.exports = LocalAudioTrack;
-
-},{"./audiotrack":69,"./localmediatrack":75,"util":149}],72:[function(require,module,exports){
+},{"./audiotrack":68,"./localmediatrack":77}],74:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var LocalTrackPublication = require('./localtrackpublication');
 
 /**
- * Construct a {@link LocalAudioTrackPublication}.
- * @class
- * @classdesc A {@link LocalAudioTrackPublication} is a {@link LocalAudioTrack} that
- * has been published to a {@link Room}.
+ * A {@link LocalAudioTrackPublication} is a {@link LocalAudioTrack} that has
+ * been published to a {@link Room}.
  * @extends LocalTrackPublication
- * @param {Track.SID} sid - SID assigned to the published {@link LocalAudioTrack}
- * @param {LocalAudioTrack} track - the {@link LocalAudioTrack}
- * @param {function(LocalTrackPublication): void} unpublish - The callback
- *    that unpublishes the {@link LocalTrackPublication}
- * @param {LocalTrackPublicationOptions} options - {@link LocalTrackPublication} options
  * @property {Track.Kind} kind - "audio"
  * @property {LocalAudioTrack} track - the {@link LocalAudioTrack}
  */
-function LocalAudioTrackPublication(sid, track, unpublish, options) {
-  if (!(this instanceof LocalAudioTrackPublication)) {
-    return new LocalAudioTrackPublication(sid, track, unpublish, options);
+
+var LocalAudioTrackPublication = function (_LocalTrackPublicatio) {
+  _inherits(LocalAudioTrackPublication, _LocalTrackPublicatio);
+
+  /**
+   * Construct a {@link LocalAudioTrackPublication}.
+   * @param {Track.SID} sid - SID assigned to the published {@link LocalAudioTrack}
+   * @param {LocalAudioTrack} track - the {@link LocalAudioTrack}
+   * @param {function(LocalTrackPublication): void} unpublish - The callback
+   *    that unpublishes the {@link LocalTrackPublication}
+   * @param {LocalTrackPublicationOptions} options - {@link LocalTrackPublication} options
+   */
+  function LocalAudioTrackPublication(sid, track, unpublish, options) {
+    _classCallCheck(this, LocalAudioTrackPublication);
+
+    return _possibleConstructorReturn(this, (LocalAudioTrackPublication.__proto__ || Object.getPrototypeOf(LocalAudioTrackPublication)).call(this, sid, track, unpublish, options));
   }
-  LocalTrackPublication.call(this, sid, track, unpublish, options);
-}
 
-inherits(LocalAudioTrackPublication, LocalTrackPublication);
+  _createClass(LocalAudioTrackPublication, [{
+    key: 'toString',
+    value: function toString() {
+      return '[LocalAudioTrackPublication #' + this._instanceId + ': ' + this.sid + ']';
+    }
+  }]);
 
-LocalAudioTrackPublication.prototype.toString = function toString() {
-  return '[LocalAudioTrackPublication #' + this._instanceId + ': ' + this.sid + ']';
-};
+  return LocalAudioTrackPublication;
+}(LocalTrackPublication);
 
 module.exports = LocalAudioTrackPublication;
-
-},{"./localtrackpublication":76,"util":149}],73:[function(require,module,exports){
+},{"./localtrackpublication":78}],75:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var Track = require('./');
 var DefaultDataTrackSender = require('../../data/sender');
-var buildLogLevels = require('../../util').buildLogLevels;
-var DEFAULT_LOG_LEVEL = require('../../util/constants').DEFAULT_LOG_LEVEL;
-var Log = require('../../util/log');
 
 /**
- * Construct a {@link LocalDataTrack}.
- * @class
- * @classdesc A {@link LocalDataTrack} is a {@link Track} representing data
- *   that your {@link LocalParticipant} can publish to a {@link Room}.
- * @extends {Track}
- * @param {LocalDataTrackOptions} [options] - {@link LocalDataTrack} options
+ * A {@link LocalDataTrack} is a {@link Track} representing data that your
+ * {@link LocalParticipant} can publish to a {@link Room}.
+ * @extends Track
  * @property {Track.Kind} kind - "data"
  * @property {?number} maxPacketLifeTime - If non-null, this represents a time
  *   limit (in milliseconds) during which the {@link LocalDataTrack} will send
@@ -17136,64 +17120,69 @@ var Log = require('../../util/log');
  *   });
  * });
  */
-function LocalDataTrack(options) {
-  if (!(this instanceof LocalDataTrack)) {
-    return new LocalDataTrack(options);
+
+var LocalDataTrack = function (_Track) {
+  _inherits(LocalDataTrack, _Track);
+
+  /**
+   * Construct a {@link LocalDataTrack}.
+   * @param {LocalDataTrackOptions} [options] - {@link LocalDataTrack} options
+   */
+  function LocalDataTrack(options) {
+    _classCallCheck(this, LocalDataTrack);
+
+    options = Object.assign({
+      DataTrackSender: DefaultDataTrackSender,
+      maxPacketLifeTime: null,
+      maxRetransmits: null,
+      ordered: true
+    }, options);
+
+    var DataTrackSender = options.DataTrackSender;
+    var dataTrackSender = new DataTrackSender(options.maxPacketLifeTime, options.maxRetransmits, options.ordered);
+
+    var _this = _possibleConstructorReturn(this, (LocalDataTrack.__proto__ || Object.getPrototypeOf(LocalDataTrack)).call(this, dataTrackSender.id, 'data', options));
+
+    Object.defineProperties(_this, {
+      _trackSender: {
+        value: dataTrackSender
+      },
+      maxPacketLifeTime: {
+        enumerable: true,
+        value: options.maxPacketLifeTime
+      },
+      maxRetransmits: {
+        enumerable: true,
+        value: options.maxRetransmits
+      },
+      ordered: {
+        enumerable: true,
+        value: options.ordered
+      },
+      reliable: {
+        enumerable: true,
+        value: options.maxPacketLifeTime === null && options.maxRetransmits === null
+      }
+    });
+    return _this;
   }
 
-  options = Object.assign({
-    DataTrackSender: DefaultDataTrackSender,
-    logLevel: DEFAULT_LOG_LEVEL,
-    maxPacketLifeTime: null,
-    maxRetransmits: null,
-    ordered: true
-  }, options);
+  /**
+   * Send a message over the {@link LocalDataTrack}.
+   * @param {string|Blob|ArrayBuffer|ArrayBufferView} data
+   * @returns {void}
+   */
 
-  var logLevels = buildLogLevels(options.logLevel);
-  options.log = options.log || new Log('default', this, logLevels);
 
-  var DataTrackSender = options.DataTrackSender;
-  var dataTrackSender = new DataTrackSender(
-    options.maxPacketLifeTime,
-    options.maxRetransmits,
-    options.ordered);
-
-  Track.call(this, dataTrackSender.id, 'data', options);
-
-  Object.defineProperties(this, {
-    _trackSender: {
-      value: dataTrackSender
-    },
-    maxPacketLifeTime: {
-      enumerable: true,
-      value: options.maxPacketLifeTime
-    },
-    maxRetransmits: {
-      enumerable: true,
-      value: options.maxRetransmits
-    },
-    ordered: {
-      enumerable: true,
-      value: options.ordered
-    },
-    reliable: {
-      enumerable: true,
-      value: options.maxPacketLifeTime === null
-        && options.maxRetransmits === null
+  _createClass(LocalDataTrack, [{
+    key: 'send',
+    value: function send(data) {
+      this._trackSender.send(data);
     }
-  });
-}
+  }]);
 
-inherits(LocalDataTrack, Track);
-
-/**
- * Send a message over the {@link LocalDataTrack}.
- * @param {string|Blob|ArrayBuffer|ArrayBufferView} data
- * @returns {void}
- */
-LocalDataTrack.prototype.send = function send(data) {
-  this._trackSender.send(data);
-};
+  return LocalDataTrack;
+}(Track);
 
 /**
  * {@link LocalDataTrack} options
@@ -17211,133 +17200,172 @@ LocalDataTrack.prototype.send = function send(data) {
  */
 
 module.exports = LocalDataTrack;
-
-},{"../../data/sender":61,"../../util":129,"../../util/constants":127,"../../util/log":132,"./":70,"util":149}],74:[function(require,module,exports){
+},{"../../data/sender":60,"./":72}],76:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var LocalTrackPublication = require('./localtrackpublication');
 
 /**
- * Construct a {@link LocalDataTrackPublication}.
- * @class
- * @classdesc A {@link LocalDataTrackPublication} is a {@link LocalDataTrack} that
- * has been published to a {@link Room}.
+ * A {@link LocalDataTrackPublication} is a {@link LocalDataTrack} that has been
+ * published to a {@link Room}.
  * @extends LocalTrackPublication
- * @param {Track.SID} sid - SID assigned to the published {@link LocalDataTrack}
- * @param {LocalDataTrack} track - the {@link LocalDataTrack}
- * @param {function(LocalTrackPublication): void} unpublish - The callback
- *    that unpublishes the {@link LocalTrackPublication}
- * @param {LocalTrackPublicationOptions} options - {@link LocalTrackPublication} options
  * @property {Track.Kind} kind - "data"
  * @property {LocalDataTrack} track - the {@link LocalDataTrack}
  */
-function LocalDataTrackPublication(sid, track, unpublish, options) {
-  if (!(this instanceof LocalDataTrackPublication)) {
-    return new LocalDataTrackPublication(sid, track, unpublish, options);
+
+var LocalDataTrackPublication = function (_LocalTrackPublicatio) {
+  _inherits(LocalDataTrackPublication, _LocalTrackPublicatio);
+
+  /**
+   * Construct a {@link LocalDataTrackPublication}.
+   * @param {Track.SID} sid - SID assigned to the published {@link LocalDataTrack}
+   * @param {LocalDataTrack} track - the {@link LocalDataTrack}
+   * @param {function(LocalTrackPublication): void} unpublish - The callback
+   *    that unpublishes the {@link LocalTrackPublication}
+   * @param {LocalTrackPublicationOptions} options - {@link LocalTrackPublication} options
+   */
+  function LocalDataTrackPublication(sid, track, unpublish, options) {
+    _classCallCheck(this, LocalDataTrackPublication);
+
+    return _possibleConstructorReturn(this, (LocalDataTrackPublication.__proto__ || Object.getPrototypeOf(LocalDataTrackPublication)).call(this, sid, track, unpublish, options));
   }
-  LocalTrackPublication.call(this, sid, track, unpublish, options);
-}
 
-inherits(LocalDataTrackPublication, LocalTrackPublication);
+  _createClass(LocalDataTrackPublication, [{
+    key: 'toString',
+    value: function toString() {
+      return '[LocalDataTrackPublication #' + this._instanceId + ': ' + this.sid + ']';
+    }
+  }]);
 
-LocalDataTrackPublication.prototype.toString = function toString() {
-  return '[LocalDataTrackPublication #' + this._instanceId + ': ' + this.sid + ']';
-};
+  return LocalDataTrackPublication;
+}(LocalTrackPublication);
 
 module.exports = LocalDataTrackPublication;
-
-},{"./localtrackpublication":76,"util":149}],75:[function(require,module,exports){
+},{"./localtrackpublication":78}],77:[function(require,module,exports){
 'use strict';
 
-var buildLogLevels = require('../../util').buildLogLevels;
-var Log = require('../../util/log');
-var DEFAULT_LOG_LEVEL = require('../../util/constants').DEFAULT_LOG_LEVEL;
-var MediaTrack = require('./mediatrack');
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var MediaTrackSender = require('./sender');
 
-/**
- * Construct a {@link LocalMediaTrack} from a MediaStreamTrack.
- * @class
- * @classdesc A {@link LocalMediaTrack} represents audio or video that your
- * {@link LocalParticipant} is sending to a {@link Room}. As such, it can be
- * enabled and disabled with {@link LocalMediaTrack#enable} and
- * {@link LocalMediaTrack#disable} or stopped completely with
- * {@link LocalMediaTrack#stop}.
- * @extends MediaTrack
- * @param {function(MediaTrackTransceiver, TrackSignaling): MediaTrack} - MediaTrack
- * @param {MediaStream} mediaStreamTrack - The underlying MediaStreamTrack
- * @param {LocalTrackOptions} [options] - {@link LocalTrack} options
- * @property {boolean} isStopped - Whether or not the {@link LocalMediaTrack} is stopped
- * @fires LocalMediaTrack#stopped
- */
-function LocalMediaTrack(MediaTrack, mediaStreamTrack, options) {
-  options = Object.assign({
-    logLevel: DEFAULT_LOG_LEVEL
-  }, options);
+function mixinLocalMediaTrack(AudioOrVideoTrack) {
+  /**
+   * A {@link LocalMediaTrack} represents audio or video that your
+   * {@link LocalParticipant} is sending to a {@link Room}. As such, it can be
+   * enabled and disabled with {@link LocalMediaTrack#enable} and
+   * {@link LocalMediaTrack#disable} or stopped completely with
+   * {@link LocalMediaTrack#stop}.
+   * @property {boolean} isStopped - Whether or not the {@link LocalMediaTrack} is stopped
+   * @emits LocalMediaTrack#stopped
+   */
+  return function (_AudioOrVideoTrack) {
+    _inherits(LocalMediaTrack, _AudioOrVideoTrack);
 
-  var logLevels = buildLogLevels(options.logLevel);
-  options.log = options.log || new Log('default', this, logLevels);
+    /**
+     * Construct a {@link LocalMediaTrack} from a MediaStreamTrack.
+     * @param {MediaStream} mediaStreamTrack - The underlying MediaStreamTrack
+     * @param {LocalTrackOptions} [options] - {@link LocalTrack} options
+     */
+    function LocalMediaTrack(mediaStreamTrack, options) {
+      _classCallCheck(this, LocalMediaTrack);
 
-  var mediaTrackSender = new MediaTrackSender(mediaStreamTrack);
-  MediaTrack.call(this, mediaTrackSender, options);
+      options = Object.assign({}, options);
 
-  Object.defineProperties(this, {
-    _didCallEnd: {
-      value: false,
-      writable: true
-    },
-    _trackSender: {
-      value: mediaTrackSender
-    },
-    isEnabled: {
-      enumerable: true,
-      get: function() {
-        return this.mediaStreamTrack.enabled;
-      }
-    },
-    isStopped: {
-      get: function() {
-        return this.mediaStreamTrack.readyState === 'ended';
-      }
+      var mediaTrackSender = new MediaTrackSender(mediaStreamTrack);
+
+      var _this = _possibleConstructorReturn(this, (LocalMediaTrack.__proto__ || Object.getPrototypeOf(LocalMediaTrack)).call(this, mediaTrackSender, options));
+
+      Object.defineProperties(_this, {
+        _didCallEnd: {
+          value: false,
+          writable: true
+        },
+        _trackSender: {
+          value: mediaTrackSender
+        },
+        isEnabled: {
+          enumerable: true,
+          get: function get() {
+            return this.mediaStreamTrack.enabled;
+          }
+        },
+        isStopped: {
+          get: function get() {
+            return this.mediaStreamTrack.readyState === 'ended';
+          }
+        }
+      });
+      return _this;
     }
-  });
+
+    /**
+     * @private
+     */
+
+
+    _createClass(LocalMediaTrack, [{
+      key: '_end',
+      value: function _end() {
+        if (this._didCallEnd) {
+          return;
+        }
+        _get(LocalMediaTrack.prototype.__proto__ || Object.getPrototypeOf(LocalMediaTrack.prototype), '_end', this).call(this);
+        this._didCallEnd = true;
+        this.emit('stopped', this);
+      }
+    }, {
+      key: 'enable',
+      value: function enable(enabled) {
+        enabled = typeof enabled === 'boolean' ? enabled : true;
+        if (enabled !== this.mediaStreamTrack.enabled) {
+          this._log.info((enabled ? 'En' : 'Dis') + 'abling');
+          this.mediaStreamTrack.enabled = enabled;
+          this.emit(enabled ? 'enabled' : 'disabled', this);
+        }
+        return this;
+      }
+    }, {
+      key: 'disable',
+      value: function disable() {
+        return this.enable(false);
+      }
+    }, {
+      key: 'stop',
+      value: function stop() {
+        this._log.info('Stopping');
+        this.mediaStreamTrack.stop();
+        this._end();
+        return this;
+      }
+    }]);
+
+    return LocalMediaTrack;
+  }(AudioOrVideoTrack);
 }
 
-LocalMediaTrack.prototype._end = function _end() {
-  if (this._didCallEnd) {
-    return;
-  }
-  MediaTrack.prototype._end.call(this);
-  this._didCallEnd = true;
-  this.emit('stopped', this);
-};
-
-LocalMediaTrack.prototype.enable = function enable(enabled) {
-  enabled = typeof enabled === 'boolean' ? enabled : true;
-  if (enabled !== this.mediaStreamTrack.enabled) {
-    this._log.info((enabled ? 'En' : 'Dis') + 'abling');
-    this.mediaStreamTrack.enabled = enabled;
-    this.emit(enabled ? 'enabled' : 'disabled', this);
-  }
-  return this;
-};
-
-LocalMediaTrack.prototype.disable = function disable() {
-  return this.enable(false);
-};
-
-LocalMediaTrack.prototype.stop = function stop() {
-  this._log.info('Stopping');
-  this.mediaStreamTrack.stop();
-  this._end();
-  return this;
-};
-
-module.exports = LocalMediaTrack;
-
-},{"../../util":129,"../../util/constants":127,"../../util/log":132,"./mediatrack":79,"./sender":86}],76:[function(require,module,exports){
+module.exports = mixinLocalMediaTrack;
+},{"./sender":88}],78:[function(require,module,exports){
 'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var buildLogLevels = require('../../util').buildLogLevels;
 var Log = require('../../util/log');
@@ -17345,72 +17373,86 @@ var DEFAULT_LOG_LEVEL = require('../../util/constants').DEFAULT_LOG_LEVEL;
 var nInstances = 0;
 
 /**
- * Construct a {@link LocalTrackPublication}.
- * @class
- * @classdesc A {@link LocalTrackPublication} is a {@link LocalTrack} that
- *   has been published to a {@link Room}.
- * @param {Track.SID} sid - SID assigned to the published {@link LocalTrack}
- * @param {LocalTrack} track - the {@link LocalTrack}
- * @param {function(LocalTrackPublication): void} unpublish - The callback
- *   that unpublishes the {@link LocalTrackPublication}
- * @param {LocalTrackPublicationOptions} options - {@link LocalTrackPublication}
- *   options
+ * A {@link LocalTrackPublication} is a {@link LocalTrack} that has been
+ * published to a {@link Room}.
  * @property {Track.Kind} kind - kind of the published {@link LocalTrack}
  * @property {LocalTrack} track - the {@link LocalTrack}
  * @property {string} trackName - the {@link LocalTrack}'s name
  * @property {Track.SID} trackSid - SID assigned to the published
  *   {@link LocalTrack}
  */
-function LocalTrackPublication(sid, track, unpublish, options) {
-  options = Object.assign({
-    logLevel: DEFAULT_LOG_LEVEL
-  }, options);
 
-  var logLevels = buildLogLevels(options.logLevel);
+var LocalTrackPublication = function () {
+  /**
+   * Construct a {@link LocalTrackPublication}.
+   * @param {Track.SID} sid - SID assigned to the published {@link LocalTrack}
+   * @param {LocalTrack} track - the {@link LocalTrack}
+   * @param {function(LocalTrackPublication): void} unpublish - The callback
+   *   that unpublishes the {@link LocalTrackPublication}
+   * @param {LocalTrackPublicationOptions} options - {@link LocalTrackPublication}
+   *   options
+   */
+  function LocalTrackPublication(sid, track, unpublish, options) {
+    _classCallCheck(this, LocalTrackPublication);
 
-  Object.defineProperties(this, {
-    _instanceId: {
-      value: nInstances++
-    },
-    _log: {
-      value: options.log || new Log('default', this, logLevels),
-    },
-    _unpublish: {
-      value: unpublish
-    },
-    kind: {
-      enumerable: true,
-      value: track.kind
-    },
-    track: {
-      enumerable: true,
-      value: track
-    },
-    trackName: {
-      enumerable: true,
-      value: track.name
-    },
-    trackSid: {
-      enumerable: true,
-      value: sid
+    options = Object.assign({
+      logLevel: DEFAULT_LOG_LEVEL
+    }, options);
+
+    var logLevels = buildLogLevels(options.logLevel);
+
+    Object.defineProperties(this, {
+      _instanceId: {
+        value: nInstances++
+      },
+      _log: {
+        value: options.log || new Log('default', this, logLevels)
+      },
+      _unpublish: {
+        value: unpublish
+      },
+      kind: {
+        enumerable: true,
+        value: track.kind
+      },
+      track: {
+        enumerable: true,
+        value: track
+      },
+      trackName: {
+        enumerable: true,
+        value: track.name
+      },
+      trackSid: {
+        enumerable: true,
+        value: sid
+      }
+    });
+  }
+
+  _createClass(LocalTrackPublication, [{
+    key: 'toString',
+    value: function toString() {
+      return '[LocalTrackPublication #' + this._instanceId + ': ' + this.trackSid + ']';
     }
-  });
-}
 
-LocalTrackPublication.prototype.toString = function toString() {
-  return '[LocalTrackPublication #' + this._instanceId + ': ' + this.trackSid + ']';
-};
+    /**
+     * Unpublish a {@link LocalTrackPublication}. This means that the media
+     * from this {@link LocalTrackPublication} is no longer available to the
+     * {@link Room}'s {@link RemoteParticipant}s.
+     * @returns {this}
+     */
 
-/**
- * Unpublish a {@link LocalTrackPublication}. This means that the media
- * from this {@link LocalTrackPublication} is no longer available to the
- * {@link Room}'s {@link RemoteParticipant}s.
- * @returns {this}
- */
-LocalTrackPublication.prototype.unpublish = function unpublish() {
-  this._unpublish(this);
-  return this;
-};
+  }, {
+    key: 'unpublish',
+    value: function unpublish() {
+      this._unpublish(this);
+      return this;
+    }
+  }]);
+
+  return LocalTrackPublication;
+}();
 
 /**
  * {@link LocalTrackPublication} options
@@ -17419,76 +17461,114 @@ LocalTrackPublication.prototype.unpublish = function unpublish() {
  */
 
 module.exports = LocalTrackPublication;
-
-},{"../../util":129,"../../util/constants":127,"../../util/log":132}],77:[function(require,module,exports){
+},{"../../util":131,"../../util/constants":129,"../../util/log":134}],79:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
-var LocalMediaTrack = require('./localmediatrack');
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var mixinLocalMediaTrack = require('./localmediatrack');
 var VideoTrack = require('./videotrack');
 
+var LocalMediaVideoTrack = mixinLocalMediaTrack(VideoTrack);
+
 /**
- * Construct a {@link LocalVideoTrack} from a MediaStreamTrack.
- * @class
- * @classdesc A {@link LocalVideoTrack} is a {@link VideoTrack} representing
- *   video that your {@link LocalParticipant} can publish to a {@link Room}. It
- *   can be enabled and disabled with {@link LocalVideoTrack#enable} and
- *   {@link LocalVideoTrack#disable} or stopped completely with
- *   {@link LocalVideoTrack#stop}.
- * @extends {VideoTrack}
- * @param {MediaStreamTrack} mediaStreamTrack - The underlying MediaStreamTrack
- * @param {LocalTrackOptions} [options] - {@link LocalTrack} options
+ * A {@link LocalVideoTrack} is a {@link VideoTrack} representing video that
+ * your {@link LocalParticipant} can publish to a {@link Room}. It can be
+ * enabled and disabled with {@link LocalVideoTrack#enable} and
+ * {@link LocalVideoTrack#disable} or stopped completely with
+ * {@link LocalVideoTrack#stop}.
+ * @extends VideoTrack
  * @property {boolean} isStopped - Whether or not the {@link LocalVideoTrack} is
  *   stopped
- * @fires LocalVideoTrack#stopped
+ * @emits LocalVideoTrack#stopped
  */
-function LocalVideoTrack(mediaStreamTrack, options) {
-  if (!(this instanceof LocalVideoTrack)) {
-    return new LocalVideoTrack(mediaStreamTrack, options);
+
+var LocalVideoTrack = function (_LocalMediaVideoTrack) {
+  _inherits(LocalVideoTrack, _LocalMediaVideoTrack);
+
+  /**
+   * Construct a {@link LocalVideoTrack} from a MediaStreamTrack.
+   * @param {MediaStreamTrack} mediaStreamTrack - The underlying MediaStreamTrack
+   * @param {LocalTrackOptions} [options] - {@link LocalTrack} options
+   */
+  function LocalVideoTrack(mediaStreamTrack, options) {
+    _classCallCheck(this, LocalVideoTrack);
+
+    return _possibleConstructorReturn(this, (LocalVideoTrack.__proto__ || Object.getPrototypeOf(LocalVideoTrack)).call(this, mediaStreamTrack, options));
   }
-  LocalMediaTrack.call(this, VideoTrack, mediaStreamTrack, options);
-}
 
-inherits(LocalVideoTrack, VideoTrack);
+  _createClass(LocalVideoTrack, [{
+    key: 'toString',
+    value: function toString() {
+      return '[LocalVideoTrack #' + this._instanceId + ': ' + this.id + ']';
+    }
 
-LocalVideoTrack.prototype._end = LocalMediaTrack.prototype._end;
+    /**
+     * @private
+     */
 
-LocalVideoTrack.prototype.toString = function toString() {
-  return '[LocalVideoTrack #' + this._instanceId + ': ' + this.id + ']';
-};
+  }, {
+    key: '_end',
+    value: function _end() {
+      return _get(LocalVideoTrack.prototype.__proto__ || Object.getPrototypeOf(LocalVideoTrack.prototype), '_end', this).apply(this, arguments);
+    }
 
-/**
- * Disable the {@link LocalVideoTrack}. This is effectively "pause".
- * @method
- * @returns {this}
- * @fires VideoTrack#disabled
- */
-LocalVideoTrack.prototype.disable = LocalMediaTrack.prototype.disable;
+    /**
+     * Disable the {@link LocalVideoTrack}. This is effectively "pause".
+     * @returns {this}
+     * @fires VideoTrack#disabled
+     */
 
-/**
- * Enable the {@link LocalVideoTrack}. This is effectively "unpause".
- * @method
- * @returns {this}
- * @fires VideoTrack#enabled
-*//**
- * Enable or disable the {@link LocalVideoTrack}. This is effectively "unpause"
- * or "pause".
- * @method
- * @param {boolean} [enabled] - Specify false to pause the
- *   {@link LocalVideoTrack}
- * @returns {this}
- * @fires VideoTrack#disabled
- * @fires VideoTrack#enabled
- */
-LocalVideoTrack.prototype.enable = LocalMediaTrack.prototype.enable;
+  }, {
+    key: 'disable',
+    value: function disable() {
+      return _get(LocalVideoTrack.prototype.__proto__ || Object.getPrototypeOf(LocalVideoTrack.prototype), 'disable', this).apply(this, arguments);
+    }
 
-/**
- * Calls stop on the underlying MediaStreamTrack. If you choose to stop a
- * {@link LocalVideoTrack}, you should unpublish it after stopping.
- * @returns {this}
- * @fires LocalVideoTrack#stopped
- */
-LocalVideoTrack.prototype.stop = LocalMediaTrack.prototype.stop;
+    /**
+     * Enable the {@link LocalVideoTrack}. This is effectively "unpause".
+     * @returns {this}
+     * @fires VideoTrack#enabled
+    */ /**
+       * Enable or disable the {@link LocalVideoTrack}. This is effectively "unpause"
+       * or "pause".
+       * @param {boolean} [enabled] - Specify false to pause the
+       *   {@link LocalVideoTrack}
+       * @returns {this}
+       * @fires VideoTrack#disabled
+       * @fires VideoTrack#enabled
+       */
+
+  }, {
+    key: 'enable',
+    value: function enable() {
+      return _get(LocalVideoTrack.prototype.__proto__ || Object.getPrototypeOf(LocalVideoTrack.prototype), 'enable', this).apply(this, arguments);
+    }
+
+    /**
+     * Calls stop on the underlying MediaStreamTrack. If you choose to stop a
+     * {@link LocalVideoTrack}, you should unpublish it after stopping.
+     * @returns {this}
+     * @fires LocalVideoTrack#stopped
+     */
+
+  }, {
+    key: 'stop',
+    value: function stop() {
+      return _get(LocalVideoTrack.prototype.__proto__ || Object.getPrototypeOf(LocalVideoTrack.prototype), 'stop', this).apply(this, arguments);
+    }
+  }]);
+
+  return LocalVideoTrack;
+}(LocalMediaVideoTrack);
 
 /**
  * The {@link LocalVideoTrack} was disabled, i.e. "muted".
@@ -17519,56 +17599,73 @@ LocalVideoTrack.prototype.stop = LocalMediaTrack.prototype.stop;
  */
 
 module.exports = LocalVideoTrack;
-
-},{"./localmediatrack":75,"./videotrack":88,"util":149}],78:[function(require,module,exports){
+},{"./localmediatrack":77,"./videotrack":90}],80:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var LocalTrackPublication = require('./localtrackpublication');
 
 /**
- * Construct a {@link LocalVideoTrackPublication}.
- * @class
- * @classdesc A {@link LocalVideoTrackPublication} is a {@link LocalVideoTrack} that
- * has been published to a {@link Room}.
+ * A {@link LocalVideoTrackPublication} is a {@link LocalVideoTrack} that has
+ * been published to a {@link Room}.
  * @extends LocalTrackPublication
- * @param {Track.SID} sid - SID assigned to the published {@link LocalVideoTrack}
- * @param {LocalVideoTrack} track - the {@link LocalVideoTrack}
- * @param {function(LocalTrackPublication): void} unpublish - The callback
- *    that unpublishes the {@link LocalTrackPublication}
- * @param {LocalTrackPublicationOptions} options - {@link LocalTrackPublication} options
  * @property {Track.Kind} kind - "video"
  * @property {LocalVideoTrack} track - the {@link LocalVideoTrack}
  */
-function LocalVideoTrackPublication(sid, track, unpublish, options) {
-  if (!(this instanceof LocalVideoTrackPublication)) {
-    return new LocalVideoTrackPublication(sid, track, unpublish, options);
+
+var LocalVideoTrackPublication = function (_LocalTrackPublicatio) {
+  _inherits(LocalVideoTrackPublication, _LocalTrackPublicatio);
+
+  /**
+   * Construct a {@link LocalVideoTrackPublication}.
+   * @param {Track.SID} sid - SID assigned to the published {@link LocalVideoTrack}
+   * @param {LocalVideoTrack} track - the {@link LocalVideoTrack}
+   * @param {function(LocalTrackPublication): void} unpublish - The callback
+   *    that unpublishes the {@link LocalTrackPublication}
+   * @param {LocalTrackPublicationOptions} options - {@link LocalTrackPublication} options
+   */
+  function LocalVideoTrackPublication(sid, track, unpublish, options) {
+    _classCallCheck(this, LocalVideoTrackPublication);
+
+    return _possibleConstructorReturn(this, (LocalVideoTrackPublication.__proto__ || Object.getPrototypeOf(LocalVideoTrackPublication)).call(this, sid, track, unpublish, options));
   }
-  LocalTrackPublication.call(this, sid, track, unpublish, options);
-}
 
-inherits(LocalVideoTrackPublication, LocalTrackPublication);
+  _createClass(LocalVideoTrackPublication, [{
+    key: 'toString',
+    value: function toString() {
+      return '[LocalVideoTrackPublication #' + this._instanceId + ': ' + this.sid + ']';
+    }
+  }]);
 
-LocalVideoTrackPublication.prototype.toString = function toString() {
-  return '[LocalVideoTrackPublication #' + this._instanceId + ': ' + this.sid + ']';
-};
+  return LocalVideoTrackPublication;
+}(LocalTrackPublication);
 
 module.exports = LocalVideoTrackPublication;
-
-},{"./localtrackpublication":76,"util":149}],79:[function(require,module,exports){
+},{"./localtrackpublication":78}],81:[function(require,module,exports){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var MediaStream = require('@twilio/webrtc').MediaStream;
-var inherits = require('util').inherits;
 var Track = require('./');
 
 /**
- * Construct a {@link MediaTrack}.
- * @class
- * @classdesc A {@link MediaTrack} represents audio or video that can be sent to
- *   or received from a {@link Room}.
- * @param {MediaTrackTransceiver} mediaTrackTransceiver
- * @param {{log: Log}} options
+ * A {@link MediaTrack} represents audio or video that can be sent to or
+ * received from a {@link Room}.
+ * @extends Track
  * @property {Track.ID} id - This {@link Track}'s ID
  * @property {boolean} isStarted - Whether or not the {@link MediaTrack} has
  *   started
@@ -17578,267 +17675,372 @@ var Track = require('./');
  *   MediaStreamTrack, "audio" or "video"
  * @property {MediaStreamTrack} mediaStreamTrack - The underlying
  *   MediaStreamTrack
- * @fires MediaTrack#disabled
- * @fires MediaTrack#enabled
- * @fires MediaTrack#started
+ * @emits MediaTrack#disabled
+ * @emits MediaTrack#enabled
+ * @emits MediaTrack#started
  */
-function MediaTrack(mediaTrackTransceiver, options) {
-  Track.call(this, mediaTrackTransceiver.id, mediaTrackTransceiver.kind, options);
-  var isStarted = false;
 
-  options = Object.assign({
-    MediaStream: MediaStream
-  }, options);
+var MediaTrack = function (_Track) {
+  _inherits(MediaTrack, _Track);
 
-  /* istanbul ignore next */
-  Object.defineProperties(this, {
-    _attachments: {
-      value: new Set()
-    },
-    _isStarted: {
-      get: function() {
-        return isStarted;
+  /**
+   * Construct a {@link MediaTrack}.
+   * @param {MediaTrackTransceiver} mediaTrackTransceiver
+   * @param {{log: Log}} options
+   */
+  function MediaTrack(mediaTrackTransceiver, options) {
+    _classCallCheck(this, MediaTrack);
+
+    var _this = _possibleConstructorReturn(this, (MediaTrack.__proto__ || Object.getPrototypeOf(MediaTrack)).call(this, mediaTrackTransceiver.id, mediaTrackTransceiver.kind, options));
+
+    var isStarted = false;
+
+    options = Object.assign({
+      MediaStream: MediaStream
+    }, options);
+
+    /* istanbul ignore next */
+    Object.defineProperties(_this, {
+      _attachments: {
+        value: new Set()
       },
-      set: function(_isStarted) {
-        isStarted = _isStarted;
+      _isStarted: {
+        get: function get() {
+          return isStarted;
+        },
+        set: function set(_isStarted) {
+          isStarted = _isStarted;
+        }
+      },
+      _MediaStream: {
+        value: options.MediaStream
+      },
+      isStarted: {
+        get: function get() {
+          return isStarted;
+        }
+      },
+      mediaStreamTrack: {
+        enumerable: true,
+        value: mediaTrackTransceiver.track
       }
-    },
-    _MediaStream: {
-      value: options.MediaStream
-    },
-    isStarted: {
-      get: function() {
-        return isStarted;
-      }
-    },
-    mediaStreamTrack: {
-      enumerable: true,
-      value: mediaTrackTransceiver.track
-    }
-  });
+    });
 
-  this._initialize();
-}
+    _this._initialize();
+    return _this;
+  }
+
+  /**
+   * @private
+   */
+
+
+  _createClass(MediaTrack, [{
+    key: '_start',
+    value: function _start() {
+      this._log.debug('Started');
+      this._isStarted = true;
+      if (this._dummyEl) {
+        this._detachElement(this._dummyEl);
+        this._dummyEl.oncanplay = null;
+      }
+      // eslint-disable-next-line no-use-before-define
+      this.emit(STARTED, this);
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_initialize',
+    value: function _initialize() {
+      var self = this;
+
+      this._log.debug('Initializing');
+      this._dummyEl = this._createElement();
+
+      this.mediaStreamTrack.addEventListener('ended', function onended() {
+        self._end();
+        self.mediaStreamTrack.removeEventListener('ended', onended);
+      });
+
+      if (this._dummyEl) {
+        this._dummyEl.muted = true;
+        this._dummyEl.oncanplay = this._start.bind(this, this._dummyEl);
+        this._attach(this._dummyEl);
+        this._attachments.delete(this._dummyEl);
+      }
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_end',
+    value: function _end() {
+      this._log.debug('Ended');
+      if (this._dummyEl) {
+        this._detachElement(this._dummyEl);
+        this._dummyEl.oncanplay = null;
+      }
+    }
+  }, {
+    key: 'attach',
+    value: function attach(el) {
+      if (typeof el === 'string') {
+        el = this._selectElement(el);
+      } else if (!el) {
+        el = this._createElement();
+      }
+      this._log.debug('Attempting to attach to element:', el);
+      el = this._attach(el);
+
+      return el;
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_attach',
+    value: function _attach(el) {
+      var mediaStream = el.srcObject;
+      if (!(mediaStream instanceof this._MediaStream)) {
+        mediaStream = new this._MediaStream();
+      }
+
+      var getTracks = this.mediaStreamTrack.kind === 'audio' ? 'getAudioTracks' : 'getVideoTracks';
+
+      mediaStream[getTracks]().forEach(function (mediaStreamTrack) {
+        mediaStream.removeTrack(mediaStreamTrack);
+      });
+      mediaStream.addTrack(this.mediaStreamTrack);
+
+      // NOTE(mroberts): Although we don't necessarily need to reset `srcObject`,
+      // we've been doing it here for a while, and it turns out it has allowed us
+      // to sidestep the following issue:
+      //
+      //   https://bugs.chromium.org/p/chromium/issues/detail?id=720258
+      //
+      el.srcObject = mediaStream;
+      el.autoplay = true;
+      el.playsInline = true;
+
+      if (!this._attachments.has(el)) {
+        this._attachments.add(el);
+      }
+
+      return el;
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_selectElement',
+    value: function _selectElement(selector) {
+      var el = document.querySelector(selector);
+
+      if (!el) {
+        throw new Error('Selector matched no element: ' + selector);
+      }
+
+      return el;
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_createElement',
+    value: function _createElement() {
+      return typeof document !== 'undefined' ? document.createElement(this.kind) : null;
+    }
+  }, {
+    key: 'detach',
+    value: function detach(el) {
+      var els = void 0;
+
+      if (typeof el === 'string') {
+        els = [this._selectElement(el)];
+      } else if (!el) {
+        els = this._getAllAttachedElements();
+      } else {
+        els = [el];
+      }
+
+      this._log.debug('Attempting to detach from elements:', els);
+      this._detachElements(els);
+      return el ? els[0] : els;
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_detachElements',
+    value: function _detachElements(elements) {
+      return elements.map(this._detachElement.bind(this));
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_detachElement',
+    value: function _detachElement(el) {
+      if (!this._attachments.has(el)) {
+        return el;
+      }
+
+      var mediaStream = el.srcObject;
+      if (mediaStream instanceof this._MediaStream) {
+        mediaStream.removeTrack(this.mediaStreamTrack);
+        // NOTE(mroberts): It's as if, in Chrome and Safari, the <audio> element's
+        // `srcObject` setter is taking a "snapshot" of the MediaStream's
+        // MediaStreamTracks in order to playback; hence, calls to `removeTrack`
+        // don't take effect unless you set the <audio> element's `srcObject` again.
+        //
+        //   https://bugs.chromium.org/p/chromium/issues/detail?id=749928
+        //
+        el.srcObject = mediaStream;
+      }
+
+      this._attachments.delete(el);
+      return el;
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_getAllAttachedElements',
+    value: function _getAllAttachedElements() {
+      var els = [];
+
+      this._attachments.forEach(function (el) {
+        els.push(el);
+      });
+
+      return els;
+    }
+  }]);
+
+  return MediaTrack;
+}(Track);
 
 MediaTrack.DISABLED = 'disabled';
 MediaTrack.ENABLED = 'enabled';
 var STARTED = MediaTrack.STARTED = 'started';
 
-inherits(MediaTrack, Track);
-
-MediaTrack.prototype._start = function _start() {
-  this._log.debug('Started');
-  this._isStarted = true;
-  if (this._dummyEl) {
-    this._detachElement(this._dummyEl);
-    this._dummyEl.oncanplay = null;
-  }
-  this.emit(STARTED, this);
-};
-
-MediaTrack.prototype._initialize = function _initialize() {
-  var self = this;
-
-  this._log.debug('Initializing');
-  this._dummyEl = this._createElement();
-
-  this.mediaStreamTrack.addEventListener('ended', function onended() {
-    self._end();
-    self.mediaStreamTrack.removeEventListener('ended', onended);
-  });
-
-  if (this._dummyEl) {
-    this._dummyEl.muted = true;
-    this._dummyEl.oncanplay = this._start.bind(this, this._dummyEl);
-    this._attach(this._dummyEl);
-    this._attachments.delete(this._dummyEl);
-  }
-};
-
-MediaTrack.prototype._end = function _end() {
-  this._log.debug('Ended');
-  if (this._dummyEl) {
-    this._detachElement(this._dummyEl);
-    this._dummyEl.oncanplay = null;
-  }
-};
-
-MediaTrack.prototype.attach = function attach(el) {
-  if (typeof el === 'string') {
-    el = this._selectElement(el);
-  } else if (!el) {
-    el = this._createElement();
-  }
-  this._log.debug('Attempting to attach to element:', el);
-  el = this._attach(el);
-
-  return el;
-};
-
-MediaTrack.prototype._attach = function _attach(el) {
-  var mediaStream = el.srcObject;
-  if (!(mediaStream instanceof this._MediaStream)) {
-    mediaStream = new this._MediaStream();
-  }
-
-  var getTracks = this.mediaStreamTrack.kind === 'audio'
-    ? 'getAudioTracks'
-    : 'getVideoTracks';
-
-  mediaStream[getTracks]().forEach(function(mediaStreamTrack) {
-    mediaStream.removeTrack(mediaStreamTrack);
-  });
-  mediaStream.addTrack(this.mediaStreamTrack);
-
-  // NOTE(mroberts): Although we don't necessarily need to reset `srcObject`,
-  // we've been doing it here for a while, and it turns out it has allowed us
-  // to sidestep the following issue:
-  //
-  //   https://bugs.chromium.org/p/chromium/issues/detail?id=720258
-  //
-  el.srcObject = mediaStream;
-  el.autoplay = true;
-  el.playsInline = true;
-
-  if (!this._attachments.has(el)) {
-    this._attachments.add(el);
-  }
-
-  return el;
-};
-
-MediaTrack.prototype._selectElement = function _selectElement(selector) {
-  var el = document.querySelector(selector);
-
-  if (!el) {
-    throw new Error('Selector matched no element: ' + selector);
-  }
-
-  return el;
-};
-
-MediaTrack.prototype._createElement = function _createElement() {
-  return typeof document !== 'undefined'
-    ? document.createElement(this.kind)
-    : null;
-};
-
-MediaTrack.prototype.detach = function _detach(el) {
-  var els;
-
-  if (typeof el === 'string') {
-    els = [this._selectElement(el)];
-  } else if (!el) {
-    els = this._getAllAttachedElements();
-  } else {
-    els = [el];
-  }
-
-  this._log.debug('Attempting to detach from elements:', els);
-  this._detachElements(els);
-  return el ? els[0] : els;
-};
-
-MediaTrack.prototype._detachElements = function _detachElements(elements) {
-  return elements.map(this._detachElement.bind(this));
-};
-
-MediaTrack.prototype._detachElement = function _detachElement(el) {
-  if (!this._attachments.has(el)) {
-    return el;
-  }
-
-  var mediaStream = el.srcObject;
-  if (mediaStream instanceof this._MediaStream) {
-    mediaStream.removeTrack(this.mediaStreamTrack);
-    // NOTE(mroberts): It's as if, in Chrome and Safari, the <audio> element's
-    // `srcObject` setter is taking a "snapshot" of the MediaStream's
-    // MediaStreamTracks in order to playback; hence, calls to `removeTrack`
-    // don't take effect unless you set the <audio> element's `srcObject` again.
-    //
-    //   https://bugs.chromium.org/p/chromium/issues/detail?id=749928
-    //
-    el.srcObject = mediaStream;
-  }
-
-  this._attachments.delete(el);
-  return el;
-};
-
-MediaTrack.prototype._getAllAttachedElements = function _getAllAttachedElements() {
-  var els = [];
-
-  this._attachments.forEach(function(el) {
-    els.push(el);
-  });
-
-  return els;
-};
-
 module.exports = MediaTrack;
-
-},{"./":70,"@twilio/webrtc":37,"util":149}],80:[function(require,module,exports){
+},{"./":72,"@twilio/webrtc":37}],82:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var MediaTrackTransceiver = require('./transceiver');
 
 /**
- * Construct a {@link MediaTrackReceiver}.
- * @class
- * @classdesc A {@link MediaTrackReceiver} represents a remote MediaStreamTrack.
- * @param {Track.ID} id - The MediaStreamTrack ID signaled through RSP/SDP
- * @param {MediaStreamTrack} mediaStreamTrack - The remote MediaStreamTrack
+ * A {@link MediaTrackReceiver} represents a remote MediaStreamTrack.
+ * @extends MediaTrackTransceiver
  */
-function MediaTrackReceiver(id, mediaStreamTrack) {
-  if (!(this instanceof MediaTrackReceiver)) {
-    return new MediaTrackReceiver(id, mediaStreamTrack);
-  }
-  MediaTrackTransceiver.call(this, id, mediaStreamTrack);
-}
 
-inherits(MediaTrackReceiver, MediaTrackTransceiver);
+var MediaTrackReceiver = function (_MediaTrackTransceive) {
+  _inherits(MediaTrackReceiver, _MediaTrackTransceive);
+
+  /**
+   * Construct a {@link MediaTrackReceiver}.
+   * @param {Track.ID} id - The MediaStreamTrack ID signaled through RSP/SDP
+   * @param {MediaStreamTrack} mediaStreamTrack - The remote MediaStreamTrack
+   */
+  function MediaTrackReceiver(id, mediaStreamTrack) {
+    _classCallCheck(this, MediaTrackReceiver);
+
+    return _possibleConstructorReturn(this, (MediaTrackReceiver.__proto__ || Object.getPrototypeOf(MediaTrackReceiver)).call(this, id, mediaStreamTrack));
+  }
+
+  return MediaTrackReceiver;
+}(MediaTrackTransceiver);
 
 module.exports = MediaTrackReceiver;
-
-},{"./transceiver":87,"util":149}],81:[function(require,module,exports){
+},{"./transceiver":89}],83:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var AudioTrack = require('./audiotrack');
-var RemoteMediaTrack = require('./remotemediatrack');
+var mixinRemoteMediaTrack = require('./remotemediatrack');
+
+var RemoteMediaAudioTrack = mixinRemoteMediaTrack(AudioTrack);
 
 /**
- * Construct a {@link RemoteAudioTrack}.
- * @class
- * @classdesc A {@link RemoteAudioTrack} represents an {@link AudioTrack}
- *   published to a {@link Room} by a {@link RemoteParticipant}.
- * @extends {AudioTrack}
- * @param {MediaTrackReceiver} mediaTrackReceiver - An audio MediaStreamTrack container
- * @param {RemoteTrackSignaling} signaling - The {@link Track} signaling
- * @param {{log: Log}} options - The {@link RemoteTrack} options
+ * A {@link RemoteAudioTrack} represents an {@link AudioTrack} published to a
+ * {@link Room} by a {@link RemoteParticipant}.
+ * @extends AudioTrack
  * @property {boolean} isSubscribed - Whether the {@link RemoteAudioTrack} is
  *   currently subscribed to
  * @property {Track.SID} sid - The {@link RemoteAudioTrack}'s SID
- * @fires RemoteAudioTrack#disabled
- * @fires RemoteAudioTrack#enabled
- * @fires RemoteAudioTrack#started
- * @fires RemoteAudioTrack#unsubscribed
+ * @emits RemoteAudioTrack#disabled
+ * @emits RemoteAudioTrack#enabled
+ * @emits RemoteAudioTrack#started
+ * @emits RemoteAudioTrack#unsubscribed
  */
-function RemoteAudioTrack(mediaTrackReceiver, signaling, options) {
-  if (!(this instanceof RemoteAudioTrack)) {
-    return new RemoteAudioTrack(mediaTrackReceiver, signaling, options);
+
+var RemoteAudioTrack = function (_RemoteMediaAudioTrac) {
+  _inherits(RemoteAudioTrack, _RemoteMediaAudioTrac);
+
+  /**
+   * Construct a {@link RemoteAudioTrack}.
+   * @param {MediaTrackReceiver} mediaTrackReceiver - An audio MediaStreamTrack container
+   * @param {RemoteTrackSignaling} signaling - The {@link Track} signaling
+   * @param {{log: Log}} options - The {@link RemoteTrack} options
+   */
+  function RemoteAudioTrack(mediaTrackReceiver, signaling, options) {
+    _classCallCheck(this, RemoteAudioTrack);
+
+    return _possibleConstructorReturn(this, (RemoteAudioTrack.__proto__ || Object.getPrototypeOf(RemoteAudioTrack)).call(this, mediaTrackReceiver, signaling, options));
   }
-  RemoteMediaTrack.call(this, AudioTrack, mediaTrackReceiver, signaling, options);
-}
 
-inherits(RemoteAudioTrack, AudioTrack);
+  _createClass(RemoteAudioTrack, [{
+    key: 'toString',
+    value: function toString() {
+      return '[RemoteAudioTrack #' + this._instanceId + ': ' + this.sid + ']';
+    }
 
-RemoteAudioTrack.prototype.toString = function toString() {
-  return '[RemoteAudioTrack #' + this._instanceId + ': ' + this.sid + ']';
-};
+    /**
+     * @private
+     */
 
-RemoteAudioTrack.prototype._unsubscribe = RemoteMediaTrack.prototype._unsubscribe;
+  }, {
+    key: '_unsubscribe',
+    value: function _unsubscribe() {
+      return _get(RemoteAudioTrack.prototype.__proto__ || Object.getPrototypeOf(RemoteAudioTrack.prototype), '_unsubscribe', this).apply(this, arguments);
+    }
+  }]);
+
+  return RemoteAudioTrack;
+}(RemoteMediaAudioTrack);
 
 /**
  * The {@link RemoteAudioTrack} was disabled, i.e. "muted".
@@ -17869,25 +18071,23 @@ RemoteAudioTrack.prototype._unsubscribe = RemoteMediaTrack.prototype._unsubscrib
  */
 
 module.exports = RemoteAudioTrack;
-
-},{"./audiotrack":69,"./remotemediatrack":83,"util":149}],82:[function(require,module,exports){
+},{"./audiotrack":68,"./remotemediatrack":85}],84:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
-var buildLogLevels = require('../../util').buildLogLevels;
-var DEFAULT_LOG_LEVEL = require('../../util/constants').DEFAULT_LOG_LEVEL;
-var Log = require('../../util/log');
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var Track = require('./');
 
 /**
- * Construct a {@link RemoteDataTrack} from a {@link DataTrackReceiver}.
- * @class
- * @classdesc A {@link RemoteDataTrack} represents data published to a
- *   {@link Room} by a {@link RemoteParticipant}.
- * @extends {Track}
- * @param {DataTrackReceiver} dataTrackReceiver
- * @param {RemoteTrackSignaling} signaling
- * @param {{log: Log}} options
+ * A {@link RemoteDataTrack} represents data published to a {@link Room} by a
+ * {@link RemoteParticipant}.
+ * @extends Track
  * @property {boolean} isSubscribed - Whether the {@link RemoteDataTrack} is
  *   currently subscribed to
  * @property {Track.Kind} kind - "data"
@@ -17905,80 +18105,93 @@ var Track = require('./');
  *   or the number of retransmits that will be attempted, ensuring "reliable"
  *   transmission.
  * @property {Track.SID} sid - The {@link RemoteDataTrack}'s SID
- * @fires RemoteDataTrack#message
- * @fires RemoteDataTrack#unsubscribed
+ * @emits RemoteDataTrack#message
+ * @emits RemoteDataTrack#unsubscribed
  */
-function RemoteDataTrack(dataTrackReceiver, signaling, options) {
-  if (!(this instanceof RemoteDataTrack)) {
-    return new RemoteDataTrack(dataTrackReceiver, signaling, options);
-  }
 
-  options = Object.assign({
-    logLevel: DEFAULT_LOG_LEVEL,
-    name: signaling.name
-  }, options);
+var RemoteDataTrack = function (_Track) {
+  _inherits(RemoteDataTrack, _Track);
 
-  var logLevels = buildLogLevels(options.logLevel);
-  options.log = options.log || new Log('default', this, logLevels);
-  Track.call(this, dataTrackReceiver.id, 'data', options);
+  /**
+   * Construct a {@link RemoteDataTrack} from a {@link DataTrackReceiver}.
+   * @param {DataTrackReceiver} dataTrackReceiver
+   * @param {RemoteTrackSignaling} signaling
+   * @param {{log: Log}} options
+   */
+  function RemoteDataTrack(dataTrackReceiver, signaling, options) {
+    _classCallCheck(this, RemoteDataTrack);
 
-  var isSubscribed = signaling.isSubscribed;
-  Object.defineProperties(this, {
-    _isSubscribed: {
-      set: function(_isSubscribed) {
-        isSubscribed = _isSubscribed;
+    options = Object.assign({
+      name: signaling.name
+    }, options);
+
+    var _this = _possibleConstructorReturn(this, (RemoteDataTrack.__proto__ || Object.getPrototypeOf(RemoteDataTrack)).call(this, dataTrackReceiver.id, 'data', options));
+
+    var isSubscribed = signaling.isSubscribed;
+    Object.defineProperties(_this, {
+      _isSubscribed: {
+        set: function set(_isSubscribed) {
+          isSubscribed = _isSubscribed;
+        },
+        get: function get() {
+          return isSubscribed;
+        }
       },
-      get: function() {
-        return isSubscribed;
+      _signaling: {
+        value: signaling
+      },
+      isSubscribed: {
+        enumerable: true,
+        get: function get() {
+          return this._isSubscribed;
+        }
+      },
+      maxPacketLifeTime: {
+        enumerable: true,
+        value: dataTrackReceiver.maxPacketLifeTime
+      },
+      maxRetransmits: {
+        enumerable: true,
+        value: dataTrackReceiver.maxRetransmits
+      },
+      ordered: {
+        enumerable: true,
+        value: dataTrackReceiver.ordered
+      },
+      reliable: {
+        enumerable: true,
+        value: dataTrackReceiver.maxPacketLifeTime === null && dataTrackReceiver.maxRetransmits === null
+      },
+      sid: {
+        enumerable: true,
+        value: signaling.sid
       }
-    },
-    _signaling: {
-      value: signaling
-    },
-    isSubscribed: {
-      enumerable: true,
-      get: function() {
-        return this._isSubscribed;
-      }
-    },
-    maxPacketLifeTime: {
-      enumerable: true,
-      value: dataTrackReceiver.maxPacketLifeTime
-    },
-    maxRetransmits: {
-      enumerable: true,
-      value: dataTrackReceiver.maxRetransmits
-    },
-    ordered: {
-      enumerable: true,
-      value: dataTrackReceiver.ordered
-    },
-    reliable: {
-      enumerable: true,
-      value: dataTrackReceiver.maxPacketLifeTime === null
-        && dataTrackReceiver.maxRetransmits === null
-    },
-    sid: {
-      enumerable: true,
-      value: signaling.sid
-    }
-  });
+    });
 
-  var self = this;
-  dataTrackReceiver.on('message', function(data) {
-    self.emit('message', data, self);
-  });
-}
-
-inherits(RemoteDataTrack, Track);
-
-RemoteDataTrack.prototype._unsubscribe = function unsubscribe() {
-  if (this.isSubscribed) {
-    this._isSubscribed = false;
-    this.emit('unsubscribed', this);
+    dataTrackReceiver.on('message', function (data) {
+      _this.emit('message', data, _this);
+    });
+    return _this;
   }
-  return this;
-};
+
+  /**
+   * @private
+   */
+
+
+  _createClass(RemoteDataTrack, [{
+    key: '_unsubscribe',
+    value: function _unsubscribe() {
+      if (this.isSubscribed) {
+        this._isSubscribed = false;
+        this.emit('unsubscribed', this);
+      }
+      return this;
+    }
+  }]);
+
+  return RemoteDataTrack;
+}(Track);
 
 /**
  * A message was received over the {@link RemoteDataTrack}.
@@ -17996,91 +18209,111 @@ RemoteDataTrack.prototype._unsubscribe = function unsubscribe() {
  */
 
 module.exports = RemoteDataTrack;
-
-},{"../../util":129,"../../util/constants":127,"../../util/log":132,"./":70,"util":149}],83:[function(require,module,exports){
+},{"./":72}],85:[function(require,module,exports){
 'use strict';
 
-var buildLogLevels = require('../../util').buildLogLevels;
-var DEFAULT_LOG_LEVEL = require('../../util/constants').DEFAULT_LOG_LEVEL;
-var Log = require('../../util/log');
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-/**
- * Construct a {@link RemoteMediaTrack}.
- * @class
- * @classdesc A {@link RemoteMediaTrack} represents a {@link MediaTrack}
- *   published to a {@link Room} by a {@link RemoteParticipant}.
- * @extends {MediaTrack}
- * @param {function(MediaTrackTransceiver, TrackSignaling): MediaTrack} MediaTrack
- * @param {MediaTrackReceiver} mediaTrackReceiver
- * @param {RemoteTrackSignaling} signaling
- * @param {{log: Log}} options
- * @property {boolean} isSubscribed - Whether the {@link RemoteMediaTrack} is
- *   subscribed by the {@link LocalParticipant}
- * @property {Track.SID} sid - The SID assigned to the {@link RemoteMediaTrack}
- * @fires RemoteTrack#unsubscribed
- */
-function RemoteMediaTrack(MediaTrack, mediaTrackReceiver, signaling, options) {
-  options = Object.assign({
-    logLevel: DEFAULT_LOG_LEVEL,
-    name: signaling.name
-  }, options);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-  var logLevels = buildLogLevels(options.logLevel);
-  options.log = options.log || new Log('default', this, logLevels);
-  MediaTrack.call(this, mediaTrackReceiver, options);
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-  var isSubscribed = signaling.isSubscribed;
-  Object.defineProperties(this, {
-    _isSubscribed: {
-      set: function(_isSubscribed) {
-        isSubscribed = _isSubscribed;
-      },
-      get: function() {
-        return isSubscribed;
-      }
-    },
-    _mediaTrackReceiver: {
-      value: mediaTrackReceiver
-    },
-    _signaling: {
-      value: signaling
-    },
-    isEnabled: {
-      enumerable: true,
-      get: function() {
-        return signaling.isEnabled;
-      }
-    },
-    isSubscribed: {
-      enumerable: true,
-      get: function() {
-        return this._isSubscribed;
-      }
-    },
-    sid: {
-      enumerable: true,
-      value: signaling.sid
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function mixinRemoteMediaTrack(AudioOrVideoTrack) {
+  /**
+   * A {@link RemoteMediaTrack} represents a {@link MediaTrack} published to a
+   * {@link Room} by a {@link RemoteParticipant}.
+   * @property {boolean} isSubscribed - Whether the {@link RemoteMediaTrack} is
+   *   subscribed by the {@link LocalParticipant}
+   * @property {Track.SID} sid - The SID assigned to the {@link RemoteMediaTrack}
+   * @emits RemoteTrack#unsubscribed
+   */
+  return function (_AudioOrVideoTrack) {
+    _inherits(RemoteMediaTrack, _AudioOrVideoTrack);
+
+    /**
+     * Construct a {@link RemoteMediaTrack}.
+     * @param {MediaTrackReceiver} mediaTrackReceiver
+     * @param {RemoteTrackSignaling} signaling
+     * @param {{log: Log}} options
+     */
+    function RemoteMediaTrack(mediaTrackReceiver, signaling, options) {
+      _classCallCheck(this, RemoteMediaTrack);
+
+      options = Object.assign({
+        name: signaling.name
+      }, options);
+
+      var _this = _possibleConstructorReturn(this, (RemoteMediaTrack.__proto__ || Object.getPrototypeOf(RemoteMediaTrack)).call(this, mediaTrackReceiver, options));
+
+      var isSubscribed = signaling.isSubscribed;
+      Object.defineProperties(_this, {
+        _isSubscribed: {
+          set: function set(_isSubscribed) {
+            isSubscribed = _isSubscribed;
+          },
+          get: function get() {
+            return isSubscribed;
+          }
+        },
+        _mediaTrackReceiver: {
+          value: mediaTrackReceiver
+        },
+        _signaling: {
+          value: signaling
+        },
+        isEnabled: {
+          enumerable: true,
+          get: function get() {
+            return signaling.isEnabled;
+          }
+        },
+        isSubscribed: {
+          enumerable: true,
+          get: function get() {
+            return this._isSubscribed;
+          }
+        },
+        sid: {
+          enumerable: true,
+          value: signaling.sid
+        }
+      });
+
+      _this._signaling.on('updated', function () {
+        _this.emit(_this.isEnabled ? 'enabled' : 'disabled', _this);
+      });
+      return _this;
     }
-  });
 
-  var self = this;
-  this._signaling.on('updated', function onupdated() {
-    self.emit(self.isEnabled ? 'enabled' : 'disabled', self);
-  });
+    /**
+     * @private
+     */
+
+
+    _createClass(RemoteMediaTrack, [{
+      key: '_unsubscribe',
+      value: function _unsubscribe() {
+        if (this.isSubscribed) {
+          this._isSubscribed = false;
+          this.emit('unsubscribed', this);
+        }
+        return this;
+      }
+    }]);
+
+    return RemoteMediaTrack;
+  }(AudioOrVideoTrack);
 }
 
-RemoteMediaTrack.prototype._unsubscribe = function unsubscribe() {
-  if (this.isSubscribed) {
-    this._isSubscribed = false;
-    this.emit('unsubscribed', this);
-  }
-  return this;
-};
-
-module.exports = RemoteMediaTrack;
-
-},{"../../util":129,"../../util/constants":127,"../../util/log":132}],84:[function(require,module,exports){
+module.exports = mixinRemoteMediaTrack;
+},{}],86:[function(require,module,exports){
 'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var buildLogLevels = require('../../util').buildLogLevels;
 var Log = require('../../util/log');
@@ -18088,57 +18321,68 @@ var DEFAULT_LOG_LEVEL = require('../../util/constants').DEFAULT_LOG_LEVEL;
 var nInstances = 0;
 
 /**
- * Construct a {@link RemoteTrackPublication}.
- * @class
- * @classdesc A {@link RemoteTrackPublication} represents a {@link RemoteTrack}
- *   that has been published to a {@link Room}.
- * @param {Track.Kind} kind - the {@link RemoteTrack}'s kind
- * @param {Track.SID} trackSid - the {@link RemoteTrack}'s SID
- * @param {string} trackName - the {@link RemoteTrack}'s name
- * @param {RemoteTrackPublicationOptions} options - {@link RemoteTrackPublication}
- *   options
+ * A {@link RemoteTrackPublication} represents a {@link RemoteTrack} that has
+ * been published to a {@link Room}.
  * @property {Track.Kind} kind - kind of the published {@link RemoteTrack}
  * @property {?RemoteTrack} track - unless you have subscribed to the
  *   {@link RemoteTrack}, this property is null
  * @property {string} trackName - the {@link RemoteTrack}'s name
  * @property {Track.SID} trackSid - the {@link RemoteTrack}'s SID
  */
-function RemoteTrackPublication(kind, trackSid, trackName, options) {
-  options = Object.assign({
-    logLevel: DEFAULT_LOG_LEVEL
-  }, options);
 
-  var logLevels = buildLogLevels(options.logLevel);
+var RemoteTrackPublication = function () {
+  /**
+   * Construct a {@link RemoteTrackPublication}.
+   * @param {Track.Kind} kind - the {@link RemoteTrack}'s kind
+   * @param {Track.SID} trackSid - the {@link RemoteTrack}'s SID
+   * @param {string} trackName - the {@link RemoteTrack}'s name
+   * @param {RemoteTrackPublicationOptions} options - {@link RemoteTrackPublication}
+   *   options
+   */
+  function RemoteTrackPublication(kind, trackSid, trackName, options) {
+    _classCallCheck(this, RemoteTrackPublication);
 
-  Object.defineProperties(this, {
-    _instanceId: {
-      value: nInstances++
-    },
-    _log: {
-      value: options.log || new Log('default', this, logLevels)
-    },
-    kind: {
-      enumerable: true,
-      value: kind
-    },
-    track: {
-      enumerable: true,
-      value: null
-    },
-    trackName: {
-      enumerable: true,
-      value: trackName
-    },
-    trackSid: {
-      enumerable: true,
-      value: trackSid
+    options = Object.assign({
+      logLevel: DEFAULT_LOG_LEVEL
+    }, options);
+
+    var logLevels = buildLogLevels(options.logLevel);
+
+    Object.defineProperties(this, {
+      _instanceId: {
+        value: nInstances++
+      },
+      _log: {
+        value: options.log || new Log('default', this, logLevels)
+      },
+      kind: {
+        enumerable: true,
+        value: kind
+      },
+      track: {
+        enumerable: true,
+        value: null
+      },
+      trackName: {
+        enumerable: true,
+        value: trackName
+      },
+      trackSid: {
+        enumerable: true,
+        value: trackSid
+      }
+    });
+  }
+
+  _createClass(RemoteTrackPublication, [{
+    key: 'toString',
+    value: function toString() {
+      return '[RemoteTrackPublication #' + this._instanceId + ': ' + this.trackSid + ']';
     }
-  });
-}
+  }]);
 
-RemoteTrackPublication.prototype.toString = function toString() {
-  return '[RemoteTrackPublication #' + this._instanceId + ': ' + this.trackSid + ']';
-};
+  return RemoteTrackPublication;
+}();
 
 /**
 /**
@@ -18148,45 +18392,71 @@ RemoteTrackPublication.prototype.toString = function toString() {
  */
 
 module.exports = RemoteTrackPublication;
-
-},{"../../util":129,"../../util/constants":127,"../../util/log":132}],85:[function(require,module,exports){
+},{"../../util":131,"../../util/constants":129,"../../util/log":134}],87:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
-var RemoteMediaTrack = require('./remotemediatrack');
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var mixinRemoteMediaTrack = require('./remotemediatrack');
 var VideoTrack = require('./videotrack');
 
+var RemoteMediaVideoTrack = mixinRemoteMediaTrack(VideoTrack);
+
 /**
- * Construct a {@link RemoteVideoTrack}.
- * @class
- * @classdesc A {@link RemoteVideoTrack} represents a {@link VideoTrack}
- *   published to a {@link Room} by a {@link RemoteParticipant}.
- * @extends {VideoTrack}
- * @param {MediaTrackReceiver} mediaTrackReceiver - A video MediaStreamTrack container
- * @param {RemoteTrackSignaling} signaling - The {@link Track} signaling
- * @param {{log: Log}} options - The {@link RemoteTrack} options
+ * A {@link RemoteVideoTrack} represents a {@link VideoTrack} published to a
+ * {@link Room} by a {@link RemoteParticipant}.
+ * @extends VideoTrack
  * @property {boolean} isSubscribed - Whether the {@link RemoteVideoTrack} is
  *   currently subscribed to
  * @property {Track.SID} sid - The {@link RemoteVideoTrack}'s SID
- * @fires RemoteVideoTrack#disabled
- * @fires RemoteVideoTrack#enabled
- * @fires RemoteVideoTrack#started
- * @fires RemoteVideoTrack#unsubscribed
+ * @emits RemoteVideoTrack#disabled
+ * @emits RemoteVideoTrack#enabled
+ * @emits RemoteVideoTrack#started
+ * @emits RemoteVideoTrack#unsubscribed
  */
-function RemoteVideoTrack(mediaTrackReceiver, signaling, options) {
-  if (!(this instanceof RemoteVideoTrack)) {
-    return new RemoteVideoTrack(mediaTrackReceiver, signaling, options);
+
+var RemoteVideoTrack = function (_RemoteMediaVideoTrac) {
+  _inherits(RemoteVideoTrack, _RemoteMediaVideoTrac);
+
+  /**
+   * Construct a {@link RemoteVideoTrack}.
+   * @param {MediaTrackReceiver} mediaTrackReceiver - A video MediaStreamTrack container
+   * @param {RemoteTrackSignaling} signaling - The {@link Track} signaling
+   * @param {{log: Log}} options - The {@link RemoteTrack} options
+   */
+  function RemoteVideoTrack(mediaTrackReceiver, signaling, options) {
+    _classCallCheck(this, RemoteVideoTrack);
+
+    return _possibleConstructorReturn(this, (RemoteVideoTrack.__proto__ || Object.getPrototypeOf(RemoteVideoTrack)).call(this, mediaTrackReceiver, signaling, options));
   }
-  RemoteMediaTrack.call(this, VideoTrack, mediaTrackReceiver, signaling, options);
-}
 
-inherits(RemoteVideoTrack, VideoTrack);
+  _createClass(RemoteVideoTrack, [{
+    key: 'toString',
+    value: function toString() {
+      return '[RemoteVideoTrack #' + this._instanceId + ': ' + this.sid + ']';
+    }
 
-RemoteVideoTrack.prototype.toString = function toString() {
-  return '[RemoteVideoTrack #' + this._instanceId + ': ' + this.sid + ']';
-};
+    /**
+     * @private
+     */
 
-RemoteVideoTrack.prototype._unsubscribe = RemoteMediaTrack.prototype._unsubscribe;
+  }, {
+    key: '_unsubscribe',
+    value: function _unsubscribe() {
+      return _get(RemoteVideoTrack.prototype.__proto__ || Object.getPrototypeOf(RemoteVideoTrack.prototype), '_unsubscribe', this).apply(this, arguments);
+    }
+  }]);
+
+  return RemoteVideoTrack;
+}(RemoteMediaVideoTrack);
 
 /**
  * The {@link RemoteVideoTrack}'s dimensions changed.
@@ -18217,107 +18487,144 @@ RemoteVideoTrack.prototype._unsubscribe = RemoteMediaTrack.prototype._unsubscrib
  */
 
 module.exports = RemoteVideoTrack;
-
-},{"./remotemediatrack":83,"./videotrack":88,"util":149}],86:[function(require,module,exports){
+},{"./remotemediatrack":85,"./videotrack":90}],88:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var MediaTrackTransceiver = require('./transceiver');
 
 /**
- * Construct a {@link MediaTrackSender}.
- * @class
- * @classdesc A {@link MediaTrackSender} represents one or more
- *   local RTCRtpSenders.
- * @param {MediaStreamTrack} mediaStreamTrack
+ * A {@link MediaTrackSender} represents one or more local RTCRtpSenders.
  * @extends MediaTrackTransceiver
  */
-function MediaTrackSender(mediaStreamTrack) {
-  if (!(this instanceof MediaTrackSender)) {
-    return new MediaTrackSender(mediaStreamTrack);
+
+var MediaTrackSender = function (_MediaTrackTransceive) {
+  _inherits(MediaTrackSender, _MediaTrackTransceive);
+
+  /**
+   * Construct a {@link MediaTrackSender}.
+   * @param {MediaStreamTrack} mediaStreamTrack
+   */
+  function MediaTrackSender(mediaStreamTrack) {
+    _classCallCheck(this, MediaTrackSender);
+
+    var _this = _possibleConstructorReturn(this, (MediaTrackSender.__proto__ || Object.getPrototypeOf(MediaTrackSender)).call(this, mediaStreamTrack.id, mediaStreamTrack));
+
+    Object.defineProperties(_this, {
+      _senders: {
+        value: new Set()
+      }
+    });
+    return _this;
   }
-  MediaTrackTransceiver.call(this, mediaStreamTrack.id, mediaStreamTrack);
-  Object.defineProperties(this, {
-    _senders: {
-      value: new Set()
+
+  /**
+   * Add an RTCRtpSender.
+   * @param {RTCRtpSender} sender
+   * @returns {this}
+   */
+
+
+  _createClass(MediaTrackSender, [{
+    key: 'addSender',
+    value: function addSender(sender) {
+      this._senders.add(sender);
+      return this;
     }
-  });
-}
 
-inherits(MediaTrackSender, MediaTrackTransceiver);
+    /**
+     * Remove an RTCRtpSender.
+     * @param {RTCRtpSender} sender
+     * @returns {this}
+     */
 
-/**
- * Add an RTCRtpSender.
- * @param {RTCRtpSender} sender
- * @returns {this}
- */
-MediaTrackSender.prototype.addSender = function addSender(sender) {
-  this._senders.add(sender);
-  return this;
-};
+  }, {
+    key: 'removeSender',
+    value: function removeSender(sender) {
+      this._senders.delete(sender);
+      return this;
+    }
+  }]);
 
-/**
- * Remove an RTCRtpSender.
- * @param {RTCRtpSender} sender
- * @returns {this}
- */
-MediaTrackSender.prototype.removeSender = function removeSender(sender) {
-  this._senders.delete(sender);
-  return this;
-};
+  return MediaTrackSender;
+}(MediaTrackTransceiver);
 
 module.exports = MediaTrackSender;
-
-},{"./transceiver":87,"util":149}],87:[function(require,module,exports){
+},{"./transceiver":89}],89:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var TrackTransceiver = require('../../transceiver');
 
 /**
- * Construct a {@link MediaTrackTransceiver}.
- * @class
- * @classdesc A {@link MediaTrackTransceiver} represents either one or more
- *   local RTCRtpSenders, or a single RTCRtpReceiver.
- * @param {Track.ID} id - The MediaStreamTrack ID signaled through RSP/SDP
- * @param {MediaStreamTrack} mediaStreamTrack
- * @property {MediaStreamTrack} track
+ * A {@link MediaTrackTransceiver} represents either one or more local
+ * RTCRtpSenders, or a single RTCRtpReceiver.
  * @extends TrackTransceiver
+ * @property {MediaStreamTrack} track
  */
-function MediaTrackTransceiver(id, mediaStreamTrack) {
-  TrackTransceiver.call(this, id, mediaStreamTrack.kind);
-  Object.defineProperties(this, {
-    readyState: {
-      enumerable: true,
-      get: function() {
-        return mediaStreamTrack.readyState;
+
+var MediaTrackTransceiver = function (_TrackTransceiver) {
+  _inherits(MediaTrackTransceiver, _TrackTransceiver);
+
+  /**
+   * Construct a {@link MediaTrackTransceiver}.
+   * @param {Track.ID} id - The MediaStreamTrack ID signaled through RSP/SDP
+   * @param {MediaStreamTrack} mediaStreamTrack
+   */
+  function MediaTrackTransceiver(id, mediaStreamTrack) {
+    _classCallCheck(this, MediaTrackTransceiver);
+
+    var _this = _possibleConstructorReturn(this, (MediaTrackTransceiver.__proto__ || Object.getPrototypeOf(MediaTrackTransceiver)).call(this, id, mediaStreamTrack.kind));
+
+    Object.defineProperties(_this, {
+      readyState: {
+        enumerable: true,
+        get: function get() {
+          return mediaStreamTrack.readyState;
+        }
+      },
+      track: {
+        enumerable: true,
+        value: mediaStreamTrack
       }
-    },
-    track: {
-      enumerable: true,
-      value: mediaStreamTrack
-    }
-  });
-}
+    });
+    return _this;
+  }
 
-
-inherits(MediaTrackTransceiver, TrackTransceiver);
+  return MediaTrackTransceiver;
+}(TrackTransceiver);
 
 module.exports = MediaTrackTransceiver;
-
-},{"../../transceiver":125,"util":149}],88:[function(require,module,exports){
+},{"../../transceiver":127}],90:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var MediaTrack = require('./mediatrack');
 
 /**
- * Construct a {@link VideoTrack}.
- * @class
- * @classdesc A {@link VideoTrack} is a {@link Track} representing video.
+ * A {@link VideoTrack} is a {@link Track} representing video.
  * @extends Track
- * @param {MediaTrackTransceiver} mediaTrackTransceiver
- * @param {{log: Log}} options
  * @property {boolean} isStarted - Whether or not the {@link VideoTrack} has
  *   started; if the {@link VideoTrack} started, there is enough video data to
  *   begin playback
@@ -18327,27 +18634,159 @@ var MediaTrack = require('./mediatrack');
  *   {@link VideoTrack.Dimensions}
  * @property {Track.Kind} kind - "video"
  * @property {MediaStreamTrack} mediaStreamTrack - A video MediaStreamTrack
- * @fires VideoTrack#dimensionsChanged
- * @fires VideoTrack#disabled
- * @fires VideoTrack#enabled
- * @fires VideoTrack#started
+ * @emits VideoTrack#dimensionsChanged
+ * @emits VideoTrack#disabled
+ * @emits VideoTrack#enabled
+ * @emits VideoTrack#started
  */
-function VideoTrack(mediaTrackTransceiver, options) {
-  MediaTrack.call(this, mediaTrackTransceiver, options);
-  Object.defineProperties(this, {
-    dimensions: {
-      enumerable: true,
-      value: {
-        width: null,
-        height: null
+
+var VideoTrack = function (_MediaTrack) {
+  _inherits(VideoTrack, _MediaTrack);
+
+  /**
+   * Construct a {@link VideoTrack}.
+   * @param {MediaTrackTransceiver} mediaTrackTransceiver
+   * @param {{log: Log}} options
+   */
+  function VideoTrack(mediaTrackTransceiver, options) {
+    var _ret;
+
+    _classCallCheck(this, VideoTrack);
+
+    var _this = _possibleConstructorReturn(this, (VideoTrack.__proto__ || Object.getPrototypeOf(VideoTrack)).call(this, mediaTrackTransceiver, options));
+
+    Object.defineProperties(_this, {
+      dimensions: {
+        enumerable: true,
+        value: {
+          width: null,
+          height: null
+        }
       }
+    });
+    Object.defineProperty(_this, '_dimensionsChangedElem', {
+      value: emitDimensionsChangedEvents(_this)
+    });
+    return _ret = _this, _possibleConstructorReturn(_this, _ret);
+  }
+
+  /**
+   * @private
+   */
+
+
+  _createClass(VideoTrack, [{
+    key: '_start',
+    value: function _start(dummyEl) {
+      this.dimensions.width = dummyEl.videoWidth;
+      this.dimensions.height = dummyEl.videoHeight;
+
+      this._log.debug('Dimensions:', this.dimensions);
+      return _get(VideoTrack.prototype.__proto__ || Object.getPrototypeOf(VideoTrack.prototype), '_start', this).call(this, dummyEl);
     }
-  });
-  Object.defineProperty(this, '_dimensionsChangedElem', {
-    value: emitDimensionsChangedEvents(this)
-  });
-  return this;
-}
+
+    /**
+     * Create an HTMLVideoElement and attach the {@link VideoTrack} to it.
+     *
+     * The HTMLVideoElement's <code>srcObject</code> will be set to a new
+     * MediaStream containing the {@link VideoTrack}'s MediaStreamTrack.
+     *
+     * @returns {HTMLVideoElement} videoElement
+     * @example
+     * const Video = require('twilio-video');
+     *
+     * Video.createLocalVideoTrack().then(function(videoTrack) {
+     *   const videoElement = videoTrack.attach();
+     *   document.body.appendChild(videoElement);
+     * });
+    */ /**
+       * Attach the {@link VideoTrack} to an existing HTMLMediaElement. The
+       * HTMLMediaElement could be an HTMLAudioElement or an HTMLVideoElement.
+       *
+       * If the HTMLMediaElement's <code>srcObject</code> is not set to a MediaStream,
+       * this method sets it to a new MediaStream containing the {@link VideoTrack}'s
+       * MediaStreamTrack; otherwise, it adds the {@link MediaTrack}'s
+       * MediaStreamTrack to the existing MediaStream. Finally, if there are any other
+       * MediaStreamTracks of the same kind on the MediaStream, this method removes
+       * them.
+       *
+       * @param {HTMLMediaElement} mediaElement - The HTMLMediaElement to attach to
+       * @returns {HTMLMediaElement} mediaElement
+       * @example
+       * const Video = require('twilio-video');
+       *
+       * const videoElement = document.createElement('video');
+       * document.body.appendChild(videoElement);
+       *
+       * Video.createLocalVideoTrack().then(function(videoTrack) {
+       *   videoTrack.attach(videoElement);
+       * });
+       */ /**
+          * Attach the {@link VideoTrack} to an HTMLMediaElement selected by
+          * <code>document.querySelector</code>. The HTMLMediaElement could be an
+          * HTMLAudioElement or an HTMLVideoElement.
+          *
+          * If the HTMLMediaElement's <code>srcObject</code> is not set to a MediaStream,
+          * this method sets it to a new MediaStream containing the {@link VideoTrack}'s
+          * MediaStreamTrack; otherwise, it adds the {@link VideoTrack}'s
+          * MediaStreamTrack to the existing MediaStream. Finally, if there are any other
+          * MediaStreamTracks of the same kind on the MediaStream, this method removes
+          * them.
+          *
+          * @param {string} selector - A query selector for the HTMLMediaElement to
+          *   attach to
+          * @returns {HTMLMediaElement} mediaElement
+          * @example
+          * const Video = require('twilio-video');
+          *
+          * const videoElement = document.createElement('video');
+          * videoElement.id = 'my-video-element';
+          * document.body.appendChild(videoElement);
+          *
+          * Video.createLocalVideoTrack().then(function(track) {
+          *   track.attach('#my-video-element');
+          * });
+          */
+
+  }, {
+    key: 'attach',
+    value: function attach() {
+      return _get(VideoTrack.prototype.__proto__ || Object.getPrototypeOf(VideoTrack.prototype), 'attach', this).apply(this, arguments);
+    }
+
+    /**
+     * Detach the {@link VideoTrack} from all previously attached HTMLMediaElements.
+     * @returns {Array<HTMLMediaElement>} mediaElements
+     * @example
+     * const mediaElements = videoTrack.detach();
+     * mediaElements.forEach(mediaElement => mediaElement.remove());
+    */ /**
+       * Detach the {@link VideoTrack} from a previously attached HTMLMediaElement.
+       * @param {HTMLMediaElement} mediaElement - One of the HTMLMediaElements to
+       *   which the {@link VideoTrack} is attached
+       * @returns {HTMLMediaElement} mediaElement
+       * @example
+       * const videoElement = document.getElementById('my-video-element');
+       * videoTrack.detach(videoElement).remove();
+       */ /**
+          * Detach the {@link VideoTrack} from a previously attached HTMLMediaElement
+          *   specified by <code>document.querySelector</code>.
+          * @param {string} selector - The query selector of HTMLMediaElement to which
+          *    the {@link VideoTrack} is attached
+          * @returns {HTMLMediaElement} mediaElement
+          * @example
+          * videoTrack.detach('#my-video-element').remove();
+          */
+
+  }, {
+    key: 'detach',
+    value: function detach() {
+      return _get(VideoTrack.prototype.__proto__ || Object.getPrototypeOf(VideoTrack.prototype), 'detach', this).apply(this, arguments);
+    }
+  }]);
+
+  return VideoTrack;
+}(MediaTrack);
 
 var DIMENSIONS_CHANGED = VideoTrack.DIMENSIONS_CHANGED = 'dimensionsChanged';
 
@@ -18379,114 +18818,8 @@ function emitDimensionsChangedEvents(track) {
 }
 
 function dimensionsChanged(track, elem) {
-  return track.dimensions.width !== elem.videoWidth
-    || track.dimensions.height !== elem.videoHeight;
+  return track.dimensions.width !== elem.videoWidth || track.dimensions.height !== elem.videoHeight;
 }
-
-inherits(VideoTrack, MediaTrack);
-
-VideoTrack.prototype._start = function _start(dummyEl) {
-  this.dimensions.width = dummyEl.videoWidth;
-  this.dimensions.height = dummyEl.videoHeight;
-
-  this._log.debug('Dimensions:', this.dimensions);
-  return MediaTrack.prototype._start.call(this, dummyEl);
-};
-
-/**
- * Create an HTMLVideoElement and attach the {@link VideoTrack} to it.
- *
- * The HTMLVideoElement's <code>srcObject</code> will be set to a new
- * MediaStream containing the {@link VideoTrack}'s MediaStreamTrack.
- *
- * @method
- * @returns {HTMLVideoElement} videoElement
- * @example
- * const Video = require('twilio-video');
- *
- * Video.createLocalVideoTrack().then(function(videoTrack) {
- *   const videoElement = videoTrack.attach();
- *   document.body.appendChild(videoElement);
- * });
-*//**
- * Attach the {@link VideoTrack} to an existing HTMLMediaElement. The
- * HTMLMediaElement could be an HTMLAudioElement or an HTMLVideoElement.
- *
- * If the HTMLMediaElement's <code>srcObject</code> is not set to a MediaStream,
- * this method sets it to a new MediaStream containing the {@link VideoTrack}'s
- * MediaStreamTrack; otherwise, it adds the {@link MediaTrack}'s
- * MediaStreamTrack to the existing MediaStream. Finally, if there are any other
- * MediaStreamTracks of the same kind on the MediaStream, this method removes
- * them.
- *
- * @method
- * @param {HTMLMediaElement} mediaElement - The HTMLMediaElement to attach to
- * @returns {HTMLMediaElement} mediaElement
- * @example
- * const Video = require('twilio-video');
- *
- * const videoElement = document.createElement('video');
- * document.body.appendChild(videoElement);
- *
- * Video.createLocalVideoTrack().then(function(videoTrack) {
- *   videoTrack.attach(videoElement);
- * });
-*//**
- * Attach the {@link VideoTrack} to an HTMLMediaElement selected by
- * <code>document.querySelector</code>. The HTMLMediaElement could be an
- * HTMLAudioElement or an HTMLVideoElement.
- *
- * If the HTMLMediaElement's <code>srcObject</code> is not set to a MediaStream,
- * this method sets it to a new MediaStream containing the {@link VideoTrack}'s
- * MediaStreamTrack; otherwise, it adds the {@link VideoTrack}'s
- * MediaStreamTrack to the existing MediaStream. Finally, if there are any other
- * MediaStreamTracks of the same kind on the MediaStream, this method removes
- * them.
- *
- * @method
- * @param {string} selector - A query selector for the HTMLMediaElement to
- *   attach to
- * @returns {HTMLMediaElement} mediaElement
- * @example
- * const Video = require('twilio-video');
- *
- * const videoElement = document.createElement('video');
- * videoElement.id = 'my-video-element';
- * document.body.appendChild(videoElement);
- *
- * Video.createLocalVideoTrack().then(function(track) {
- *   track.attach('#my-video-element');
- * });
- */
-VideoTrack.prototype.attach = MediaTrack.prototype.attach;
-
-/**
- * Detach the {@link VideoTrack} from all previously attached HTMLMediaElements.
- * @method
- * @returns {Array<HTMLMediaElement>} mediaElements
- * @example
- * const mediaElements = videoTrack.detach();
- * mediaElements.forEach(mediaElement => mediaElement.remove());
-*//**
- * Detach the {@link VideoTrack} from a previously attached HTMLMediaElement.
- * @method
- * @param {HTMLMediaElement} mediaElement - One of the HTMLMediaElements to
- *   which the {@link VideoTrack} is attached
- * @returns {HTMLMediaElement} mediaElement
- * @example
- * const videoElement = document.getElementById('my-video-element');
- * videoTrack.detach(videoElement).remove();
-*//**
- * Detach the {@link VideoTrack} from a previously attached HTMLMediaElement
- *   specified by <code>document.querySelector</code>.
- * @method
- * @param {string} selector - The query selector of HTMLMediaElement to which
- *    the {@link VideoTrack} is attached
- * @returns {HTMLMediaElement} mediaElement
- * @example
- * videoTrack.detach('#my-video-element').remove();
- */
-VideoTrack.prototype.detach = MediaTrack.prototype.detach;
 
 /**
  * A {@link VideoTrack}'s width and height.
@@ -18523,24 +18856,30 @@ VideoTrack.prototype.detach = MediaTrack.prototype.detach;
  */
 
 module.exports = VideoTrack;
-
-},{"./mediatrack":79,"util":149}],89:[function(require,module,exports){
+},{"./mediatrack":81}],91:[function(require,module,exports){
 'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var RemoteAudioTrack = require('./media/track/remoteaudiotrack');
 var RemoteDataTrack = require('./media/track/remotedatatrack');
 var RemoteTrackPublication = require('./media/track/remotetrackpublication');
 var RemoteVideoTrack = require('./media/track/remotevideotrack');
 var EventEmitter = require('events').EventEmitter;
-var inherits = require('util').inherits;
 var util = require('./util');
+
 var nInstances = 0;
 
 /**
- * Construct a {@link Participant}.
- * @class
- * @param {ParticipantSignaling} signaling
- * @param {object} [options]
+ * @extends EventEmitter
  * @property {Map<Track.ID, AudioTrack>} audioTracks -
  *    The {@link Participant}'s {@link AudioTrack}s.
  * @property {Map<Track.ID, DataTrack>} dataTracks -
@@ -18552,244 +18891,274 @@ var nInstances = 0;
  *    The {@link Participant}'s {@link Track}s
  * @property {Map<Track.ID, VideoTrack>} videoTracks -
  *    The {@link Participant}'s {@link VideoTrack}s.
- * @fires Participant#disconnected
- * @fires Participant#trackAdded
- * @fires Participant#trackDimensionsChanged
- * @fires Participant#trackDisabled
- * @fires Participant#trackEnabled
- * @fires Participant#trackRemoved
- * @fires Participant#trackStarted
+ * @emits Participant#disconnected
+ * @emits Participant#trackAdded
+ * @emits Participant#trackDimensionsChanged
+ * @emits Participant#trackDisabled
+ * @emits Participant#trackEnabled
+ * @emits Participant#trackRemoved
+ * @emits Participant#trackStarted
  */
-function Participant(signaling, options) {
-  EventEmitter.call(this);
 
-  options = Object.assign({
-    RemoteAudioTrack: RemoteAudioTrack,
-    RemoteVideoTrack: RemoteVideoTrack,
-    RemoteDataTrack: RemoteDataTrack,
-    tracks: []
-  }, options);
+var Participant = function (_EventEmitter) {
+  _inherits(Participant, _EventEmitter);
 
-  var indexed = indexTracksById(options.tracks);
-  var log = options.log.createLog('default', this);
-  var audioTracks = new Map(indexed.audioTracks);
-  var dataTracks = new Map(indexed.dataTracks);
-  var tracks = new Map(indexed.tracks);
-  var videoTracks = new Map(indexed.videoTracks);
+  /**
+   * Construct a {@link Participant}.
+   * @param {ParticipantSignaling} signaling
+   * @param {object} [options]
+   */
+  function Participant(signaling, options) {
+    _classCallCheck(this, Participant);
 
-  Object.defineProperties(this, {
-    _RemoteAudioTrack: {
-      value: options.RemoteAudioTrack
-    },
-    _RemoteDataTrack: {
-      value: options.RemoteDataTrack
-    },
-    _instanceId: {
-      value: ++nInstances
-    },
-    _log: {
-      value: log
-    },
-    _signaling: {
-      value: signaling
-    },
-    _trackEventReemitters: {
-      value: new Map()
-    },
-    _RemoteVideoTrack: {
-      value: options.RemoteVideoTrack
-    },
-    audioTracks: {
-      enumerable: true,
-      value: audioTracks
-    },
-    dataTracks: {
-      enumerable: true,
-      value: dataTracks
-    },
-    identity: {
-      enumerable: true,
-      get: function() {
-        return signaling.identity;
+    var _this = _possibleConstructorReturn(this, (Participant.__proto__ || Object.getPrototypeOf(Participant)).call(this));
+
+    options = Object.assign({
+      RemoteAudioTrack: RemoteAudioTrack,
+      RemoteVideoTrack: RemoteVideoTrack,
+      RemoteDataTrack: RemoteDataTrack,
+      tracks: []
+    }, options);
+
+    var indexed = indexTracksById(options.tracks);
+    var log = options.log.createLog('default', _this);
+    var audioTracks = new Map(indexed.audioTracks);
+    var dataTracks = new Map(indexed.dataTracks);
+    var tracks = new Map(indexed.tracks);
+    var videoTracks = new Map(indexed.videoTracks);
+
+    Object.defineProperties(_this, {
+      _RemoteAudioTrack: {
+        value: options.RemoteAudioTrack
+      },
+      _RemoteDataTrack: {
+        value: options.RemoteDataTrack
+      },
+      _instanceId: {
+        value: ++nInstances
+      },
+      _log: {
+        value: log
+      },
+      _signaling: {
+        value: signaling
+      },
+      _trackEventReemitters: {
+        value: new Map()
+      },
+      _RemoteVideoTrack: {
+        value: options.RemoteVideoTrack
+      },
+      audioTracks: {
+        enumerable: true,
+        value: audioTracks
+      },
+      dataTracks: {
+        enumerable: true,
+        value: dataTracks
+      },
+      identity: {
+        enumerable: true,
+        get: function get() {
+          return signaling.identity;
+        }
+      },
+      sid: {
+        enumerable: true,
+        get: function get() {
+          return signaling.sid;
+        }
+      },
+      state: {
+        enumerable: true,
+        get: function get() {
+          return signaling.state;
+        }
+      },
+      tracks: {
+        enumerable: true,
+        value: tracks
+      },
+      videoTracks: {
+        enumerable: true,
+        value: videoTracks
       }
-    },
-    sid: {
-      enumerable: true,
-      get: function() {
-        return signaling.sid;
-      }
-    },
-    state: {
-      enumerable: true,
-      get: function() {
-        return signaling.state;
-      }
-    },
-    tracks: {
-      enumerable: true,
-      value: tracks
-    },
-    videoTracks: {
-      enumerable: true,
-      value: videoTracks
-    }
-  });
+    });
 
-  this.tracks.forEach(reemitTrackEvents.bind(null, this));
-  reemitSignalingStateChangedEvents(this, signaling);
-  this._handleTrackSignalingEvents();
-  log.info('Created a new Participant' + (this.identity ? ': ' + this.identity : ''));
-}
-
-inherits(Participant, EventEmitter);
-
-/**
- * Get the {@link RemoteTrack} events to re-emit.
- * @private
- * @returns {Array<Array<string>>} events
- */
-Participant.prototype._getTrackEvents = function _getTrackEvents() {
-  return [
-    ['dimensionsChanged', 'trackDimensionsChanged'],
-    ['disabled', 'trackDisabled'],
-    ['enabled', 'trackEnabled'],
-    ['message', 'trackMessage'],
-    ['started', 'trackStarted']
-  ];
-};
-
-Participant.prototype.toString = function toString() {
-  return '[Participant #' + this._instanceId + ': ' + this.sid + ']';
-};
-
-Participant.prototype._addTrack = function _addTrack(track) {
-  var log = this._log;
-  if (this.tracks.has(track.id)) {
-    return null;
-  }
-  this.tracks.set(track.id, track);
-
-  var tracksByKind = {
-    audio: this.audioTracks,
-    video: this.videoTracks,
-    data: this.dataTracks
-  }[track.kind];
-  tracksByKind.set(track.id, track);
-  reemitTrackEvents(this, track);
-
-  log.info('Added a new ' + util.trackClass(track) + ':', track.id);
-  log.debug(util.trackClass(track) + ':', track);
-  this.emit('trackAdded', track);
-
-  return track;
-};
-
-Participant.prototype._handleTrackSignalingEvents = function _handleTrackSignalingEvents() {
-  var log = this._log;
-  var self = this;
-
-  if (this.state === 'disconnected') {
-    return;
+    _this.tracks.forEach(reemitTrackEvents.bind(null, _this));
+    reemitSignalingStateChangedEvents(_this, signaling);
+    log.info('Created a new Participant' + (_this.identity ? ': ' + _this.identity : ''));
+    return _this;
   }
 
-  var RemoteAudioTrack = this._RemoteAudioTrack;
-  var RemoteVideoTrack = this._RemoteVideoTrack;
-  var RemoteDataTrack = this._RemoteDataTrack;
-  var signaling = this._signaling;
+  /**
+   * Get the {@link RemoteTrack} events to re-emit.
+   * @private
+   * @returns {Array<Array<string>>} events
+   */
 
-  function trackSignalingAdded(signaling) {
-    function handleTrackSubscriptionFailed() {
-      if (!signaling.error) {
-        return;
-      }
-      signaling.removeListener('updated', handleTrackSubscriptionFailed);
-      var remoteTrackPublication = new RemoteTrackPublication(
-        signaling.kind,
-        signaling.sid,
-        signaling.name,
-        { log: log });
-      self._log.warn('Failed to subscribe to Remote' +
-        util.capitalize(signaling.kind) + 'Track ' + signaling.sid + ' with ' +
-        'name "' + signaling.name + '": ' + signaling.error.message);
-      self.emit('trackSubscriptionFailed', signaling.error, remoteTrackPublication);
+
+  _createClass(Participant, [{
+    key: '_getTrackEvents',
+    value: function _getTrackEvents() {
+      return [['dimensionsChanged', 'trackDimensionsChanged'], ['disabled', 'trackDisabled'], ['enabled', 'trackEnabled'], ['message', 'trackMessage'], ['started', 'trackStarted']];
+    }
+  }, {
+    key: 'toString',
+    value: function toString() {
+      return '[Participant #' + this._instanceId + ': ' + this.sid + ']';
     }
 
-    signaling.on('updated', handleTrackSubscriptionFailed);
+    /**
+     * @private
+     */
 
-    signaling.getTrackTransceiver().then(function(trackReceiver) {
-      signaling.removeListener('updated', handleTrackSubscriptionFailed);
+  }, {
+    key: '_addTrack',
+    value: function _addTrack(track) {
+      var log = this._log;
+      if (this.tracks.has(track.id)) {
+        return null;
+      }
+      this.tracks.set(track.id, track);
 
-      var RemoteTrack = {
-        audio: RemoteAudioTrack,
-        video: RemoteVideoTrack,
-        data: RemoteDataTrack
-      }[signaling.kind];
+      var tracksByKind = {
+        audio: this.audioTracks,
+        video: this.videoTracks,
+        data: this.dataTracks
+      }[track.kind];
+      tracksByKind.set(track.id, track);
+      reemitTrackEvents(this, track);
 
-      // NOTE(mroberts): It should never be the case that the TrackSignaling and
-      // MediaStreamTrack or DataTrackReceiver kinds disagree; however, just in
-      // case, we handle it here.
-      if (!RemoteTrack || signaling.kind !== trackReceiver.kind) {
+      log.info('Added a new ' + util.trackClass(track) + ':', track.id);
+      log.debug(util.trackClass(track) + ':', track);
+      this.emit('trackAdded', track);
+
+      return track;
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_handleTrackSignalingEvents',
+    value: function _handleTrackSignalingEvents() {
+      var log = this._log;
+      var self = this;
+
+      if (this.state === 'disconnected') {
         return;
       }
 
-      var track = new RemoteTrack(trackReceiver, signaling, { log: log });
-      self._addTrack(track);
-    });
-  }
+      var RemoteAudioTrack = this._RemoteAudioTrack;
+      var RemoteVideoTrack = this._RemoteVideoTrack;
+      var RemoteDataTrack = this._RemoteDataTrack;
+      var signaling = this._signaling;
 
-  function trackSignalingRemoved(signaling) {
-    signaling.getTrackTransceiver().then(function() {
-      var track = self.tracks.get(signaling.id);
-      if (track) {
-        self._removeTrack(track);
+      function trackSignalingAdded(signaling) {
+        function handleTrackSubscriptionFailed() {
+          if (!signaling.error) {
+            return;
+          }
+          signaling.removeListener('updated', handleTrackSubscriptionFailed);
+          var remoteTrackPublication = new RemoteTrackPublication(signaling.kind, signaling.sid, signaling.name, { log: log });
+          self._log.warn('Failed to subscribe to Remote' + util.capitalize(signaling.kind) + 'Track ' + signaling.sid + ' with name "' + signaling.name + '": ' + signaling.error.message);
+          self.emit('trackSubscriptionFailed', signaling.error, remoteTrackPublication);
+        }
+
+        signaling.on('updated', handleTrackSubscriptionFailed);
+
+        signaling.getTrackTransceiver().then(function (trackReceiver) {
+          signaling.removeListener('updated', handleTrackSubscriptionFailed);
+
+          var RemoteTrack = {
+            audio: RemoteAudioTrack,
+            video: RemoteVideoTrack,
+            data: RemoteDataTrack
+          }[signaling.kind];
+
+          // NOTE(mroberts): It should never be the case that the TrackSignaling and
+          // MediaStreamTrack or DataTrackReceiver kinds disagree; however, just in
+          // case, we handle it here.
+          if (!RemoteTrack || signaling.kind !== trackReceiver.kind) {
+            return;
+          }
+
+          var track = new RemoteTrack(trackReceiver, signaling, { log: log });
+          self._addTrack(track);
+        });
       }
-    });
-  }
 
-  signaling.on('trackAdded', trackSignalingAdded);
-  signaling.on('trackRemoved', trackSignalingRemoved);
+      function trackSignalingRemoved(signaling) {
+        signaling.getTrackTransceiver().then(function () {
+          var track = self.tracks.get(signaling.id);
+          if (track) {
+            self._removeTrack(track);
+          }
+        });
+      }
 
-  signaling.tracks.forEach(trackSignalingAdded);
+      signaling.on('trackAdded', trackSignalingAdded);
+      signaling.on('trackRemoved', trackSignalingRemoved);
 
-  signaling.on('stateChanged', function stateChanged(state) {
-    if (state === 'disconnected') {
-      log.debug('Removing TrackSignaling listeners');
-      signaling.removeListener('stateChanged', stateChanged);
-      signaling.removeListener('trackAdded', trackSignalingAdded);
-      signaling.removeListener('trackRemoved', trackSignalingRemoved);
+      signaling.tracks.forEach(trackSignalingAdded);
+
+      signaling.on('stateChanged', function stateChanged(state) {
+        if (state === 'disconnected') {
+          log.debug('Removing TrackSignaling listeners');
+          signaling.removeListener('stateChanged', stateChanged);
+          signaling.removeListener('trackAdded', trackSignalingAdded);
+          signaling.removeListener('trackRemoved', trackSignalingRemoved);
+        }
+      });
     }
-  });
-};
 
-Participant.prototype._deleteTrack = function _deleteTrack(track) {
-  this.tracks.delete(track.id);
+    /**
+     * @private
+     */
 
-  var tracksByKind = {
-    audio: this.audioTracks,
-    video: this.videoTracks,
-    data: this.dataTracks
-  }[track.kind];
-  tracksByKind.delete(track.id);
+  }, {
+    key: '_deleteTrack',
+    value: function _deleteTrack(track) {
+      this.tracks.delete(track.id);
 
-  var reemitters = this._trackEventReemitters.get(track.id) || new Map();
-  reemitters.forEach(function(reemitter, event) {
-    track.removeListener(event, reemitter);
-  });
+      var tracksByKind = {
+        audio: this.audioTracks,
+        video: this.videoTracks,
+        data: this.dataTracks
+      }[track.kind];
+      tracksByKind.delete(track.id);
 
-  var log = this._log;
-  log.info('Removed a ' + util.trackClass(track) + ':', track.id);
-  log.debug(util.trackClass(track) + ':', track);
-};
+      var reemitters = this._trackEventReemitters.get(track.id) || new Map();
+      reemitters.forEach(function (reemitter, event) {
+        track.removeListener(event, reemitter);
+      });
 
-Participant.prototype._removeTrack = function _removeTrack(track) {
-  if (!this.tracks.has(track.id)) {
-    return null;
-  }
-  track = this.tracks.get(track.id);
-  this._deleteTrack(track);
-  this.emit('trackRemoved', track);
-  return track;
-};
+      var log = this._log;
+      log.info('Removed a ' + util.trackClass(track) + ':', track.id);
+      log.debug(util.trackClass(track) + ':', track);
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_removeTrack',
+    value: function _removeTrack(track) {
+      if (!this.tracks.has(track.id)) {
+        return null;
+      }
+      track = this.tracks.get(track.id);
+      this._deleteTrack(track);
+      this.emit('trackRemoved', track);
+      return track;
+    }
+  }]);
+
+  return Participant;
+}(EventEmitter);
 
 /**
  * A {@link Participant.SID} is a 34-character string starting with "PA"
@@ -18866,17 +19235,19 @@ Participant.prototype._removeTrack = function _removeTrack(track) {
  * @returns {IndexedTracks}
  * @private
  */
+
+
 function indexTracksById(tracks) {
-  var indexedTracks = tracks.map(function(track) {
+  var indexedTracks = tracks.map(function (track) {
     return [track.id, track];
   });
-  var indexedAudioTracks = indexedTracks.filter(function(keyValue) {
+  var indexedAudioTracks = indexedTracks.filter(function (keyValue) {
     return keyValue[1].kind === 'audio';
   });
-  var indexedVideoTracks = indexedTracks.filter(function(keyValue) {
+  var indexedVideoTracks = indexedTracks.filter(function (keyValue) {
     return keyValue[1].kind === 'video';
   });
-  var indexedDataTracks = indexedTracks.filter(function(keyValue) {
+  var indexedDataTracks = indexedTracks.filter(function (keyValue) {
     return keyValue[1].kind === 'data';
   });
 
@@ -18909,11 +19280,10 @@ function reemitSignalingStateChangedEvents(participant, signaling) {
       log.debug('Removing Track event reemitters');
       signaling.removeListener('stateChanged', stateChanged);
 
-      participant.tracks.forEach(function(track) {
-        participant._trackEventReemitters.get(track.id)
-          .forEach(function(reemitter, event) {
-            track.removeListener(event, reemitter);
-          });
+      participant.tracks.forEach(function (track) {
+        participant._trackEventReemitters.get(track.id).forEach(function (reemitter, event) {
+          track.removeListener(event, reemitter);
+        });
       });
       participant._trackEventReemitters.clear();
     }
@@ -18933,13 +19303,13 @@ function reemitTrackEvents(participant, track) {
     return;
   }
 
-  participant._getTrackEvents().forEach(function(eventPair) {
+  participant._getTrackEvents().forEach(function (eventPair) {
     var trackEvent = eventPair[0];
     var participantEvent = eventPair[1];
 
-    trackEventReemitters.set(trackEvent, function() {
+    trackEventReemitters.set(trackEvent, function () {
       var args = [participantEvent].concat([].slice.call(arguments));
-      return participant.emit.apply(participant, args);
+      return participant.emit.apply(participant, _toConsumableArray(args));
     });
 
     track.on(trackEvent, trackEventReemitters.get(trackEvent));
@@ -18949,90 +19319,121 @@ function reemitTrackEvents(participant, track) {
 }
 
 module.exports = Participant;
-
-},{"./media/track/remoteaudiotrack":81,"./media/track/remotedatatrack":82,"./media/track/remotetrackpublication":84,"./media/track/remotevideotrack":85,"./util":129,"events":54,"util":149}],90:[function(require,module,exports){
+},{"./media/track/remoteaudiotrack":83,"./media/track/remotedatatrack":84,"./media/track/remotetrackpublication":86,"./media/track/remotevideotrack":87,"./util":131,"events":152}],92:[function(require,module,exports){
 'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var EventEmitter = require('events').EventEmitter;
-var inherits = require('util').inherits;
 
 /**
- * Construct a {@link QueueingEventEmitter}
- * @class
- * @classdesc A {@link QueueingEventEmitter} can queue events until a listener
- *   has been added.
+ * A {@link QueueingEventEmitter} can queue events until a listener has been
+ * added.
  * @extends EventEmitter
  */
-function QueueingEventEmitter() {
-  EventEmitter.call(this);
-  Object.defineProperties(this, {
-    _queuedEvents: {
-      value: new Map()
+
+var QueueingEventEmitter = function (_EventEmitter) {
+  _inherits(QueueingEventEmitter, _EventEmitter);
+
+  /**
+   * Construct a {@link QueueingEventEmitter}
+   */
+  function QueueingEventEmitter() {
+    _classCallCheck(this, QueueingEventEmitter);
+
+    var _this = _possibleConstructorReturn(this, (QueueingEventEmitter.__proto__ || Object.getPrototypeOf(QueueingEventEmitter)).call(this));
+
+    Object.defineProperties(_this, {
+      _queuedEvents: {
+        value: new Map()
+      }
+    });
+    return _this;
+  }
+
+  /**
+   * Emit any queued events.
+   * @returns {boolean} true if every event had listeners, false otherwise
+  */ /**
+     * Emit any queued events matching the event name.
+     * @param {string} event
+     * @returns {boolean} true if every event had listeners, false otherwise
+     */
+
+
+  _createClass(QueueingEventEmitter, [{
+    key: 'dequeue',
+    value: function dequeue(event) {
+      var _this2 = this;
+
+      var result = true;
+      if (!event) {
+        this._queuedEvents.forEach(function (_, queuedEvent) {
+          result = this.dequeue(queuedEvent) && result;
+        }, this);
+        return result;
+      }
+      var queue = this._queuedEvents.get(event) || [];
+      this._queuedEvents.delete(event);
+      return queue.reduce(function (result, args) {
+        return _this2.emit.apply(_this2, _toConsumableArray([event].concat(args))) && result;
+      }, result);
     }
-  });
-}
 
-inherits(QueueingEventEmitter, EventEmitter);
+    /**
+     * If the event has listeners, emit the event; otherwise, queue the event.
+     * @param {string} event
+     * @param {...*} args
+     * @returns {boolean} true if the event had listeners, false if the event was queued
+     */
 
-/**
- * Emit any queued events.
- * @returns {boolean} true if every event had listeners, false otherwise
-*//**
- * Emit any queued events matching the event name.
- * @param {string} event
- * @returns {boolean} true if every event had listeners, false otherwise
- */
-QueueingEventEmitter.prototype.dequeue = function dequeue(event) {
-  var result = true;
-  if (!event) {
-    this._queuedEvents.forEach(function(_, queuedEvent) {
-      result = this.dequeue(queuedEvent) && result;
-    }, this);
-    return result;
-  }
-  var queue = this._queuedEvents.get(event) || [];
-  this._queuedEvents.delete(event);
-  var self = this;
-  return queue.reduce(function(result, args) {
-    return self.emit.apply(self, [event].concat(args)) && result;
-  }, result);
-};
+  }, {
+    key: 'queue',
+    value: function queue() {
+      var args = [].slice.call(arguments);
+      if (this.emit.apply(this, _toConsumableArray(args))) {
+        return true;
+      }
+      var event = args[0];
+      if (!this._queuedEvents.has(event)) {
+        this._queuedEvents.set(event, []);
+      }
+      this._queuedEvents.get(event).push(args.slice(1));
+      return false;
+    }
+  }]);
 
-/**
- * If the event has listeners, emit the event; otherwise, queue the event.
- * @param {string} event
- * @param {...*} args
- * @returns {boolean} true if the event had listeners, false if the event was queued
- */
-QueueingEventEmitter.prototype.queue = function queue() {
-  var args = [].slice.call(arguments);
-  if (this.emit.apply(this, args)) {
-    return true;
-  }
-  var event = args[0];
-  if (!this._queuedEvents.has(event)) {
-    this._queuedEvents.set(event, []);
-  }
-  this._queuedEvents.get(event).push(args.slice(1));
-  return false;
-};
+  return QueueingEventEmitter;
+}(EventEmitter);
 
 module.exports = QueueingEventEmitter;
-
-},{"events":54,"util":149}],91:[function(require,module,exports){
+},{"events":152}],93:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var Participant = require('./participant');
 
 /**
- * Construct a {@link RemoteParticipant}.
- * @class
- * @classdesc A {@link RemoteParticipant} represents a remote {@link Participant}
- * in a {@link Room}.
+ * A {@link RemoteParticipant} represents a remote {@link Participant} in a
+ * {@link Room}.
  * @extends Participant
- * @param {ParticipantSignaling} signaling
- * @param {object} [options]
  * @property {Map<Track.SID, RemoteAudioTrack>} audioTracks -
  *    The {@link Participant}'s {@link RemoteAudioTrack}s.
  * @property {Map<Track.SID, RemoteDataTrack>} dataTracks -
@@ -19041,67 +19442,104 @@ var Participant = require('./participant');
  *    The {@link Participant}'s {@link RemoteTrack}s
  * @property {Map<Track.SID, RemoteVideoTrack>} videoTracks -
  *    The {@link Participant}'s {@link RemoteVideoTrack}s.
- * @fires RemoteParticipant#trackAdded
- * @fires RemoteParticipant#trackDimensionsChanged
- * @fires RemoteParticipant#trackDisabled
- * @fires RemoteParticipant#trackEnabled
- * @fires RemoteParticipant#trackMessage
- * @fires RemoteParticipant#trackRemoved
- * @fires RemoteParticipant#trackStarted
- * @fires RemoteParticipant#trackSubscribed
- * @fires RemoteParticipant#trackSubscriptionFailed
- * @fires RemoteParticipant#trackUnsubscribed
+ * @emits RemoteParticipant#trackAdded
+ * @emits RemoteParticipant#trackDimensionsChanged
+ * @emits RemoteParticipant#trackDisabled
+ * @emits RemoteParticipant#trackEnabled
+ * @emits RemoteParticipant#trackMessage
+ * @emits RemoteParticipant#trackRemoved
+ * @emits RemoteParticipant#trackStarted
+ * @emits RemoteParticipant#trackSubscribed
+ * @emits RemoteParticipant#trackSubscriptionFailed
+ * @emits RemoteParticipant#trackUnsubscribed
  */
-function RemoteParticipant(signaling, options) {
-  if (!(this instanceof RemoteParticipant)) {
-    return new RemoteParticipant(signaling, options);
-  }
-  Participant.call(this, signaling, options);
-  this.once('disconnected', this._unsubscribeTracks.bind(this));
-}
 
-inherits(RemoteParticipant, Participant);
+var RemoteParticipant = function (_Participant) {
+  _inherits(RemoteParticipant, _Participant);
 
-RemoteParticipant.prototype.toString = function toString() {
-  return '[RemoteParticipant #' + this._instanceId
-    + (this.sid ? ': ' + this.sid : '')
-    + ']';
-};
+  /**
+   * Construct a {@link RemoteParticipant}.
+   * @param {ParticipantSignaling} signaling
+   * @param {object} [options]
+   */
+  function RemoteParticipant(signaling, options) {
+    _classCallCheck(this, RemoteParticipant);
 
-RemoteParticipant.prototype._addTrack = function _addTrack(remoteTrack) {
-  if (!Participant.prototype._addTrack.call(this, remoteTrack)) {
-    return null;
-  }
-  this.emit('trackSubscribed', remoteTrack);
-  return remoteTrack;
-};
+    var _this = _possibleConstructorReturn(this, (RemoteParticipant.__proto__ || Object.getPrototypeOf(RemoteParticipant)).call(this, signaling, options));
 
-RemoteParticipant.prototype._unsubscribeTracks = function _unsubscribeTracks() {
-  var tracks = Array.from(this.tracks.values());
-  tracks.forEach(this._unsubscribeTrack, this);
-};
-
-RemoteParticipant.prototype._unsubscribeTrack = function _unsubscribeTrack(remoteTrack) {
-  var unsubscribedTrack = this.tracks.get(remoteTrack.id);
-  if (unsubscribedTrack) {
-    unsubscribedTrack._unsubscribe();
-    this.emit('trackUnsubscribed', unsubscribedTrack);
-  }
-};
-
-RemoteParticipant.prototype._removeTrack = function _removeTrack(remoteTrack) {
-  var unsubscribedTrack = this.tracks.get(remoteTrack.id);
-  if (!unsubscribedTrack) {
-    return null;
+    _this._handleTrackSignalingEvents();
+    _this.once('disconnected', _this._unsubscribeTracks.bind(_this));
+    return _this;
   }
 
-  this._deleteTrack(unsubscribedTrack);
-  unsubscribedTrack._unsubscribe();
-  this.emit('trackUnsubscribed', unsubscribedTrack);
-  this.emit('trackRemoved', unsubscribedTrack);
+  _createClass(RemoteParticipant, [{
+    key: 'toString',
+    value: function toString() {
+      return '[RemoteParticipant #' + this._instanceId + (this.sid ? ': ' + this.sid : '') + ']';
+    }
 
-  return unsubscribedTrack;
-};
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_addTrack',
+    value: function _addTrack(remoteTrack) {
+      if (!_get(RemoteParticipant.prototype.__proto__ || Object.getPrototypeOf(RemoteParticipant.prototype), '_addTrack', this).call(this, remoteTrack)) {
+        return null;
+      }
+      this.emit('trackSubscribed', remoteTrack);
+      return remoteTrack;
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_unsubscribeTracks',
+    value: function _unsubscribeTracks() {
+      var tracks = Array.from(this.tracks.values());
+      tracks.forEach(this._unsubscribeTrack, this);
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_unsubscribeTrack',
+    value: function _unsubscribeTrack(remoteTrack) {
+      var unsubscribedTrack = this.tracks.get(remoteTrack.id);
+      if (unsubscribedTrack) {
+        unsubscribedTrack._unsubscribe();
+        this.emit('trackUnsubscribed', unsubscribedTrack);
+      }
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_removeTrack',
+    value: function _removeTrack(remoteTrack) {
+      var unsubscribedTrack = this.tracks.get(remoteTrack.id);
+      if (!unsubscribedTrack) {
+        return null;
+      }
+
+      this._deleteTrack(unsubscribedTrack);
+      unsubscribedTrack._unsubscribe();
+      this.emit('trackUnsubscribed', unsubscribedTrack);
+      this.emit('trackRemoved', unsubscribedTrack);
+
+      return unsubscribedTrack;
+    }
+  }]);
+
+  return RemoteParticipant;
+}(Participant);
 
 /**
  * A {@link RemoteTrack} was added by the {@link RemoteParticipant}.
@@ -19158,6 +19596,9 @@ RemoteParticipant.prototype._removeTrack = function _removeTrack(remoteTrack) {
  * A {@link RemoteParticipant}'s {@link RemoteTrack} could not be subscribed to.
  * @param {TwilioError} error - The reason the {@link RemoteTrack} could not be
  *   subscribed to
+ * @param {RemoteTrackPublication} publication - The
+ *   {@link RemoteTrackPublication} for the {@link RemoteTrack} that could not
+ *   be subscribed to
  * @event RemoteParticipant#trackSubscriptionFailed
  */
 
@@ -19168,8 +19609,7 @@ RemoteParticipant.prototype._removeTrack = function _removeTrack(remoteTrack) {
  */
 
 module.exports = RemoteParticipant;
-
-},{"./participant":89,"util":149}],92:[function(require,module,exports){
+},{"./participant":91}],94:[function(require,module,exports){
 'use strict';
 
 var XHR = require('xmlhttprequest').XMLHttpRequest;
@@ -19179,17 +19619,17 @@ var XHR = require('xmlhttprequest').XMLHttpRequest;
  * @param {String} method - HTTP method to use. e.g: GET, POST.
  * @param {RequestParams} params
  * @returns {Promise<String>} responseText
- *//**
- * @typedef {Object} RequestParams
- * @property {String} url - URL to access.
- * @property {Object} [headers] - An unformatted map of headers.
- * @property {Object} [body] - An unformatted map representing
- *   post body.
- * @property {Boolean} [withCredentials=false] - Whether to set the
- *   XHR withCredentials flag.
- */
+*/ /**
+   * @typedef {Object} RequestParams
+   * @property {String} url - URL to access.
+   * @property {Object} [headers] - An unformatted map of headers.
+   * @property {Object} [body] - An unformatted map representing
+   *   post body.
+   * @property {Boolean} [withCredentials=false] - Whether to set the
+   *   XHR withCredentials flag.
+   */
 function request(method, params) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     if (typeof method !== 'string' || !params) {
       throw new Error('<String>method and <Object>params are required args.');
     }
@@ -19199,7 +19639,9 @@ function request(method, params) {
     xhr.withCredentials = !!params.withCredentials;
 
     xhr.onreadystatechange = function onreadystatechange() {
-      if (xhr.readyState !== 4) { return; }
+      if (xhr.readyState !== 4) {
+        return;
+      }
 
       if (200 <= xhr.status && xhr.status < 300) {
         resolve(xhr.responseText);
@@ -19220,25 +19662,34 @@ request.get = request.bind(null, 'GET');
 request.post = request.bind(null, 'POST');
 
 module.exports = request;
-
-},{"xmlhttprequest":146}],93:[function(require,module,exports){
+},{"xmlhttprequest":148}],95:[function(require,module,exports){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var EventEmitter = require('events').EventEmitter;
-var inherits = require('util').inherits;
 var RemoteParticipant = require('./remoteparticipant');
+
+var _require = require('./util/twilio-video-errors'),
+    MediaConnectionError = _require.MediaConnectionError;
+
 var nInstances = 0;
 
 /**
- * Construct a {@link Room}.
- * @class
- * @classdesc A {@link Room} represents communication between you and one or
- *   more {@link RemoteParticipant}s sharing {@link AudioTrack}s
- *   and {@link VideoTrack}s.
- *   <br><br>
- *   You can connect to a {@link Room} by calling {@link connect}.
- * @param {RoomSignaling} signaling
- * @param {?object} [options={}]
+ * A {@link Room} represents communication between you and one or more
+ * {@link RemoteParticipant}s sharing {@link AudioTrack}s and
+ * {@link VideoTrack}s.
+ * <br><br>
+ * You can connect to a {@link Room} by calling {@link connect}.
+ * @extends EventEmitter
  * @property {boolean} isRecording - Whether or not the {@link Room} is being
  *   recorded
  * @property {LocalParticipant} localParticipant - Your {@link LocalParticipant}
@@ -19247,109 +19698,130 @@ var nInstances = 0;
  * @property {Map<Participant.SID, RemoteParticipant>} participants -
  *   The {@link RemoteParticipant}s participating in this {@link Room}
  * @property {Room.SID} sid - The {@link Room}'s SID
- * @property {string} state - "connected" or "disconnected"
+ * @property {string} state - "connected", "reconnecting", or "disconnected"
  * @throws {SignalingConnectionDisconnectedError}
- * @fires Room#disconnected
- * @fires Room#participantConnected
- * @fires Room#participantDisconnected
- * @fires Room#recordingStarted
- * @fires Room#recordingStopped
- * @fires Room#trackAdded
- * @fires Room#trackDimensionsChanged
- * @fires Room#trackDisabled
- * @fires Room#trackEnabled
- * @fires Room#trackMessage
- * @fires Room#trackRemoved
- * @fires Room#trackStarted
- * @fires Room#trackSubscribed
- * @fires Room#trackUnsubscribed
+ * @emits Room#disconnected
+ * @emits Room#participantConnected
+ * @emits Room#participantDisconnected
+ * @emits Room#reconnected
+ * @emits Room#reconnecting
+ * @emits Room#recordingStarted
+ * @emits Room#recordingStopped
+ * @emits Room#trackAdded
+ * @emits Room#trackDimensionsChanged
+ * @emits Room#trackDisabled
+ * @emits Room#trackEnabled
+ * @emits Room#trackMessage
+ * @emits Room#trackRemoved
+ * @emits Room#trackStarted
+ * @emits Room#trackSubscribed
+ * @emits Room#trackUnsubscribed
  */
-function Room(localParticipant, signaling, options) {
-  if (!(this instanceof Room)) {
-    return new Room(localParticipant, signaling, options);
+
+var Room = function (_EventEmitter) {
+  _inherits(Room, _EventEmitter);
+
+  /**
+   * Construct a {@link Room}.
+   * @param {RoomSignaling} signaling
+   * @param {?object} [options={}]
+   */
+  function Room(localParticipant, signaling, options) {
+    _classCallCheck(this, Room);
+
+    var _this = _possibleConstructorReturn(this, (Room.__proto__ || Object.getPrototypeOf(Room)).call(this));
+
+    var log = options.log.createLog('default', _this);
+    var participants = new Map();
+
+    /* istanbul ignore next */
+    Object.defineProperties(_this, {
+      _log: {
+        value: log
+      },
+      _instanceId: {
+        value: ++nInstances
+      },
+      _options: {
+        value: options
+      },
+      _participants: {
+        value: participants
+      },
+      _signaling: {
+        value: signaling
+      },
+      isRecording: {
+        enumerable: true,
+        get: function get() {
+          return signaling.recording.isEnabled || false;
+        }
+      },
+      localParticipant: {
+        enumerable: true,
+        value: localParticipant
+      },
+      name: {
+        enumerable: true,
+        value: signaling.name
+      },
+      participants: {
+        enumerable: true,
+        value: participants
+      },
+      sid: {
+        enumerable: true,
+        value: signaling.sid
+      },
+      state: {
+        enumerable: true,
+        get: function get() {
+          return signaling.state;
+        }
+      }
+    });
+
+    handleRecordingEvents(_this, signaling.recording);
+    handleSignalingEvents(_this, signaling);
+
+    log.info('Created a new Room:', _this.name);
+    log.debug('Initial RemoteParticipants:', Array.from(_this._participants.values()));
+    return _this;
   }
-  EventEmitter.call(this);
 
-  var log = options.log.createLog('default', this);
-  var participants = new Map();
-
-  /* istanbul ignore next */
-  Object.defineProperties(this, {
-    _log: {
-      value: log
-    },
-    _instanceId: {
-      value: ++nInstances
-    },
-    _options: {
-      value: options
-    },
-    _participants: {
-      value: participants
-    },
-    _signaling: {
-      value: signaling
-    },
-    isRecording: {
-      enumerable: true,
-      get: function() {
-        return signaling.recording.isEnabled || false;
-      }
-    },
-    localParticipant: {
-      enumerable: true,
-      value: localParticipant
-    },
-    name: {
-      enumerable: true,
-      value: signaling.name
-    },
-    participants: {
-      enumerable: true,
-      value: participants
-    },
-    sid: {
-      enumerable: true,
-      value: signaling.sid
-    },
-    state: {
-      enumerable: true,
-      get: function() {
-        return signaling.state;
-      }
+  _createClass(Room, [{
+    key: 'toString',
+    value: function toString() {
+      return '[Room #' + this._instanceId + ': ' + this.sid + ']';
     }
-  });
 
-  handleRecordingEvents(this, signaling.recording);
-  handleSignalingEvents(this, signaling);
+    /**
+     * Disconnect from the {@link Room}.
+     * @returns {this}
+     */
 
-  log.info('Created a new Room:', this.name);
-  log.debug('Initial RemoteParticipants:', Array.from(this._participants.values()));
-}
+  }, {
+    key: 'disconnect',
+    value: function disconnect() {
+      this._log.info('Disconnecting');
+      this._signaling.disconnect();
+      return this;
+    }
 
-inherits(Room, EventEmitter);
+    /**
+     * Get the {@link Room}'s media statistics.
+     * @returns {Promise.<Array<StatsReport>>}
+     */
 
-Room.prototype.toString = function toString() {
-  return '[Room #' + this._instanceId + ': ' + this.sid + ']';
-};
+  }, {
+    key: 'getStats',
+    value: function getStats() {
+      return this._signaling.getStats();
+    }
+  }]);
 
-/**
- * Disconnect from the {@link Room}.
- * @returns {this}
- */
-Room.prototype.disconnect = function disconnect() {
-  this._log.info('Disconnecting');
-  this._signaling.disconnect();
-  return this;
-};
-
-/**
- * Get the {@link Room}'s media statistics.
- * @returns {Promise.<Array<StatsReport>>}
- */
-Room.prototype.getStats = function getStats() {
-  return this._signaling.getStats();
-};
+  return Room;
+}(EventEmitter);
 
 /**
  * A {@link Room.SID} is a 34-character string starting with "RM"
@@ -19401,6 +19873,30 @@ Room.prototype.getStats = function getStats() {
  *     });
  *   });
  * });
+ */
+
+/**
+ * Your application successfully reconnected to the {@link Room}. When this
+ * event is emitted, the {@link Room} is in state "connected".
+ * @event Room#reconnected
+ * @example
+ * myRoom.on('reconnected', () => {
+ *   console.log('Reconnected!');
+ * });
+ */
+
+/**
+ * Your application is reconnecting to the {@link Room}. Typically this happens
+ * when there is a disruption in your media connection. When this event is
+ * emitted, the {@link Room} is in state "reconnecting". If reconnecting
+ * succeeds, the {@link Room} will emit a "reconnected" event.
+ * @param {TwilioError} error - A {@link TwilioError} explaining why your
+ *   application is reconnecting
+ * @example
+ * myRoom.on('reconnecting', error => {
+ *   console.warn('Reconnecting!', error);
+ * });
+ * @event Room#reconnecting
  */
 
 /**
@@ -19497,6 +19993,18 @@ Room.prototype.getStats = function getStats() {
  */
 
 /**
+ * A {@link RemoteParticipant}'s {@link RemoteTrack} could not be subscribed to.
+ * @param {TwilioError} error - The reason the {@link RemoteTrack} could not be
+ *   subscribed to
+ * @param {RemoteTrackPublication} publication - The
+ *   {@link RemoteTrackPublication} for the {@link RemoteTrack} that could not
+ *   be subscribed to
+ * @param {RemoteParticipant} participant - The {@link RemoteParticipant} whose
+ *   {@link RemoteTrack} could not be subscribed to
+ * @event Room#trackSubscriptionFailed
+ */
+
+/**
  * A {@link RemoteParticipant}'s {@link RemoteTrack} was unsubscribed from.
  * @param {RemoteTrack} track - The {@link RemoteTrack} that was unsubscribed
  * @param {RemoteParticipant} participant - The {@link RemoteParticipant} whose
@@ -19519,23 +20027,12 @@ function connectParticipant(room, participantSignaling) {
   room.emit('participantConnected', participant);
 
   // Reemit Track events from the RemoteParticipant.
-  var eventListeners = [
-    'trackAdded',
-    'trackDimensionsChanged',
-    'trackDisabled',
-    'trackEnabled',
-    'trackMessage',
-    'trackRemoved',
-    'trackStarted',
-    'trackSubscribed',
-    'trackSubscriptionFailed',
-    'trackUnsubscribed'
-  ].map(function(event) {
+  var eventListeners = ['trackAdded', 'trackDimensionsChanged', 'trackDisabled', 'trackEnabled', 'trackMessage', 'trackRemoved', 'trackStarted', 'trackSubscribed', 'trackSubscriptionFailed', 'trackUnsubscribed'].map(function (event) {
     function reemit() {
       var args = [].slice.call(arguments);
       args.unshift(event);
       args.push(participant);
-      room.emit.apply(room, args);
+      room.emit.apply(room, _toConsumableArray(args));
     }
     participant.on(event, reemit);
     return [event, reemit];
@@ -19545,7 +20042,7 @@ function connectParticipant(room, participantSignaling) {
   participant.once('disconnected', function participantDisconnected() {
     log.info('RemoteParticipant disconnected:', participant);
     room._participants.delete(participant.sid);
-    eventListeners.forEach(function(args) {
+    eventListeners.forEach(function (args) {
       participant.removeListener(args[0], args[1]);
     });
     room.emit('participantDisconnected', participant);
@@ -19564,30 +20061,44 @@ function handleSignalingEvents(room, signaling) {
   var log = room._log;
 
   // Reemit RemoteParticipant events from the RoomSignaling.
-  log.debug('Creating a new RemoteParticipant for each ParticipantSignaling '
-    + 'in the RoomSignaling');
+  log.debug('Creating a new RemoteParticipant for each ParticipantSignaling ' + 'in the RoomSignaling');
   signaling.participants.forEach(connectParticipant.bind(null, room));
-  log.debug('Setting up RemoteParticipant creation for all subsequent '
-    + 'ParticipantSignalings that connect to the RoomSignaling');
+  log.debug('Setting up RemoteParticipant creation for all subsequent ' + 'ParticipantSignalings that connect to the RoomSignaling');
   signaling.on('participantConnected', connectParticipant.bind(null, room));
 
   // Reemit state transition events from the RoomSignaling.
   signaling.on('stateChanged', function stateChanged(state, error) {
-    room.participants.forEach(function(participant) {
-      participant._unsubscribeTracks();
-    });
     log.info('Transitioned to state:', state);
-    room.emit(state, room, error);
+    switch (state) {
+      case 'disconnected':
+        room.participants.forEach(function (participant) {
+          participant._unsubscribeTracks();
+        });
+        room.emit(state, room, error);
+        signaling.removeListener('stateChanged', stateChanged);
+        break;
+      case 'reconnecting':
+        room.emit('reconnecting', new MediaConnectionError());
+        break;
+      default:
+        room.emit('reconnected');
+    }
   });
 }
 
 module.exports = Room;
-
-},{"./remoteparticipant":91,"events":54,"util":149}],94:[function(require,module,exports){
+},{"./remoteparticipant":93,"./util/twilio-video-errors":143,"events":152}],96:[function(require,module,exports){
 /* eslint consistent-return:0 */
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var ParticipantSignaling = require('./participant');
 var RoomSignaling = require('./room');
 var StateMachine = require('../statemachine');
@@ -19615,192 +20126,248 @@ Signaling States
 */
 
 var states = {
-  closed: [
-    'opening'
-  ],
-  opening: [
-    'closed',
-    'open'
-  ],
-  open: [
-    'closed',
-    'closing'
-  ],
-  closing: [
-    'closed',
-    'open'
-  ]
+  closed: ['opening'],
+  opening: ['closed', 'open'],
+  open: ['closed', 'closing'],
+  closing: ['closed', 'open']
 };
 
 /**
- * Construct {@link Signaling}.
- * @class
  * @extends StateMachine
  * @property {string} state - one of "closed", "opening", "open", or "closing"
  */
-function Signaling() {
-  StateMachine.call(this, 'closed', states);
-}
 
-inherits(Signaling, StateMachine);
+var Signaling = function (_StateMachine) {
+  _inherits(Signaling, _StateMachine);
 
-// NOTE(mroberts): This is a dummy implementation suitable for testing.
-Signaling.prototype._close = function _close(key) {
-  this.transition('closing', key);
-  this.transition('closed', key);
-  return Promise.resolve(this);
-};
+  /**
+   * Construct {@link Signaling}.
+   */
+  function Signaling() {
+    _classCallCheck(this, Signaling);
 
-// NOTE(mroberts): This is a dummy implementation suitable for testing.
-Signaling.prototype._connect = function _connect(localParticipant, token, iceServerSource, encodingParameters, preferredCodecs, options) {
-  localParticipant.connect('PA00000000000000000000000000000000', 'test');
-  var sid = 'RM00000000000000000000000000000000';
-  var promise = Promise.resolve(new RoomSignaling(localParticipant, sid, options));
-  promise.cancel = function cancel() {};
-  return promise;
-};
+    return _possibleConstructorReturn(this, (Signaling.__proto__ || Object.getPrototypeOf(Signaling)).call(this, 'closed', states));
+  }
 
-// NOTE(mroberts): This is a dummy implementation suitable for testing.
-Signaling.prototype._open = function _open(key) {
-  this.transition('opening', key);
-  this.transition('open', key);
-  return Promise.resolve(this);
-};
+  /**
+   * @private
+   */
+  // NOTE(mroberts): This is a dummy implementation suitable for testing.
 
-/**
- * Close the {@link Signaling}.
- * @returns {Promise<this>}
- */
-Signaling.prototype.close = function close() {
-  var self = this;
-  return this.bracket('close', function transition(key) {
-    switch (self.state) {
-      case 'closed':
-        return self;
-      case 'open':
-        return self._close(key);
-      default:
-        throw new Error('Unexpected Signaling state "' + self.state + '"');
+
+  _createClass(Signaling, [{
+    key: '_close',
+    value: function _close(key) {
+      this.transition('closing', key);
+      this.transition('closed', key);
+      return Promise.resolve(this);
     }
-  });
-};
 
-/**
- * Connect to a {@link RoomSignaling}.
- * @param {ParticipantSignaling} localParticipant
- * @param {string} token
- * @param {IceServerSource} iceServerSource
- * @param {EncodingParametersImpl} encodingParameters
- * @param {PreferredCodecs} preferredCodecs
- * @param {object} options
- * @returns {Promise<function(): CancelablePromise<RoomSignaling>>}
- */
-Signaling.prototype.connect = function connect(localParticipant, token, iceServerSource, encodingParameters, preferredCodecs, options) {
-  var self = this;
-  return this.bracket('connect', function transition(key) {
-    switch (self.state) {
-      case 'closed':
-        return self._open(key).then(transition.bind(null, key));
-      case 'open':
-        // NOTE(mroberts): We don't need to hold the lock in _connect. Instead,
-        // we just need to ensure the Signaling remains open.
-        self.releaseLockCompletely(key);
-        return self._connect(localParticipant, token, iceServerSource, encodingParameters, preferredCodecs, options);
-      default:
-        throw new Error('Unexpected Signaling state "' + self.state + '"');
+    /**
+     * @private
+     */
+    // NOTE(mroberts): This is a dummy implementation suitable for testing.
+
+  }, {
+    key: '_connect',
+    value: function _connect(localParticipant, token, iceServerSource, encodingParameters, preferredCodecs, options) {
+      localParticipant.connect('PA00000000000000000000000000000000', 'test');
+      var sid = 'RM00000000000000000000000000000000';
+      var promise = Promise.resolve(new RoomSignaling(localParticipant, sid, options));
+      promise.cancel = function cancel() {};
+      return promise;
     }
-  });
-};
 
-/**
- * Create a local {@link ParticipantSignaling}.
- * @returns {ParticipantSignaling}
- */
-Signaling.prototype.createLocalParticipantSignaling = function createLocalParticipantSignaling() {
-  return new ParticipantSignaling();
-};
+    /**
+     * @private
+     */
+    // NOTE(mroberts): This is a dummy implementation suitable for testing.
 
-/**
- * Open the {@link Signaling}.
- * @returns {Promise<this>}
- */
-Signaling.prototype.open = function open() {
-  var self = this;
-  return this.bracket('open', function transition(key) {
-    switch (self.state) {
-      case 'closed':
-        return self._open(key);
-      case 'open':
-        return self;
-      default:
-        throw new Error('Unexpected Signaling state "' + self.state + '"');
+  }, {
+    key: '_open',
+    value: function _open(key) {
+      this.transition('opening', key);
+      this.transition('open', key);
+      return Promise.resolve(this);
     }
-  });
-};
+
+    /**
+     * Close the {@link Signaling}.
+     * @returns {Promise<this>}
+     */
+
+  }, {
+    key: 'close',
+    value: function close() {
+      var _this2 = this;
+
+      return this.bracket('close', function (key) {
+        switch (_this2.state) {
+          case 'closed':
+            return _this2;
+          case 'open':
+            return _this2._close(key);
+          default:
+            throw new Error('Unexpected Signaling state "' + _this2.state + '"');
+        }
+      });
+    }
+
+    /**
+     * Connect to a {@link RoomSignaling}.
+     * @param {ParticipantSignaling} localParticipant
+     * @param {string} token
+     * @param {IceServerSource} iceServerSource
+     * @param {EncodingParametersImpl} encodingParameters
+     * @param {PreferredCodecs} preferredCodecs
+     * @param {object} options
+     * @returns {Promise<function(): CancelablePromise<RoomSignaling>>}
+     */
+
+  }, {
+    key: 'connect',
+    value: function connect(localParticipant, token, iceServerSource, encodingParameters, preferredCodecs, options) {
+      var self = this;
+      return this.bracket('connect', function transition(key) {
+        switch (self.state) {
+          case 'closed':
+            return self._open(key).then(transition.bind(null, key));
+          case 'open':
+            // NOTE(mroberts): We don't need to hold the lock in _connect. Instead,
+            // we just need to ensure the Signaling remains open.
+            self.releaseLockCompletely(key);
+            return self._connect(localParticipant, token, iceServerSource, encodingParameters, preferredCodecs, options);
+          default:
+            throw new Error('Unexpected Signaling state "' + self.state + '"');
+        }
+      });
+    }
+
+    /**
+     * Create a local {@link ParticipantSignaling}.
+     * @returns {ParticipantSignaling}
+     */
+
+  }, {
+    key: 'createLocalParticipantSignaling',
+    value: function createLocalParticipantSignaling() {
+      return new ParticipantSignaling();
+    }
+
+    /**
+     * Open the {@link Signaling}.
+     * @returns {Promise<this>}
+     */
+
+  }, {
+    key: 'open',
+    value: function open() {
+      var _this3 = this;
+
+      return this.bracket('open', function (key) {
+        switch (_this3.state) {
+          case 'closed':
+            return _this3._open(key);
+          case 'open':
+            return _this3;
+          default:
+            throw new Error('Unexpected Signaling state "' + _this3.state + '"');
+        }
+      });
+    }
+  }]);
+
+  return Signaling;
+}(StateMachine);
 
 module.exports = Signaling;
-
-},{"../statemachine":116,"./participant":96,"./room":100,"util":149}],95:[function(require,module,exports){
+},{"../statemachine":118,"./participant":98,"./room":102}],97:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var TrackSignaling = require('./track');
 
 /**
- * Construct a {@link LocalTrackPublicationSignaling}.
- * @class
- * @classdesc A {@link LocalTrackPublication} implementation
+ * A {@link LocalTrackPublication} implementation
  * @extends TrackSignaling
- * @param {DataTrackSender|MediaTrackSender} trackSender
- * @param {string} name
  * @property {?Error} error - non-null if publication failed
  */
-function LocalTrackPublicationSignaling(trackSender, name) {
-  var enabled = trackSender.kind === 'data'
-    ? true
-    : trackSender.track.enabled;
-  TrackSignaling.call(this, name, trackSender.id, trackSender.kind, enabled);
-  this.setTrackTransceiver(trackSender);
-  Object.defineProperties(this, {
-    _error: {
-      value: null,
-      writable: true
-    },
-    error: {
-      enumerable: true,
-      get: function() {
-        return this._error;
+
+var LocalTrackPublicationSignaling = function (_TrackSignaling) {
+  _inherits(LocalTrackPublicationSignaling, _TrackSignaling);
+
+  /**
+   * Construct a {@link LocalTrackPublicationSignaling}.
+   * @param {DataTrackSender|MediaTrackSender} trackSender
+   * @param {string} name
+   */
+  function LocalTrackPublicationSignaling(trackSender, name) {
+    _classCallCheck(this, LocalTrackPublicationSignaling);
+
+    var enabled = trackSender.kind === 'data' ? true : trackSender.track.enabled;
+
+    var _this = _possibleConstructorReturn(this, (LocalTrackPublicationSignaling.__proto__ || Object.getPrototypeOf(LocalTrackPublicationSignaling)).call(this, name, trackSender.id, trackSender.kind, enabled));
+
+    _this.setTrackTransceiver(trackSender);
+    Object.defineProperties(_this, {
+      _error: {
+        value: null,
+        writable: true
+      },
+      error: {
+        enumerable: true,
+        get: function get() {
+          return this._error;
+        }
       }
+    });
+    return _this;
+  }
+
+  /**
+   * Rejects the SID's deferred promise with the given Error.
+   * @param {Error} error
+   * @returns {this}
+   */
+
+
+  _createClass(LocalTrackPublicationSignaling, [{
+    key: 'publishFailed',
+    value: function publishFailed(error) {
+      if (setError(this, error)) {
+        this.emit('updated');
+      }
+      return this;
     }
-  });
-}
+  }, {
+    key: 'setSid',
+    value: function setSid(sid) {
+      if (this._error) {
+        return this;
+      }
+      return _get(LocalTrackPublicationSignaling.prototype.__proto__ || Object.getPrototypeOf(LocalTrackPublicationSignaling.prototype), 'setSid', this).call(this, sid);
+    }
+  }]);
 
-inherits(LocalTrackPublicationSignaling, TrackSignaling);
-
-/**
- * Rejects the SID's deferred promise with the given Error.
- * @param {Error} error
- * @returns {this}
- */
-LocalTrackPublicationSignaling.prototype.publishFailed = function publishFailed(error) {
-  if (setError(this, error)) {
-    this.emit('updated');
-  }
-  return this;
-};
-
-LocalTrackPublicationSignaling.prototype.setSid = function setSid(sid) {
-  if (this._error) {
-    return this;
-  }
-  return TrackSignaling.prototype.setSid.call(this, sid);
-};
+  return LocalTrackPublicationSignaling;
+}(TrackSignaling);
 
 /**
  * @param {LocalTrackPublication} publication
  * @param {Error} error
  * @returns {boolean} updated
  */
+
+
 function setError(publication, error) {
   if (publication._sid !== null || publication._error) {
     return false;
@@ -19810,11 +20377,17 @@ function setError(publication, error) {
 }
 
 module.exports = LocalTrackPublicationSignaling;
-
-},{"./track":101,"util":149}],96:[function(require,module,exports){
+},{"./track":103}],98:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var StateMachine = require('../statemachine');
 
 /*
@@ -19830,19 +20403,13 @@ ParticipantSignaling States
 */
 
 var states = {
-  connecting: [
-    'connected'
-  ],
-  connected: [
-    'disconnected'
-  ],
+  connecting: ['connected'],
+  connected: ['disconnected'],
   disconnected: []
 };
 
 /**
- * Construct a {@link ParticipantSignaling}.
- * @class
- * @classdesc A {@link Participant} implementation
+ * A {@link Participant} implementation
  * @extends StateMachine
  * @property {?string} identity
  * @property {?Participant.SID} sid
@@ -19851,94 +20418,119 @@ var states = {
  * @emits ParticipantSignaling#trackAdded
  * @emits ParticipantSignaling#trackRemoved
  */
-function ParticipantSignaling() {
-  StateMachine.call(this, 'connecting', states);
 
-  Object.defineProperties(this, {
-    _identity: {
-      writable: true,
-      value: null
-    },
-    _sid: {
-      writable: true,
-      value: null
-    },
-    identity: {
-      enumerable: true,
-      get: function() {
-        return this._identity;
+var ParticipantSignaling = function (_StateMachine) {
+  _inherits(ParticipantSignaling, _StateMachine);
+
+  /**
+   * Construct a {@link ParticipantSignaling}.
+   */
+  function ParticipantSignaling() {
+    _classCallCheck(this, ParticipantSignaling);
+
+    var _this = _possibleConstructorReturn(this, (ParticipantSignaling.__proto__ || Object.getPrototypeOf(ParticipantSignaling)).call(this, 'connecting', states));
+
+    Object.defineProperties(_this, {
+      _identity: {
+        writable: true,
+        value: null
+      },
+      _sid: {
+        writable: true,
+        value: null
+      },
+      identity: {
+        enumerable: true,
+        get: function get() {
+          return this._identity;
+        }
+      },
+      sid: {
+        enumerable: true,
+        get: function get() {
+          return this._sid;
+        }
+      },
+      tracks: {
+        enumerable: true,
+        value: new Map()
       }
-    },
-    sid: {
-      enumerable: true,
-      get: function() {
-        return this._sid;
-      }
-    },
-    tracks: {
-      enumerable: true,
-      value: new Map()
+    });
+    return _this;
+  }
+
+  /**
+   * Add the {@link TrackSignaling}, MediaStreamTrack, or
+   * {@link DataTrackSender} to the {@link ParticipantSignaling}.
+   * @param {TrackSignaling|DataTrackSender|MediaTrackSender} track
+   * @returns {this}
+   * @fires ParticipantSignaling#trackAdded
+   */
+
+
+  _createClass(ParticipantSignaling, [{
+    key: 'addTrack',
+    value: function addTrack(track) {
+      this.tracks.set(track.id, track);
+      this.emit('trackAdded', track);
+      return this;
     }
-  });
-}
 
-inherits(ParticipantSignaling, StateMachine);
+    /**
+     * Disconnect the {@link ParticipantSignaling}.
+     * @returns {boolean}
+     */
 
-/**
- * Add the {@link TrackSignaling}, MediaStreamTrack, or
- * {@link DataTrackSender} to the {@link ParticipantSignaling}.
- * @param {TrackSignaling|DataTrackSender|MediaTrackSender} track
- * @returns {this}
- * @fires ParticipantSignaling#trackAdded
- */
-ParticipantSignaling.prototype.addTrack = function addTrack(track) {
-  this.tracks.set(track.id, track);
-  this.emit('trackAdded', track);
-  return this;
-};
+  }, {
+    key: 'disconnect',
+    value: function disconnect() {
+      if (this.state !== 'disconnected') {
+        this.preempt('disconnected');
+        return true;
+      }
+      return false;
+    }
 
-/**
- * Disconnect the {@link ParticipantSignaling}.
- * @returns {boolean}
- */
-ParticipantSignaling.prototype.disconnect = function disconnect() {
-  if (this.state !== 'disconnected') {
-    this.preempt('disconnected');
-    return true;
-  }
-  return false;
-};
+    /**
+     * Remove the {@link TrackSignaling}, MediaStreamTrack, or
+     * {@link DataTrackSender} from the {@link ParticipantSignaling}.
+     * @param {TrackSignaling|DataTrackSender|MediaTrackSender} track
+     * @returns {boolean}
+     * @fires ParticipantSignaling#trackRemoved
+     */
 
-/**
- * Remove the {@link TrackSignaling}, MediaStreamTrack, or
- * {@link DataTrackSender} from the {@link ParticipantSignaling}.
- * @param {TrackSignaling|DataTrackSender|MediaTrackSender} track
- * @returns {boolean}
- * @fires ParticipantSignaling#trackRemoved
- */
-ParticipantSignaling.prototype.removeTrack = function removeTrack(track) {
-  var didDelete = this.tracks.delete(track.id);
-  if (didDelete) {
-    this.emit('trackRemoved', track);
-  }
-  return didDelete;
-};
+  }, {
+    key: 'removeTrack',
+    value: function removeTrack(track) {
+      var didDelete = this.tracks.delete(track.id);
+      if (didDelete) {
+        this.emit('trackRemoved', track);
+      }
+      return didDelete;
+    }
 
-/**
- * Connect the {@link ParticipantSignaling}.
- * @param {Participant.SID} sid
- * @param {string} identity
- * @returns {boolean}
- */
-ParticipantSignaling.prototype.connect = function connect(sid, identity) {
-  if (this.state === 'connecting') {
-    this._sid = sid;
-    this._identity = identity;
-    this.preempt('connected');
-    return true;
-  }
-  return false;
-};
+    /**
+     * Connect the {@link ParticipantSignaling}.
+     * @param {Participant.SID} sid
+     * @param {string} identity
+     * @returns {boolean}
+     */
+
+  }, {
+    key: 'connect',
+    value: function connect(sid, identity) {
+      if (this.state === 'connecting') {
+        this._sid = sid;
+        this._identity = identity;
+        this.preempt('connected');
+        return true;
+      }
+      return false;
+    }
+  }]);
+
+  return ParticipantSignaling;
+}(StateMachine);
 
 /**
  * {@link TrackSignaling} was added to the {@link ParticipantSignaling}.
@@ -19953,59 +20545,84 @@ ParticipantSignaling.prototype.connect = function connect(sid, identity) {
  */
 
 module.exports = ParticipantSignaling;
-
-},{"../statemachine":116,"util":149}],97:[function(require,module,exports){
+},{"../statemachine":118}],99:[function(require,module,exports){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var EventEmitter = require('events').EventEmitter;
-var inherits = require('util').inherits;
 
 /**
- * Construct a {@link RecordingSignaling}.
- * @class
- * @classdesc Represents recording state
+ * Represents recording state
+ * @extends EventEmitter
  * @property {?boolean} isEnabled
  */
-function RecordingSignaling() {
-  EventEmitter.call(this);
-  Object.defineProperties(this, {
-    _isEnabled: {
-      value: null,
-      writable: true
-    },
-    isEnabled: {
-      enumerable: true,
-      get: function() {
-        return this._isEnabled;
+
+var RecordingSignaling = function (_EventEmitter) {
+  _inherits(RecordingSignaling, _EventEmitter);
+
+  /**
+   * Construct a {@link RecordingSignaling}.
+   */
+  function RecordingSignaling() {
+    _classCallCheck(this, RecordingSignaling);
+
+    var _this = _possibleConstructorReturn(this, (RecordingSignaling.__proto__ || Object.getPrototypeOf(RecordingSignaling)).call(this));
+
+    Object.defineProperties(_this, {
+      _isEnabled: {
+        value: null,
+        writable: true
+      },
+      isEnabled: {
+        enumerable: true,
+        get: function get() {
+          return this._isEnabled;
+        }
       }
-    }
-  });
-}
-
-inherits(RecordingSignaling, EventEmitter);
-
-/**
- * Disable the {@link RecordingSignaling} if it is not already disabled.
- * @return {this}
- */
-RecordingSignaling.prototype.disable = function disable() {
-  return this.enable(false);
-};
-
-/**
- * Enable (or disable) the {@link RecordingSignaling} if it is not already enabled
- * (or disabled).
- * @param {boolean} [enabled=true]
- * @return {this}
- */
-RecordingSignaling.prototype.enable = function enable(enabled) {
-  enabled = typeof enabled === 'boolean' ? enabled : true;
-  if (this.isEnabled !== enabled) {
-    this._isEnabled = enabled;
-    this.emit('updated');
+    });
+    return _this;
   }
-  return this;
-};
+
+  /**
+   * Disable the {@link RecordingSignaling} if it is not already disabled.
+   * @return {this}
+   */
+
+
+  _createClass(RecordingSignaling, [{
+    key: 'disable',
+    value: function disable() {
+      return this.enable(false);
+    }
+
+    /**
+     * Enable (or disable) the {@link RecordingSignaling} if it is not already enabled
+     * (or disabled).
+     * @param {boolean} [enabled=true]
+     * @return {this}
+     */
+
+  }, {
+    key: 'enable',
+    value: function enable(enabled) {
+      enabled = typeof enabled === 'boolean' ? enabled : true;
+      if (this.isEnabled !== enabled) {
+        this._isEnabled = enabled;
+        this.emit('updated');
+      }
+      return this;
+    }
+  }]);
+
+  return RecordingSignaling;
+}(EventEmitter);
 
 /**
  * Emitted whenever the {@link RecordingSignaling} is updated
@@ -20013,94 +20630,135 @@ RecordingSignaling.prototype.enable = function enable(enabled) {
  */
 
 module.exports = RecordingSignaling;
-
-},{"events":54,"util":149}],98:[function(require,module,exports){
+},{"events":152}],100:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var ParticipantSignaling = require('./participant');
 
 /**
- * Construct a {@link RemoteParticipantSignaling}.
- * @class
- * @classdesc A {@link Participant} implementation
+ * A {@link Participant} implementation
  * @extends ParticipantSignaling
- * @param {Participant.SID} sid
- * @param {string} identity
  * @property {string} identity
  * @property {Participant.SID} sid
  */
-function RemoteParticipantSignaling(sid, identity) {
-  ParticipantSignaling.call(this);
-  this.connect(sid, identity);
-}
 
-inherits(RemoteParticipantSignaling, ParticipantSignaling);
+var RemoteParticipantSignaling = function (_ParticipantSignaling) {
+  _inherits(RemoteParticipantSignaling, _ParticipantSignaling);
+
+  /**
+   * Construct a {@link RemoteParticipantSignaling}.
+   * @param {Participant.SID} sid
+   * @param {string} identity
+   */
+  function RemoteParticipantSignaling(sid, identity) {
+    _classCallCheck(this, RemoteParticipantSignaling);
+
+    var _this = _possibleConstructorReturn(this, (RemoteParticipantSignaling.__proto__ || Object.getPrototypeOf(RemoteParticipantSignaling)).call(this));
+
+    _this.connect(sid, identity);
+    return _this;
+  }
+
+  return RemoteParticipantSignaling;
+}(ParticipantSignaling);
 
 module.exports = RemoteParticipantSignaling;
-
-},{"./participant":96,"util":149}],99:[function(require,module,exports){
+},{"./participant":98}],101:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var TrackSignaling = require('./track');
 
 /**
- * Construct a {@link RemoteTrackSignaling}.
- * @class
- * @classdesc A {@link RemoteTrack} implementation
+ * A {@link RemoteTrack} implementation
  * @extends TrackSignaling
- * @param {Track.SID} sid
- * @param {string} name
- * @param {Track.ID} id
- * @param {Track.Kind} kind
- * @param {boolean} isEnabled
  * @property {boolean} isSubscribed
  * @property {?Error} error - non-null if subscription failed
  */
-function RemoteTrackSignaling(sid, name, id, kind, isEnabled) {
-  TrackSignaling.call(this, name, id, kind, isEnabled);
-  Object.defineProperties(this, {
-    _error: {
-      value: null,
-      writable: true
-    },
-    error: {
-      enumerable: true,
-      get: function() {
-        return this._error;
-      }
-    },
-    isSubscribed: {
-      enumerable: true,
-      get: function() {
-        return !!this._trackTransceiver;
-      }
-    }
-  });
-  this.setSid(sid);
-}
 
-inherits(RemoteTrackSignaling, TrackSignaling);
+var RemoteTrackSignaling = function (_TrackSignaling) {
+  _inherits(RemoteTrackSignaling, _TrackSignaling);
 
-/**
- * @param {Error} error
- * @returns {this}
- */
-RemoteTrackSignaling.prototype.subscribeFailed = function subscribeFailed(error) {
-  if (!this._error) {
-    this._error = error;
-    this.emit('updated');
+  /**
+   * Construct a {@link RemoteTrackSignaling}.
+   * @param {Track.SID} sid
+   * @param {string} name
+   * @param {Track.ID} id
+   * @param {Track.Kind} kind
+   * @param {boolean} isEnabled
+   */
+  function RemoteTrackSignaling(sid, name, id, kind, isEnabled) {
+    _classCallCheck(this, RemoteTrackSignaling);
+
+    var _this = _possibleConstructorReturn(this, (RemoteTrackSignaling.__proto__ || Object.getPrototypeOf(RemoteTrackSignaling)).call(this, name, id, kind, isEnabled));
+
+    Object.defineProperties(_this, {
+      _error: {
+        value: null,
+        writable: true
+      },
+      error: {
+        enumerable: true,
+        get: function get() {
+          return this._error;
+        }
+      },
+      isSubscribed: {
+        enumerable: true,
+        get: function get() {
+          return !!this._trackTransceiver;
+        }
+      }
+    });
+    _this.setSid(sid);
+    return _this;
   }
-  return this;
-};
+
+  /**
+   * @param {Error} error
+   * @returns {this}
+   */
+
+
+  _createClass(RemoteTrackSignaling, [{
+    key: 'subscribeFailed',
+    value: function subscribeFailed(error) {
+      if (!this._error) {
+        this._error = error;
+        this.emit('updated');
+      }
+      return this;
+    }
+  }]);
+
+  return RemoteTrackSignaling;
+}(TrackSignaling);
 
 module.exports = RemoteTrackSignaling;
-
-},{"./track":101,"util":149}],100:[function(require,module,exports){
+},{"./track":103}],102:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var DefaultRecordingSignaling = require('./recording');
 var StateMachine = require('../statemachine');
 
@@ -20113,120 +20771,163 @@ RoomSignaling States
     | connected |---->| disconnected |
     |           |     |              |
     +-----------+     +--------------+
+          |  ^               ^
+          |  |               |
+          |  |   +--------------+
+          |  +---|              |
+          |      | reconnecting |
+          +----->|              |
+                 +--------------+
 
 */
 
 var states = {
-  connected: [
-    'disconnected'
-  ],
+  connected: ['reconnecting', 'disconnected'],
+  reconnecting: ['connected', 'disconnected'],
   disconnected: []
 };
 
 /**
- * Construct a {@link RoomSignaling}.
- * @class
- * @classdesc A {@link Room} implementation
+ * A {@link Room} implementation
  * @extends StateMachine
- * @param {ParticipantSignaling} localParticipant
- * @param {Room.SID} sid
- * @param {string} name
  * @property {ParticipantSignaling} localParticipant
+ * @property {RTCIceConnectionState} mediaConnectionState
  * @property {string} name
  * @property {Map<string, RemoteParticipantSignaling>} participants
  * @property {RecordingSignaling} recording
  * @property {Room.SID} sid
- * @property {string} state - "connected" or "disconnected"
+ * @property {string} state - "connected", "reconnecting", or "disconnected"
+ * @property {string} signalingConnectionState - "connected",
+ *   "reconnecting", or "disconnected"
+ * @emits RoomSignaling#mediaConnectionStateChanged
+ * @emits RoomSignaling#signalingConnectionStateChanged
  */
-function RoomSignaling(localParticipant, sid, name, options) {
-  options = Object.assign({
-    RecordingSignaling: DefaultRecordingSignaling
-  }, options);
 
-  StateMachine.call(this, 'connected', states);
+var RoomSignaling = function (_StateMachine) {
+  _inherits(RoomSignaling, _StateMachine);
 
-  var RecordingSignaling = options.RecordingSignaling;
+  /**
+   * Construct a {@link RoomSignaling}.
+   * @param {ParticipantSignaling} localParticipant
+   * @param {Room.SID} sid
+   * @param {string} name
+   */
+  function RoomSignaling(localParticipant, sid, name, options) {
+    _classCallCheck(this, RoomSignaling);
 
-  Object.defineProperties(this, {
-    _options: {
-      value: options
-    },
-    localParticipant: {
-      enumerable: true,
-      value: localParticipant
-    },
-    name: {
-      enumerable: true,
-      value: name
-    },
-    participants: {
-      enumerable: true,
-      value: new Map()
-    },
-    recording: {
-      enumerable: true,
-      value: new RecordingSignaling()
-    },
-    sid: {
-      enumerable: true,
-      value: sid
+    options = Object.assign({
+      RecordingSignaling: DefaultRecordingSignaling
+    }, options);
+
+    var _this = _possibleConstructorReturn(this, (RoomSignaling.__proto__ || Object.getPrototypeOf(RoomSignaling)).call(this, 'connected', states));
+
+    var RecordingSignaling = options.RecordingSignaling;
+
+    Object.defineProperties(_this, {
+      _mediaConnectionIsReconnecting: {
+        writable: true,
+        value: false
+      },
+      _options: {
+        value: options
+      },
+      localParticipant: {
+        enumerable: true,
+        value: localParticipant
+      },
+      name: {
+        enumerable: true,
+        value: name
+      },
+      participants: {
+        enumerable: true,
+        value: new Map()
+      },
+      recording: {
+        enumerable: true,
+        value: new RecordingSignaling()
+      },
+      sid: {
+        enumerable: true,
+        value: sid
+      }
+    });
+
+    _this.on('mediaConnectionStateChanged', function () {
+      return maybeUpdateState(_this);
+    });
+    _this.on('signalingConnectionStateChanged', function () {
+      return maybeUpdateState(_this);
+    });
+    return _this;
+  }
+
+  /**
+   * Disconnect, possibly with an Error.
+   * @private
+   * @param {Error} [error]
+   * @returns {boolean}
+   */
+
+
+  _createClass(RoomSignaling, [{
+    key: '_disconnect',
+    value: function _disconnect(error) {
+      if (this.state !== 'disconnected') {
+        this.preempt('disconnected', null, [error]);
+        return true;
+      }
+      return false;
     }
-  });
-}
 
-inherits(RoomSignaling, StateMachine);
+    /**
+     * Connect {@link RemoteParticipantSignaling} to the {@link RoomSignaling}.
+     * @param {RemoteParticipantSignaling} participant
+     * @returns {boolean}
+     */
 
-/**
- * Disconnect, possibly with an Error.
- * @param {Error} [error]
- * @returns {boolean}
- */
-RoomSignaling.prototype._disconnect = function _disconnect(error) {
-  if (this.state === 'connected') {
-    this.preempt('disconnected', null, [error]);
-    return true;
-  }
-  return false;
-};
+  }, {
+    key: 'connectParticipant',
+    value: function connectParticipant(participant) {
+      var self = this;
 
-/**
- * Connect {@link RemoteParticipantSignaling} to the {@link RoomSignaling}.
- * @param {RemoteParticipantSignaling} participant
- * @returns {boolean}
- */
-RoomSignaling.prototype.connectParticipant = function connectParticipant(participant) {
-  var self = this;
+      if (participant.state === 'disconnected') {
+        return false;
+      }
 
-  if (participant.state === 'disconnected') {
-    return false;
-  }
+      if (this.participants.has(participant.sid)) {
+        return false;
+      }
 
-  if (this.participants.has(participant.sid)) {
-    return false;
-  }
+      this.participants.set(participant.sid, participant);
 
-  this.participants.set(participant.sid, participant);
+      participant.on('stateChanged', function stateChanged(state) {
+        if (state === 'disconnected') {
+          participant.removeListener('stateChanged', stateChanged);
+          self.participants.delete(participant.sid);
+          self.emit('participantDisconnected', participant);
+        }
+      });
 
-  participant.on('stateChanged', function stateChanged(state) {
-    if (state === 'disconnected') {
-      participant.removeListener('stateChanged', stateChanged);
-      self.participants.delete(participant.sid);
-      self.emit('participantDisconnected', participant);
+      this.emit('participantConnected', participant);
+
+      return true;
     }
-  });
 
-  this.emit('participantConnected', participant);
+    /**
+     * Disconnect.
+     * @returns {boolean}
+     */
 
-  return true;
-};
+  }, {
+    key: 'disconnect',
+    value: function disconnect() {
+      return this._disconnect();
+    }
+  }]);
 
-/**
- * Disconnect.
- * @returns {boolean}
- */
-RoomSignaling.prototype.disconnect = function disconnect() {
-  return this._disconnect();
-};
+  return RoomSignaling;
+}(StateMachine);
 
 /**
  * {@link RemoteParticipantSignaling} connected to the {@link RoomSignaling}.
@@ -20240,150 +20941,224 @@ RoomSignaling.prototype.disconnect = function disconnect() {
  * @param {RemoteParticipantSignaling} participantSignaling
  */
 
-module.exports = RoomSignaling;
+/**
+ * @event RoomSignaling#event:mediaConnectionStateChanged
+ */
 
-},{"../statemachine":116,"./recording":97,"util":149}],101:[function(require,module,exports){
+/**
+ * @event RoomSignaling#event:signalingConnectionStateChanged
+ */
+
+/**
+ * Maybe update the {@link RoomSignaling} state.
+ * @param {RoomSignaling} roomSignaling
+ */
+
+
+function maybeUpdateState(roomSignaling) {
+  if (roomSignaling.state === 'disconnected') {
+    return;
+  }
+
+  var newState = void 0;
+
+  if (roomSignaling.signalingConnectionState === 'reconnecting' || roomSignaling.signalingConnectionState === 'disconnected') {
+    newState = roomSignaling.signalingConnectionState;
+  } else if (roomSignaling.mediaConnectionState === 'failed') {
+    roomSignaling._mediaConnectionIsReconnecting = true;
+    newState = 'reconnecting';
+  } else if (roomSignaling.mediaConnectionState === 'new' || roomSignaling.mediaConnectionState === 'checking') {
+    newState = roomSignaling._mediaConnectionIsReconnecting ? 'reconnecting' : 'connected';
+  } else {
+    roomSignaling._mediaConnectionIsReconnecting = false;
+    newState = 'connected';
+  }
+
+  if (newState === roomSignaling.state) {
+    return;
+  }
+
+  roomSignaling.preempt(newState);
+}
+
+module.exports = RoomSignaling;
+},{"../statemachine":118,"./recording":99}],103:[function(require,module,exports){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var EventEmitter = require('events').EventEmitter;
-var inherits = require('util').inherits;
 var util = require('../util');
 
 /**
- * Construct a {@link TrackSignaling}.
- * @class
- * @classdesc A {@link Track} implementation
- * @param {string} name
- * @param {Track.ID} id
- * @param {Track.Kind} kind
- * @param {boolean} isEnabled
+ * A {@link Track} implementation
+ * @extends EventEmitter
  * @property {Track.ID} id
  * @property {boolean} isEnabled
  * @property {Track.Kind} kind
  * @property {?TrackTransceiver} trackTransceiver
  * @property {?Track.SID} sid
  */
-function TrackSignaling(name, id, kind, isEnabled) {
-  EventEmitter.call(this);
-  var sid = null;
-  var trackTransceiver = null;
-  Object.defineProperties(this, {
-    _isEnabled: {
-      value: isEnabled,
-      writable: true
-    },
-    _trackTransceiver: {
-      get: function() {
-        return trackTransceiver;
+
+var TrackSignaling = function (_EventEmitter) {
+  _inherits(TrackSignaling, _EventEmitter);
+
+  /**
+   * Construct a {@link TrackSignaling}.
+   * @param {string} name
+   * @param {Track.ID} id
+   * @param {Track.Kind} kind
+   * @param {boolean} isEnabled
+   */
+  function TrackSignaling(name, id, kind, isEnabled) {
+    _classCallCheck(this, TrackSignaling);
+
+    var _this = _possibleConstructorReturn(this, (TrackSignaling.__proto__ || Object.getPrototypeOf(TrackSignaling)).call(this));
+
+    var sid = null;
+    var trackTransceiver = null;
+    Object.defineProperties(_this, {
+      _isEnabled: {
+        value: isEnabled,
+        writable: true
       },
-      set: function(_trackTransceiver) {
-        if (trackTransceiver === null) {
-          trackTransceiver = _trackTransceiver;
-          this._trackTransceiverDeferred.resolve(trackTransceiver);
+      _trackTransceiver: {
+        get: function get() {
+          return trackTransceiver;
+        },
+        set: function set(_trackTransceiver) {
+          if (trackTransceiver === null) {
+            trackTransceiver = _trackTransceiver;
+            this._trackTransceiverDeferred.resolve(trackTransceiver);
+          }
+        }
+      },
+      _trackTransceiverDeferred: {
+        value: util.defer()
+      },
+      _sid: {
+        get: function get() {
+          return sid;
+        },
+        set: function set(_sid) {
+          if (sid === null) {
+            sid = _sid;
+          }
+        }
+      },
+      id: {
+        enumerable: true,
+        value: id
+      },
+      isEnabled: {
+        enumerable: true,
+        get: function get() {
+          return this._isEnabled;
+        }
+      },
+      kind: {
+        enumerable: true,
+        value: kind
+      },
+      trackTransceiver: {
+        enumerable: true,
+        get: function get() {
+          return trackTransceiver;
+        }
+      },
+      name: {
+        enumerable: true,
+        value: name
+      },
+      sid: {
+        enumerable: true,
+        get: function get() {
+          return sid;
         }
       }
-    },
-    _trackTransceiverDeferred: {
-      value: util.defer()
-    },
-    _sid: {
-      get: function() {
-        return sid;
-      },
-      set: function(_sid) {
-        if (sid === null) {
-          sid = _sid;
-        }
-      }
-    },
-    id: {
-      enumerable: true,
-      value: id
-    },
-    isEnabled: {
-      enumerable: true,
-      get: function() {
-        return this._isEnabled;
-      }
-    },
-    kind: {
-      enumerable: true,
-      value: kind
-    },
-    trackTransceiver: {
-      enumerable: true,
-      get: function() {
-        return trackTransceiver;
-      }
-    },
-    name: {
-      enumerable: true,
-      value: name
-    },
-    sid: {
-      enumerable: true,
-      get: function() {
-        return sid;
-      }
+    });
+    return _this;
+  }
+
+  /**
+   * Disable the {@link TrackSignaling} if it is not already disabled.
+   * @return {this}
+   */
+
+
+  _createClass(TrackSignaling, [{
+    key: 'disable',
+    value: function disable() {
+      return this.enable(false);
     }
-  });
-}
 
-inherits(TrackSignaling, EventEmitter);
+    /**
+     * Enable (or disable) the {@link TrackSignaling} if it is not already enabled
+     * (or disabled).
+     * @param {boolean} [enabled=true]
+     * @return {this}
+     */
 
-/**
- * Disable the {@link TrackSignaling} if it is not already disabled.
- * @return {this}
- */
-TrackSignaling.prototype.disable = function disable() {
-  return this.enable(false);
-};
+  }, {
+    key: 'enable',
+    value: function enable(enabled) {
+      enabled = typeof enabled === 'boolean' ? enabled : true;
+      if (this.isEnabled !== enabled) {
+        this._isEnabled = enabled;
+        this.emit('updated');
+      }
+      return this;
+    }
 
-/**
- * Enable (or disable) the {@link TrackSignaling} if it is not already enabled
- * (or disabled).
- * @param {boolean} [enabled=true]
- * @return {this}
- */
-TrackSignaling.prototype.enable = function enable(enabled) {
-  enabled = typeof enabled === 'boolean' ? enabled : true;
-  if (this.isEnabled !== enabled) {
-    this._isEnabled = enabled;
-    this.emit('updated');
-  }
-  return this;
-};
+    /**
+     * Get the {@link TrackTransceiver} on the @link TrackSignaling}.
+     * @returns {Promise<TrackTransceiver>}
+     */
 
-/**
- * Get the {@link TrackTransceiver} on the @link TrackSignaling}.
- * @returns {Promise<TrackTransceiver>}
- */
-TrackSignaling.prototype.getTrackTransceiver = function getTrackTransceiver() {
-  return this._trackTransceiverDeferred.promise;
-};
+  }, {
+    key: 'getTrackTransceiver',
+    value: function getTrackTransceiver() {
+      return this._trackTransceiverDeferred.promise;
+    }
 
-/**
- * Set the {@link TrackTransceiver} on the {@link TrackSignaling}.
- * @param {TrackTransceiver} trackTransceiver
- * @returns {this}
- */
-TrackSignaling.prototype.setTrackTransceiver = function setTrackTransceiver(trackTransceiver) {
-  this._trackTransceiver = trackTransceiver;
-  return this;
-};
+    /**
+     * Set the {@link TrackTransceiver} on the {@link TrackSignaling}.
+     * @param {TrackTransceiver} trackTransceiver
+     * @returns {this}
+     */
 
-/**
- * Set the SID on the {@link TrackSignaling} once.
- * @param {string} sid
- * @returns {this}
- */
-TrackSignaling.prototype.setSid = function setSid(sid) {
-  if (this._sid === null) {
-    this._sid = sid;
-    this.emit('updated');
-  }
-  return this;
-};
+  }, {
+    key: 'setTrackTransceiver',
+    value: function setTrackTransceiver(trackTransceiver) {
+      this._trackTransceiver = trackTransceiver;
+      return this;
+    }
+
+    /**
+     * Set the SID on the {@link TrackSignaling} once.
+     * @param {string} sid
+     * @returns {this}
+     */
+
+  }, {
+    key: 'setSid',
+    value: function setSid(sid) {
+      if (this._sid === null) {
+        this._sid = sid;
+        this.emit('updated');
+      }
+      return this;
+    }
+  }]);
+
+  return TrackSignaling;
+}(EventEmitter);
 
 /**
  * Emitted whenever the {@link TrackSignaling} is updated
@@ -20391,8 +21166,7 @@ TrackSignaling.prototype.setSid = function setSid(sid) {
  */
 
 module.exports = TrackSignaling;
-
-},{"../util":129,"events":54,"util":149}],102:[function(require,module,exports){
+},{"../util":131,"events":152}],104:[function(require,module,exports){
 'use strict';
 
 var CancelablePromise = require('../../util/cancelablepromise');
@@ -20410,14 +21184,14 @@ function createCancelableRoomSignalingPromise(token, ua, localParticipant, iceSe
     Transport: DefaultTransport
   }, options);
 
-  var transport;
+  var transport = void 0;
 
   var PeerConnectionManager = options.PeerConnectionManager;
   var RoomV2 = options.RoomV2;
 
   var peerConnectionManager = new PeerConnectionManager(iceServerSource, encodingParameters, preferredCodecs, options);
 
-  var trackSenders = flatMap(localParticipant.tracks, function(trackV2) {
+  var trackSenders = flatMap(localParticipant.tracks, function (trackV2) {
     return [trackV2.trackTransceiver];
   });
 
@@ -20434,15 +21208,13 @@ function createCancelableRoomSignalingPromise(token, ua, localParticipant, iceSe
       // the client after connecting to a room.
       peerConnectionManager.dequeue('description');
 
-      return new Promise(function(resolve, reject) {
+      return new Promise(function (resolve, reject) {
         if (isCanceled()) {
           reject(cancelationError);
           return;
         }
 
-        var transportOptions = typeof options.wsServerInsights === 'string'
-          ? { wsServerInsights: options.wsServerInsights }
-          : {};
+        var transportOptions = typeof options.wsServerInsights === 'string' ? { wsServerInsights: options.wsServerInsights } : {};
 
         if (options.InsightsPublisher) {
           transportOptions.InsightsPublisher = options.InsightsPublisher;
@@ -20459,13 +21231,7 @@ function createCancelableRoomSignalingPromise(token, ua, localParticipant, iceSe
         }, transportOptions);
 
         var Transport = options.Transport;
-        transport = new Transport(
-          options.name,
-          token,
-          localParticipant,
-          peerConnectionManager,
-          ua,
-          transportOptions);
+        transport = new Transport(options.name, token, localParticipant, peerConnectionManager, ua, transportOptions);
 
         transport.once('connected', function connected(initialState) {
           if (isCanceled()) {
@@ -20515,86 +21281,105 @@ function createCancelableRoomSignalingPromise(token, ua, localParticipant, iceSe
 }
 
 module.exports = createCancelableRoomSignalingPromise;
-
-},{"../../util":129,"../../util/cancelablepromise":126,"../../util/twilio-video-errors":141,"./peerconnectionmanager":108,"./room":112,"./transport":114}],103:[function(require,module,exports){
+},{"../../util":131,"../../util/cancelablepromise":128,"../../util/twilio-video-errors":143,"./peerconnectionmanager":110,"./room":114,"./transport":116}],105:[function(require,module,exports){
 'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Filter = require('../../util/filter');
 
 /**
- * Construct an {@link IceBox}.
- * @class
- * @classdesc An {@link IceBox} stores trickled ICE candidates. Candidates added
- * to the {@link IceBox} via {@link IceBox#update} are compared against
- * previously trickled candidates and only new candidates will be returned
- * (assuming they match the current ICE username fragment set by
- * {@link IceBox#setUfrag}.
+ * An {@link IceBox} stores trickled ICE candidates. Candidates added to the
+ * {@link IceBox} via {@link IceBox#update} are compared against previously
+ * trickled candidates and only new candidates will be returned (assuming they
+ * match the current ICE username fragment set by {@link IceBox#setUfrag}).
  * @property {?string} ufrag
  */
-function IceBox() {
-  if (!(this instanceof IceBox)) {
-    return new IceBox();
-  }
-  Object.defineProperties(this, {
-    _filter: {
-      value: new Filter({
-        getKey: function getKey(iceState) {
-          return iceState.ufrag;
-        },
-        isLessThanOrEqualTo: function isLessThanOrEqualTo(a, b) {
-          return a.revision <= b.revision;
+
+var IceBox = function () {
+  /**
+   * Construct an {@link IceBox}.
+   */
+  function IceBox() {
+    _classCallCheck(this, IceBox);
+
+    Object.defineProperties(this, {
+      _filter: {
+        value: new Filter({
+          getKey: function getKey(iceState) {
+            return iceState.ufrag;
+          },
+          isLessThanOrEqualTo: function isLessThanOrEqualTo(a, b) {
+            return a.revision <= b.revision;
+          }
+        })
+      },
+      _ufrag: {
+        writable: true,
+        value: null
+      },
+      ufrag: {
+        enumerable: true,
+        get: function get() {
+          return this._ufrag;
         }
-      })
-    },
-    _ufrag: {
-      writable: true,
-      value: null
-    },
-    ufrag: {
-      enumerable: true,
-      get: function() {
-        return this._ufrag;
       }
+    });
+  }
+
+  /**
+   * Set the ICE username fragment on the {@link IceBox}. This method returns any
+   * ICE candidates associated with the username fragment.
+   * @param {string} ufrag
+   * @returns {Array<RTCIceCandidateInit>}
+   */
+
+
+  _createClass(IceBox, [{
+    key: 'setUfrag',
+    value: function setUfrag(ufrag) {
+      this._ufrag = ufrag;
+      var ice = this._filter.toMap().get(ufrag);
+      return ice ? ice.candidates : [];
     }
-  });
-}
 
-/**
- * Set the ICE username fragment on the {@link IceBox}. This method returns any
- * ICE candidates associated with the username fragment.
- * @param {string} ufrag
- * @returns {Array<RTCIceCandidateInit>}
- */
-IceBox.prototype.setUfrag = function setUfrag(ufrag) {
-  this._ufrag = ufrag;
-  var ice = this._filter.toMap().get(ufrag);
-  return ice ? ice.candidates : [];
-};
+    /**
+     * Update the {@link IceBox}. This method returns any new ICE candidates
+     * associated with the current username fragment.
+     * @param {object} iceState
+     * @returns {Array<RTCIceCandidateInit>}
+     */
 
-/**
- * Update the {@link IceBox}. This method returns any new ICE candidates
- * associated with the current username fragment.
- * @param {object} iceState
- * @returns {Array<RTCIceCandidateInit>}
- */
-IceBox.prototype.update = function update(iceState) {
-  // NOTE(mroberts): The Server sometimes does not set the candidates property.
-  iceState.candidates = iceState.candidates || [];
-  var oldIceState = this._filter.toMap().get(iceState.ufrag);
-  var oldCandidates = oldIceState ? oldIceState.candidates : [];
-  return this._filter.update(iceState) && this._ufrag === iceState.ufrag
-    ? iceState.candidates.slice(oldCandidates.length)
-    : [];
-};
+  }, {
+    key: 'update',
+    value: function update(iceState) {
+      // NOTE(mroberts): The Server sometimes does not set the candidates property.
+      iceState.candidates = iceState.candidates || [];
+      var oldIceState = this._filter.toMap().get(iceState.ufrag);
+      var oldCandidates = oldIceState ? oldIceState.candidates : [];
+      return this._filter.update(iceState) && this._ufrag === iceState.ufrag ? iceState.candidates.slice(oldCandidates.length) : [];
+    }
+  }]);
+
+  return IceBox;
+}();
 
 module.exports = IceBox;
-
-},{"../../util/filter":128}],104:[function(require,module,exports){
+},{"../../util/filter":130}],106:[function(require,module,exports){
 'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var constants = require('../../util/constants');
 var defaultCreateCancelableRoomSignalingPromise = require('./cancelableroomsignalingpromise');
-var inherits = require('util').inherits;
 var LocalParticipantV2 = require('./localparticipant');
 var Signaling = require('../');
 var SIP = require('../../sip');
@@ -20602,239 +21387,349 @@ var SIPJSMediaHandler = require('./sipjsmediahandler');
 var util = require('../../util');
 
 /**
- * Construct {@link SignalingV2}.
- * @class
- * @classdesc {@link SignalingV2} implements version 2 of our signaling
- * protocol.
- * @extends {Signaling}
- * @param {string} wsServer
- * @param {?object} [options={}]
+ * {@link SignalingV2} implements version 2 of our signaling protocol.
+ * @extends Signaling
  */
-function SignalingV2(wsServer, options) {
-  var uri = util.makeClientSIPURI();
 
-  /* eslint new-cap:0 */
-  options = Object.assign({
-    createCancelableRoomSignalingPromise: defaultCreateCancelableRoomSignalingPromise,
-    registrarServer: constants.REGISTRAR_SERVER,
-    UA: SIP.UA
-  }, options);
+var SignalingV2 = function (_Signaling) {
+  _inherits(SignalingV2, _Signaling);
 
-  var debug = options.logLevel === 'debug';
-  var useWssHack = wsServer.startsWith('wss://');
+  /**
+   * Construct {@link SignalingV2}.
+   * @param {string} wsServer
+   * @param {?object} [options={}]
+   */
+  function SignalingV2(wsServer, options) {
+    _classCallCheck(this, SignalingV2);
 
-  var UA = options.UA;
-  var ua = new UA({
-    autostart: false,
-    log: {
-      builtinEnabled: debug
-    },
-    extraSupported: ['room-signaling', 'timer'],
-    hackAllowUnregisteredOptionTags: true,
-    keepAliveInterval: 30,
-    mediaHandlerFactory: SIPJSMediaHandler.defaultFactory,
-    register: false,
-    registrarServer: options.registrarServer,
-    traceSip: debug,
-    uri: uri,
-    wsServers: wsServer,
-    hackWssInTransport: useWssHack
-  });
+    var uri = util.makeClientSIPURI();
 
-  Signaling.call(this);
+    /* eslint new-cap:0 */
+    options = Object.assign({
+      createCancelableRoomSignalingPromise: defaultCreateCancelableRoomSignalingPromise,
+      registrarServer: constants.REGISTRAR_SERVER,
+      UA: SIP.UA
+    }, options);
 
-  Object.defineProperties(this, {
-    _createCancelableRoomSignalingPromise: {
-      value: options.createCancelableRoomSignalingPromise
-    },
-    _options: {
-      value: options
-    },
-    _ua: {
-      value: ua
-    }
-  });
-}
+    var debug = options.logLevel === 'debug';
+    var useWssHack = wsServer.startsWith('wss://');
 
-inherits(SignalingV2, Signaling);
+    var UA = options.UA;
+    var ua = new UA({
+      autostart: false,
+      log: {
+        builtinEnabled: debug
+      },
+      extraSupported: ['room-signaling', 'timer'],
+      hackAllowUnregisteredOptionTags: true,
+      keepAliveInterval: 30,
+      mediaHandlerFactory: SIPJSMediaHandler.defaultFactory,
+      register: false,
+      registrarServer: options.registrarServer,
+      traceSip: debug,
+      uri: uri,
+      wsServers: wsServer,
+      hackWssInTransport: useWssHack
+    });
 
-SignalingV2.prototype._close = function _close(key) {
-  this.transition('closing', key);
-  this._ua.stop();
-  this._ua.transport.disconnect();
-  this.transition('closed', key);
-  return Promise.resolve(this);
-};
+    var _this = _possibleConstructorReturn(this, (SignalingV2.__proto__ || Object.getPrototypeOf(SignalingV2)).call(this));
 
-SignalingV2.prototype._open = function _open(key) {
-  var self = this;
-
-  function startUA() {
-    self._ua.start();
+    Object.defineProperties(_this, {
+      _createCancelableRoomSignalingPromise: {
+        value: options.createCancelableRoomSignalingPromise
+      },
+      _options: {
+        value: options
+      },
+      _ua: {
+        value: ua
+      }
+    });
+    return _this;
   }
 
-  this.transition('opening', key);
-  return util.promiseFromEvents(startUA, this._ua, 'connected', 'disconnected').then(function() {
-    self.transition('open', key);
-    return self;
-  }, function() {
-    self.transition('closed', key);
-    throw new Error('Open failed');
-  });
-};
+  /**
+   * @private
+   */
 
-SignalingV2.prototype._connect = function _connect(localParticipant, token, iceServerSource, encodingParameters, preferredCodecs, options) {
-  options = Object.assign({}, this._options, options);
 
-  var ua = this._ua;
+  _createClass(SignalingV2, [{
+    key: '_close',
+    value: function _close(key) {
+      this.transition('closing', key);
+      this._ua.stop();
+      this._ua.transport.disconnect();
+      this.transition('closed', key);
+      return Promise.resolve(this);
+    }
 
-  return this._createCancelableRoomSignalingPromise.bind(
-    null,
-    token,
-    ua,
-    localParticipant,
-    iceServerSource,
-    encodingParameters,
-    preferredCodecs,
-    options);
-};
+    /**
+     * @private
+     */
 
-SignalingV2.prototype.createLocalParticipantSignaling = function createLocalParticipantSignaling(encodingParameters) {
-  return new LocalParticipantV2(encodingParameters);
-};
+  }, {
+    key: '_open',
+    value: function _open(key) {
+      var _this2 = this;
+
+      var ua = this._ua;
+
+      function startUA() {
+        ua.start();
+      }
+
+      this.transition('opening', key);
+      return util.promiseFromEvents(startUA, ua, 'connected', 'disconnected').then(function () {
+        _this2.transition('open', key);
+        return _this2;
+      }, function () {
+        _this2.transition('closed', key);
+        throw new Error('Open failed');
+      });
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_connect',
+    value: function _connect(localParticipant, token, iceServerSource, encodingParameters, preferredCodecs, options) {
+      options = Object.assign({}, this._options, options);
+
+      var ua = this._ua;
+
+      return this._createCancelableRoomSignalingPromise.bind(null, token, ua, localParticipant, iceServerSource, encodingParameters, preferredCodecs, options);
+    }
+  }, {
+    key: 'createLocalParticipantSignaling',
+    value: function createLocalParticipantSignaling(encodingParameters) {
+      return new LocalParticipantV2(encodingParameters);
+    }
+  }]);
+
+  return SignalingV2;
+}(Signaling);
 
 module.exports = SignalingV2;
-
-},{"../":94,"../../sip":115,"../../util":129,"../../util/constants":127,"./cancelableroomsignalingpromise":102,"./localparticipant":105,"./sipjsmediahandler":113,"util":149}],105:[function(require,module,exports){
+},{"../":96,"../../sip":117,"../../util":131,"../../util/constants":129,"./cancelableroomsignalingpromise":104,"./localparticipant":107,"./sipjsmediahandler":115}],107:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var ParticipantSignaling = require('../participant');
 var LocalTrackPublicationV2 = require('./localtrackpublication');
 
 /**
- * Construct a {@link LocalParticipantV2}.
- * @class
  * @extends ParticipantSignaling
- * @param {EncodingParametersImpl} encodingParameters
- * @param {object} [options]
  * @property {number} revision
+ * @emits LocalParticipantV2#updated
  */
-function LocalParticipantV2(encodingParameters, options) {
-  if (!(this instanceof LocalParticipantV2)) {
-    return new LocalParticipantV2(encodingParameters, options);
+
+var LocalParticipantV2 = function (_ParticipantSignaling) {
+  _inherits(LocalParticipantV2, _ParticipantSignaling);
+
+  /**
+   * Construct a {@link LocalParticipantV2}.
+   * @param {EncodingParametersImpl} encodingParameters
+   * @param {object} [options]
+   */
+  function LocalParticipantV2(encodingParameters, options) {
+    _classCallCheck(this, LocalParticipantV2);
+
+    options = Object.assign({
+      LocalTrackPublicationV2: LocalTrackPublicationV2
+    }, options);
+
+    var _this = _possibleConstructorReturn(this, (LocalParticipantV2.__proto__ || Object.getPrototypeOf(LocalParticipantV2)).call(this));
+
+    Object.defineProperties(_this, {
+      _encodingParameters: {
+        value: encodingParameters
+      },
+      _removeListeners: {
+        value: new Map()
+      },
+      _LocalTrackPublicationV2: {
+        value: options.LocalTrackPublicationV2
+      },
+      _publishedRevision: {
+        writable: true,
+        value: 0
+      },
+      _revision: {
+        writable: true,
+        value: 1
+      },
+      revision: {
+        enumerable: true,
+        get: function get() {
+          return this._revision;
+        }
+      }
+    });
+    return _this;
   }
 
-  options = Object.assign({
-    LocalTrackPublicationV2: LocalTrackPublicationV2
-  }, options);
+  /**
+   * Set the {@link EncodingParameters}.
+   * @param {?EncodingParameters} encodingParameters
+   * @returns {this}
+   */
 
-  ParticipantSignaling.call(this);
-  Object.defineProperties(this, {
-    _encodingParameters: {
-      value: encodingParameters
-    },
-    _LocalTrackPublicationV2: {
-      value: options.LocalTrackPublicationV2
-    },
-    _publishedRevision: {
-      writable: true,
-      value: 0
-    },
-    _revision: {
-      writable: true,
-      value: 1
-    },
-    revision: {
-      enumerable: true,
-      get: function() {
-        return this._revision;
+
+  _createClass(LocalParticipantV2, [{
+    key: 'setParameters',
+    value: function setParameters(encodingParameters) {
+      this._encodingParameters.update(encodingParameters);
+      return this;
+    }
+
+    /**
+     * Update the {@link LocalParticipantV2} with the new state.
+     * @param {Published} published
+     * @returns {this}
+     */
+
+  }, {
+    key: 'update',
+    value: function update(published) {
+      if (this._publishedRevision >= published.revision) {
+        return this;
+      }
+
+      this._publishedRevision = published.revision;
+
+      published.tracks.forEach(function (publicationState) {
+        var localTrackPublicationV2 = this.tracks.get(publicationState.id);
+        if (localTrackPublicationV2) {
+          localTrackPublicationV2.update(publicationState);
+        }
+      }, this);
+
+      return this;
+    }
+
+    /**
+     * Add a {@link LocalTrackPublicationV2} for the given {@link DataTrackSender}
+     * or {@link MediaTrackSender} to the {@link LocalParticipantV2}.
+     * @param {DataTrackSender|MediaTrackSender} trackSender
+     * @param {string} name
+     * @returns {this}
+     */
+
+  }, {
+    key: 'addTrack',
+    value: function addTrack(trackSender, name) {
+      var _this2 = this;
+
+      var publication = new this._LocalTrackPublicationV2(trackSender, name);
+      _get(LocalParticipantV2.prototype.__proto__ || Object.getPrototypeOf(LocalParticipantV2.prototype), 'addTrack', this).call(this, publication);
+
+      var sid = publication.sid;
+
+
+      var updated = function updated() {
+        // NOTE(mmalavalli): The LocalParticipantV2's state is only published if
+        // the "updated" event is emitted due to LocalTrackPublicationV2's
+        // .isEnabled being toggled. We do not publish if it is fired due to the
+        // LocalTrackPublicationV2's .sid being set.
+        if (sid === publication.sid) {
+          _this2.didUpdate();
+          return;
+        }
+        sid = publication.sid;
+      };
+
+      publication.on('updated', updated);
+
+      this._removeListener(publication);
+      this._removeListeners.set(publication, function () {
+        return publication.removeListener('updated', updated);
+      });
+
+      this.didUpdate();
+
+      return this;
+    }
+
+    /**
+     * @private
+     * @param {LocalTrackPublicationV2} publication
+     * @returns {void}
+     */
+
+  }, {
+    key: '_removeListener',
+    value: function _removeListener(publication) {
+      var removeListener = this._removeListeners.get(publication);
+      if (removeListener) {
+        removeListener();
       }
     }
-  });
-}
 
-inherits(LocalParticipantV2, ParticipantSignaling);
+    /**
+     * Get the current state of the {@link LocalParticipantV2}.
+     * @returns {object}
+     */
 
-/**
- * Set the {@link EncodingParameters}.
- * @param {?EncodingParameters} encodingParameters
- * @returns {this}
- */
-LocalParticipantV2.prototype.setParameters = function setParameters(encodingParameters) {
-  this._encodingParameters.update(encodingParameters);
-  return this;
-};
-
-/**
- * Update the {@link LocalParticipantV2} with the new state.
- * @param {Published} published
- * @returns {this}
- */
-LocalParticipantV2.prototype.update = function update(published) {
-  if (this._publishedRevision >= published.revision) {
-    return this;
-  }
-
-  this._publishedRevision = published.revision;
-
-  published.tracks.forEach(function(publicationState) {
-    var localTrackPublicationV2 = this.tracks.get(publicationState.id);
-    if (localTrackPublicationV2) {
-      localTrackPublicationV2.update(publicationState);
+  }, {
+    key: 'getState',
+    value: function getState() {
+      return {
+        revision: this.revision,
+        tracks: Array.from(this.tracks.values()).map(function (track) {
+          return track.getState();
+        })
+      };
     }
-  }, this);
 
-  return this;
-};
+    /**
+     * Increment the revision for the {@link LocalParticipantV2}.
+     * @private
+     * @returns {void}
+     */
 
-/**
- * Add a {@link LocalTrackPublicationV2} for the given {@link DataTrackSender}
- * or {@link MediaTrackSender} to the {@link LocalParticipantV2}.
- * @param {DataTrackSender|MediaTrackSender} trackSender
- * @param {string} name
- * @returns {this}
- */
-LocalParticipantV2.prototype.addTrack = function addTrack(trackSender, name) {
-  var localTrackPublicationV2 = new this._LocalTrackPublicationV2(trackSender, name);
-  return ParticipantSignaling.prototype.addTrack.call(this, localTrackPublicationV2);
-};
+  }, {
+    key: 'didUpdate',
+    value: function didUpdate() {
+      this._revision++;
+      this.emit('updated');
+    }
 
-/**
- * Get the current state of the {@link LocalParticipantV2}.
- * @returns {object}
- */
-LocalParticipantV2.prototype.getState = function getState() {
-  return {
-    revision: this.revision,
-    tracks: Array.from(this.tracks.values()).map(function(track) {
-      return track.getState();
-    })
-  };
-};
+    /**
+     * Remove the {@link LocalTrackPublicationV2} for the given {@link DataTrackSender}
+     * or {@link MediaTrackSender} from the {@link LocalParticipantV2}.
+     * @param {DataTrackSender|MediaTrackSender} trackSender
+     * @returns {boolean}
+     */
 
-/**
- * Increment the revision for the {@link LocalParticipantV2}.
- * @returns {this}
- */
-LocalParticipantV2.prototype.incrementRevision = function incrementRevision() {
-  this._revision++;
-  return this;
-};
+  }, {
+    key: 'removeTrack',
+    value: function removeTrack(trackSender) {
+      var publication = this.tracks.get(trackSender.id);
+      if (!publication) {
+        return false;
+      }
+      var didDelete = _get(LocalParticipantV2.prototype.__proto__ || Object.getPrototypeOf(LocalParticipantV2.prototype), 'removeTrack', this).call(this, publication);
+      if (didDelete) {
+        this._removeListener(publication);
+        this.didUpdate();
+      }
+      return didDelete;
+    }
+  }]);
 
-/**
- * Remove the {@link LocalTrackPublicationV2} for the given {@link DataTrackSender}
- * or {@link MediaTrackSender} from the {@link LocalParticipantV2}.
- * @param {DataTrackSender|MediaTrackSender} trackSender
- * @returns {boolean}
- */
-LocalParticipantV2.prototype.removeTrack = function removeTrack(trackSender) {
-  var localTrackPublicationV2 = this.tracks.get(trackSender.id);
-  if (!localTrackPublicationV2) {
-    return false;
-  }
-  return ParticipantSignaling.prototype.removeTrack.call(this, localTrackPublicationV2);
-};
+  return LocalParticipantV2;
+}(ParticipantSignaling);
 
 /**
  * @interface Published
@@ -20872,65 +21767,91 @@ LocalParticipantV2.prototype.removeTrack = function removeTrack(trackSender) {
  * @property {string} message
  */
 
-module.exports = LocalParticipantV2;
+/**
+ * @event LocalParticipantV2#updated
+ */
 
-},{"../participant":96,"./localtrackpublication":106,"util":149}],106:[function(require,module,exports){
+module.exports = LocalParticipantV2;
+},{"../participant":98,"./localtrackpublication":108}],108:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var LocalTrackPublicationSignaling = require('../localtrackpublication');
 var createTwilioError = require('../../util/twilio-video-errors').createTwilioError;
 
 /**
- * Construct a {@link LocalTrackPublicationV2}.
- * @class
  * @extends LocalTrackPublicationSignaling
- * @param {DataTrackSender|MediaTrackSender} trackSender
- * @param {string} name
  */
-function LocalTrackPublicationV2(trackSender, name) {
-  if (!(this instanceof LocalTrackPublicationV2)) {
-    return new LocalTrackPublicationV2(trackSender, name);
+
+var LocalTrackPublicationV2 = function (_LocalTrackPublicatio) {
+  _inherits(LocalTrackPublicationV2, _LocalTrackPublicatio);
+
+  /**
+   * Construct a {@link LocalTrackPublicationV2}.
+   * @param {DataTrackSender|MediaTrackSender} trackSender
+   * @param {string} name
+   */
+  function LocalTrackPublicationV2(trackSender, name) {
+    _classCallCheck(this, LocalTrackPublicationV2);
+
+    return _possibleConstructorReturn(this, (LocalTrackPublicationV2.__proto__ || Object.getPrototypeOf(LocalTrackPublicationV2)).call(this, trackSender, name));
   }
-  LocalTrackPublicationSignaling.call(this, trackSender, name);
-}
 
-inherits(LocalTrackPublicationV2, LocalTrackPublicationSignaling);
+  /**
+   * Get the {@link LocalTrackPublicationV2#Representation} of a given {@link TrackSignaling}.
+   * @returns {LocalTrackPublicationV2#Representation} - without the SID
+   */
 
-/**
- * Get the {@link LocalTrackPublicationV2#Representation} of a given {@link TrackSignaling}.
- * @returns {LocalTrackPublicationV2#Representation} - without the SID
- */
-LocalTrackPublicationV2.prototype.getState = function getState() {
-  return {
-    enabled: this.isEnabled,
-    id: this.id,
-    kind: this.kind,
-    name: this.name
-  };
-};
 
-/**
- * Compare the {@link LocalTrackPublicationV2} to a {@link LocalTrackPublicationV2#Representation} of itself
- * and perform any updates necessary.
- * @param {PublishedTrack} track
- * @returns {this}
- * @fires TrackSignaling#updated
- */
-LocalTrackPublicationV2.prototype.update = function update(track) {
-  switch (track.state) {
-    case 'ready':
-      this.setSid(track.sid);
-      break;
-    case 'failed':
-      var error = track.error;
-      this.publishFailed(createTwilioError(error.code, error.message));
-      break;
-    default: // 'created'
-      break;
-  }
-  return this;
-};
+  _createClass(LocalTrackPublicationV2, [{
+    key: 'getState',
+    value: function getState() {
+      return {
+        enabled: this.isEnabled,
+        id: this.id,
+        kind: this.kind,
+        name: this.name
+      };
+    }
+
+    /**
+     * Compare the {@link LocalTrackPublicationV2} to a {@link LocalTrackPublicationV2#Representation} of itself
+     * and perform any updates necessary.
+     * @param {PublishedTrack} track
+     * @returns {this}
+     * @fires TrackSignaling#updated
+     */
+
+  }, {
+    key: 'update',
+    value: function update(track) {
+      switch (track.state) {
+        case 'ready':
+          this.setSid(track.sid);
+          break;
+        case 'failed':
+          {
+            var error = track.error;
+            this.publishFailed(createTwilioError(error.code, error.message));
+            break;
+          }
+        default:
+          // 'created'
+          break;
+      }
+      return this;
+    }
+  }]);
+
+  return LocalTrackPublicationV2;
+}(LocalTrackPublicationSignaling);
 
 /**
  * The Room Signaling Protocol (RSP) representation of a {@link LocalTrackPublicationV2}.
@@ -20943,9 +21864,16 @@ LocalTrackPublicationV2.prototype.update = function update(track) {
  */
 
 module.exports = LocalTrackPublicationV2;
-
-},{"../../util/twilio-video-errors":141,"../localtrackpublication":95,"util":149}],107:[function(require,module,exports){
+},{"../../util/twilio-video-errors":143,"../localtrackpublication":97}],109:[function(require,module,exports){
 'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var WebRTC = require('@twilio/webrtc');
 var DefaultMediaStream = WebRTC.MediaStream;
@@ -20960,13 +21888,20 @@ var setBitrateParameters = require('../../util/sdp').setBitrateParameters;
 var setCodecPreferences = require('../../util/sdp').setCodecPreferences;
 var setSimulcast = require('../../util/sdp').setSimulcast;
 var IceBox = require('./icebox');
-var inherits = require('util').inherits;
 var MediaClientLocalDescFailedError = require('../../util/twilio-video-errors').MediaClientLocalDescFailedError;
 var MediaClientRemoteDescFailedError = require('../../util/twilio-video-errors').MediaClientRemoteDescFailedError;
 var DataTrackReceiver = require('../../data/receiver');
 var MediaTrackReceiver = require('../../media/track/receiver');
-var StateMachine = require('../../../lib/statemachine');
+var StateMachine = require('../../statemachine');
 var StatsReport = require('../../stats/statsreport');
+
+var _require = require('../../util'),
+    buildLogLevels = _require.buildLogLevels;
+
+var _require2 = require('../../util/constants'),
+    DEFAULT_LOG_LEVEL = _require2.DEFAULT_LOG_LEVEL;
+
+var Log = require('../../util/log');
 var IdentityTrackMatcher = require('../../util/sdp/trackmatcher/identity');
 var OrderedTrackMatcher = require('../../util/sdp/trackmatcher/ordered');
 var MIDTrackMatcher = require('../../util/sdp/trackmatcher/mid');
@@ -20998,793 +21933,944 @@ PeerConnectionV2 States
 */
 
 var states = {
-  open: [
-    'closed',
-    'updating'
-  ],
-  updating: [
-    'closed',
-    'open'
-  ],
+  open: ['closed', 'updating'],
+  updating: ['closed', 'open'],
   closed: []
 };
 
 /**
- * Construct a {@link PeerConnectionV2}.
- * @class
  * @extends StateMachine
- * @param {string} id
- * @param {EncodingParametersImpl} encodingParameters
- * @param {PreferredCodecs} preferredCodecs
- * @param {object} [options]
  * @property {id}
- * @fires PeerConnectionV2#candidates
- * @fires PeerConnectionV2#description
+ * @emits PeerConnectionV2#iceConnectionStateChanged
+ * @emits PeerConnectionV2#candidates
+ * @emits PeerConnectionV2#description
  */
-function PeerConnectionV2(id, encodingParameters, preferredCodecs, options) {
-  if (!(this instanceof PeerConnectionV2)) {
-    return new PeerConnectionV2(id, encodingParameters, preferredCodecs, options);
-  }
-  StateMachine.call(this, 'open', states);
 
-  options = Object.assign({
-    iceServers: [],
-    offerOptions: {},
-    setBitrateParameters: setBitrateParameters,
-    setCodecPreferences: setCodecPreferences,
-    setSimulcast: setSimulcast,
-    MediaStream: DefaultMediaStream,
-    RTCIceCandidate: DefaultRTCIceCandidate,
-    RTCPeerConnection: DefaultRTCPeerConnection,
-    RTCSessionDescription: DefaultRTCSessionDescription
-  }, options);
+var PeerConnectionV2 = function (_StateMachine) {
+  _inherits(PeerConnectionV2, _StateMachine);
 
-  var configuration = getConfiguration(options);
-  var RTCPeerConnection = options.RTCPeerConnection;
-  var peerConnection = new RTCPeerConnection(configuration);
+  /**
+   * Construct a {@link PeerConnectionV2}.
+   * @param {string} id
+   * @param {EncodingParametersImpl} encodingParameters
+   * @param {PreferredCodecs} preferredCodecs
+   * @param {object} [options]
+   */
+  function PeerConnectionV2(id, encodingParameters, preferredCodecs, options) {
+    _classCallCheck(this, PeerConnectionV2);
 
-  Object.defineProperties(this, {
-    _dataChannels: {
-      value: new Map()
-    },
-    _dataTrackReceivers: {
-      value: new Set()
-    },
-    _descriptionRevision: {
-      writable: true,
-      value: 0
-    },
-    _encodingParameters: {
-      value: encodingParameters
-    },
-    _lastStableDescriptionRevision: {
-      writable: true,
-      value: 0
-    },
-    _localCandidates: {
-      writable: true,
-      value: []
-    },
-    _localCandidatesRevision: {
-      writable: true,
-      value: 1
-    },
-    _localDescription: {
-      writable: true,
-      value: null
-    },
-    _localMediaStream: {
-      value: new options.MediaStream()
-    },
-    _localUfrag: {
-      writable: true,
-      value: null
-    },
-    _log: {
-      value: options.log
-        ? options.log.createLog('signaling', this)
-        : null
-    },
-    _rtpSenders: {
-      value: new Map()
-    },
-    _mediaTrackReceivers: {
-      value: new Set()
-    },
-    _needsInitialAnswer: {
-      writable: true,
-      value: false
-    },
-    _negotiationRole: {
-      writable: true,
-      value: null
-    },
-    _offerOptions: {
-      writable: true,
-      value: options.offerOptions
-    },
-    _peerConnection: {
-      value: peerConnection
-    },
-    _preferredAudioCodecs: {
-      value: preferredCodecs.audio
-    },
-    _preferredVideoCodecs: {
-      value: preferredCodecs.video
-    },
-    _queuedDescription: {
-      writable: true,
-      value: null
-    },
-    _remoteCandidates: {
-      writable: true,
-      value: new IceBox()
-    },
-    _setBitrateParameters: {
-      value: options.setBitrateParameters
-    },
-    _setCodecPreferences: {
-      value: options.setCodecPreferences
-    },
-    _setSimulcast: {
-      value: options.setSimulcast
-    },
-    _RTCIceCandidate: {
-      value: options.RTCIceCandidate
-    },
-    _RTCPeerConnection: {
-      value: options.RTCPeerConnection
-    },
-    _RTCSessionDescription: {
-      value: options.RTCSessionDescription
-    },
-    _shouldOffer: {
-      writable: true,
-      value: false
-    },
-    _trackIdsToAttributes: {
-      value: new Map()
-    },
-    _trackMatcher: {
-      writable: true,
-      value: null
-    },
-    id: {
-      enumerable: true,
-      value: id
-    }
-  });
+    var _this = _possibleConstructorReturn(this, (PeerConnectionV2.__proto__ || Object.getPrototypeOf(PeerConnectionV2)).call(this, 'open', states));
 
-  encodingParameters.on('changed', oncePerTick(this.offer.bind(this)));
-  peerConnection.addEventListener('datachannel', this._handleDataChannelEvent.bind(this));
-  peerConnection.addEventListener('icecandidate', this._handleIceCandidateEvent.bind(this));
-  peerConnection.addEventListener('signalingstatechange', this._handleSignalingStateChange.bind(this));
-  peerConnection.addEventListener('track', this._handleTrackEvent.bind(this));
+    options = Object.assign({
+      iceServers: [],
+      logLevel: DEFAULT_LOG_LEVEL,
+      offerOptions: {},
+      setBitrateParameters: setBitrateParameters,
+      setCodecPreferences: setCodecPreferences,
+      setSimulcast: setSimulcast,
+      MediaStream: DefaultMediaStream,
+      RTCIceCandidate: DefaultRTCIceCandidate,
+      RTCPeerConnection: DefaultRTCPeerConnection,
+      RTCSessionDescription: DefaultRTCSessionDescription
+    }, options);
 
-  var self = this;
-  this.on('stateChanged', function stateChanged(state) {
-    if (state !== 'closed') {
-      return;
-    }
-    self.removeListener('stateChanged', stateChanged);
-    self._dataChannels.forEach(function(dataChannel, dataTrackSender) {
-      self.removeDataTrackSender(dataTrackSender);
+    var configuration = getConfiguration(options);
+    var logLevels = buildLogLevels(options.logLevel);
+    var RTCPeerConnection = options.RTCPeerConnection;
+    var peerConnection = new RTCPeerConnection(configuration);
+
+    Object.defineProperties(_this, {
+      _dataChannels: {
+        value: new Map()
+      },
+      _dataTrackReceivers: {
+        value: new Set()
+      },
+      _descriptionRevision: {
+        writable: true,
+        value: 0
+      },
+      _encodingParameters: {
+        value: encodingParameters
+      },
+      _isRestartingIce: {
+        writable: true,
+        value: false
+      },
+      _lastIceConnectionState: {
+        writable: true,
+        value: null
+      },
+      _lastStableDescriptionRevision: {
+        writable: true,
+        value: 0
+      },
+      _localCandidates: {
+        writable: true,
+        value: []
+      },
+      _localCandidatesRevision: {
+        writable: true,
+        value: 1
+      },
+      _localDescription: {
+        writable: true,
+        value: null
+      },
+      _localMediaStream: {
+        value: new options.MediaStream()
+      },
+      _localUfrag: {
+        writable: true,
+        value: null
+      },
+      _log: {
+        value: options.log ? options.log.createLog('signaling', _this) : new Log('webrtc', _this, logLevels)
+      },
+      _rtpSenders: {
+        value: new Map()
+      },
+      _mediaTrackReceivers: {
+        value: new Set()
+      },
+      _needsInitialAnswer: {
+        writable: true,
+        value: false
+      },
+      _negotiationRole: {
+        writable: true,
+        value: null
+      },
+      _offerOptions: {
+        writable: true,
+        value: options.offerOptions
+      },
+      _peerConnection: {
+        value: peerConnection
+      },
+      _preferredAudioCodecs: {
+        value: preferredCodecs.audio
+      },
+      _preferredVideoCodecs: {
+        value: preferredCodecs.video
+      },
+      _queuedDescription: {
+        writable: true,
+        value: null
+      },
+      _remoteCandidates: {
+        writable: true,
+        value: new IceBox()
+      },
+      _setBitrateParameters: {
+        value: options.setBitrateParameters
+      },
+      _setCodecPreferences: {
+        value: options.setCodecPreferences
+      },
+      _setSimulcast: {
+        value: options.setSimulcast
+      },
+      _RTCIceCandidate: {
+        value: options.RTCIceCandidate
+      },
+      _RTCPeerConnection: {
+        value: options.RTCPeerConnection
+      },
+      _RTCSessionDescription: {
+        value: options.RTCSessionDescription
+      },
+      _shouldOffer: {
+        writable: true,
+        value: false
+      },
+      _shouldRestartIce: {
+        writable: true,
+        value: false
+      },
+      _trackIdsToAttributes: {
+        value: new Map()
+      },
+      _trackMatcher: {
+        writable: true,
+        value: null
+      },
+      id: {
+        enumerable: true,
+        value: id
+      }
     });
-  });
-}
 
-inherits(PeerConnectionV2, StateMachine);
+    encodingParameters.on('changed', oncePerTick(_this.offer.bind(_this)));
+    peerConnection.addEventListener('datachannel', _this._handleDataChannelEvent.bind(_this));
+    peerConnection.addEventListener('icecandidate', _this._handleIceCandidateEvent.bind(_this));
+    peerConnection.addEventListener('iceconnectionstatechange', _this._handleIceConnectionStateChange.bind(_this));
+    peerConnection.addEventListener('signalingstatechange', _this._handleSignalingStateChange.bind(_this));
+    peerConnection.addEventListener('track', _this._handleTrackEvent.bind(_this));
 
-/**
- * Add an ICE candidate to the {@link PeerConnectionV2}.
- * @param {object} candidate
- * @returns {Promise<void>}
- */
-PeerConnectionV2.prototype._addIceCandidate = function _addIceCandidate(candidate) {
-  var self = this;
-  return Promise.resolve().then(function() {
-    candidate = new self._RTCIceCandidate(candidate);
-    return self._peerConnection.addIceCandidate(candidate);
-  });
-};
-
-/**
- * Add ICE candidates to the {@link PeerConnectionV2}.
- * @param {Array<object>} candidates
- * @returns {Promise<void>}
- */
-PeerConnectionV2.prototype._addIceCandidates = function _addIceCandidates(candidates) {
-  return Promise.all(candidates.map(this._addIceCandidate, this)).then(function() {});
-};
-
-/**
- * Check the {@link IceBox}.
- * @param {RTCSessionDescriptionInit} description
- * @returns {Promise<void>}
- */
-PeerConnectionV2.prototype._checkIceBox = function checkIceBox(description) {
-  var ufrag = getUfrag(description);
-  if (!ufrag) {
-    return Promise.resolve();
-  }
-  var candidates = this._remoteCandidates.setUfrag(ufrag);
-  return this._addIceCandidates(candidates);
-};
-
-/**
- * Create an answer and set it on the {@link PeerConnectionV2}.
- * @param {RTCSessionDescriptionInit} offer
- * @returns {Promise<void>}
- */
-PeerConnectionV2.prototype._answer = function _answer(offer) {
-  var self = this;
-  return Promise.resolve().then(function() {
-    if (!self._negotiationRole) {
-      self._negotiationRole = 'answerer';
-    }
-    return self._setRemoteDescription(offer);
-  }).catch(function() {
-    throw new MediaClientRemoteDescFailedError();
-  }).then(function() {
-    return self._peerConnection.createAnswer();
-  }).then(function(answer) {
-    if (!isFirefox) {
-      answer = workaroundIssue8329(answer);
-    }
-    return self._setLocalDescription(answer);
-  }).then(function() {
-    return self._checkIceBox(offer);
-  }).then(function() {
-    return self._peerConnection.localDescription
-      ? self._maybeReoffer(self._peerConnection.localDescription)
-      : Promise.resolve();
-  }).catch(function(error) {
-    throw error instanceof MediaClientRemoteDescFailedError
-      ? error
-      : new MediaClientLocalDescFailedError();
-  });
-};
-
-/**
- * Close the underlying RTCPeerConnection. Returns false if the
- * RTCPeerConnection was already closed.
- * @returns {boolean}
- */
-PeerConnectionV2.prototype._close = function _close() {
-  if (this._peerConnection.signalingState !== 'closed') {
-    this._peerConnection.close();
-    return true;
-  }
-  return false;
-};
-
-/**
- * Handle a "datachannel" event.
- * @param {RTCDataChannelEvent} event
- * @returns {void}
- */
-PeerConnectionV2.prototype._handleDataChannelEvent = function _handleDataChannelEvent(event) {
-  var dataChannel = event.channel;
-  var dataTrackReceiver = new DataTrackReceiver(dataChannel);
-  this._dataTrackReceivers.add(dataTrackReceiver);
-
-  var self = this;
-  dataChannel.addEventListener('close', function() {
-    self._dataTrackReceivers.delete(dataTrackReceiver);
-  });
-
-  this.emit('trackAdded', dataTrackReceiver);
-};
-
-/**
- * Handle a glare scenario on the {@link PeerConnectionV2}.
- * @param {RTCSessionDescriptionInit} offer
- * @returns {Promise<void>}
- */
-PeerConnectionV2.prototype._handleGlare = function _handleGlare(offer) {
-  var self = this;
-  return Promise.resolve().then(function() {
-    return self._setLocalDescription({ type: 'rollback' });
-  }).then(function() {
-    return self._answer(offer);
-  }).then(function() {
-    return self._offer();
-  });
-};
-
-/**
- * Handle an ICE candidate event.
- * @param {Event} event
- * @returns {void}
- */
-PeerConnectionV2.prototype._handleIceCandidateEvent = function _handleIceCandidateEvent(event) {
-  if (event.candidate) {
-    this._localCandidates.push(event.candidate);
-  }
-  var peerConnectionState = {
-    ice: {
-      candidates: this._localCandidates.slice(),
-      revision: this._localCandidatesRevision++,
-      ufrag: this._localUfrag
-    },
-    id: this.id
-  };
-  if (!event.candidate) {
-    peerConnectionState.ice.complete = true;
-  }
-  this.emit('candidates', peerConnectionState);
-};
-
-
-/**
- * Handle a signaling state change event.
- * @param {Event}
- * @returns {void}
- */
-PeerConnectionV2.prototype._handleSignalingStateChange = function _handleSignalingStateChange() {
-  if (this._peerConnection.signalingState === 'closed' && this.state !== 'closed') {
-    this.preempt('closed');
-  }
-};
-
-/**
- * Handle a track event.
- * @param {Event} event
- * @returns {void}
- */
-PeerConnectionV2.prototype._handleTrackEvent = function _handleTrackEvent(event) {
-  var sdp = this._peerConnection.remoteDescription
-    ? this._peerConnection.remoteDescription.sdp
-    : null;
-
-  if (!this._trackMatcher) {
-    this._trackMatcher = event.transceiver && event.transceiver.mid
-      ? new MIDTrackMatcher()
-      : isSafari ? new OrderedTrackMatcher() : new IdentityTrackMatcher();
-  }
-  this._trackMatcher.update(sdp);
-
-  var mediaStreamTrack = event.track;
-  var signaledTrackId = this._trackMatcher.match(event) || mediaStreamTrack.id;
-  var mediaTrackReceiver = new MediaTrackReceiver(signaledTrackId, mediaStreamTrack);
-  this._mediaTrackReceivers.add(mediaTrackReceiver);
-
-  var self = this;
-  mediaStreamTrack.addEventListener('ended', function() {
-    self._mediaTrackReceivers.delete(mediaTrackReceiver);
-  });
-
-  this.emit('trackAdded', mediaTrackReceiver);
-};
-
-/**
- * Conditionally re-offer.
- * @param {RTCSessionDescriptionInit} localDescription
- * @returns {Promise<void>}
- */
-PeerConnectionV2.prototype._maybeReoffer = function _maybeReoffer(localDescription) {
-  var shouldReoffer = this._shouldOffer;
-
-  // NOTE(mmalavalli): In Firefox, if the remote RTCPeerConnection sends
-  // an offer with fewer audio m= lines than the number of audio RTCRTPSenders
-  // in the local RTCPeerConnection, then the local RTCPeerConnection creates
-  // an answer with the same number of audio m= lines as in the offer. This
-  // behavior was triggered by the removal of 'offerToReceiveAudio' from the
-  // default RTCOfferOptions. Ideally, the local RTCPeerConnection should create
-  // an answer with the same number of audio m= lines as the number of
-  // RTCRTPSenders. In order to achieve this,the local RTCPeerConnection
-  // initiates renegotiation.
-  //
-  // We can reduce the number of cases where renegotiation is needed by
-  // re-introducing 'offerToReceiveAudio' to the default RTCOfferOptions with a
-  // value > 1.
-  if (isFirefox) {
-    var senders = this._peerConnection.getSenders().filter(function(sender) {
-      return sender.track;
+    var self = _this;
+    _this.on('stateChanged', function stateChanged(state) {
+      if (state !== 'closed') {
+        return;
+      }
+      self.removeListener('stateChanged', stateChanged);
+      self._dataChannels.forEach(function (dataChannel, dataTrackSender) {
+        self.removeDataTrackSender(dataTrackSender);
+      });
     });
-    shouldReoffer = ['audio', 'video'].reduce(function(shouldOffer, kind) {
-      var mediaSections = getMediaSections(localDescription.sdp, kind, '(sendrecv|sendonly)');
-      var sendersOfKind = senders.filter(isSenderOfKind.bind(null, kind));
-      return shouldOffer || (mediaSections.length < sendersOfKind.length);
-    }, shouldReoffer);
+    return _this;
   }
 
-  // NOTE(mroberts): We also need to re-offer if we have a DataTrack to share
-  // but no m= application section.
-  var hasDataTrack = this._dataChannels.size > 0;
-  var hasApplicationMediaSection = getMediaSections(localDescription.sdp, 'application').length > 0;
-  var needsApplicationMediaSection = hasDataTrack && !hasApplicationMediaSection;
-  shouldReoffer = shouldReoffer || needsApplicationMediaSection;
+  /**
+   * The {@link PeerConnectionV2}'s underlying RTCPeerConnection's
+   * RTCIceConnectionState.
+   * @property {RTCIceConnectionState}
+   */
 
-  return shouldReoffer ? this._offer() : Promise.resolve();
-};
 
-/**
- * Create an offer and set it on the {@link PeerConnectionV2}.
- * @returns {Promise<void>}
- */
-PeerConnectionV2.prototype._offer = function _offer() {
-  var self = this;
-  return Promise.resolve().then(function() {
-    return self._peerConnection.createOffer(self._offerOptions);
-  }).catch(function() {
-    throw new MediaClientLocalDescFailedError();
-  }).then(function(offer) {
-    if (!isFirefox) {
-      offer = workaroundIssue8329(offer);
+  _createClass(PeerConnectionV2, [{
+    key: '_addIceCandidate',
+
+
+    /**
+     * Add an ICE candidate to the {@link PeerConnectionV2}.
+     * @private
+     * @param {object} candidate
+     * @returns {Promise<void>}
+     */
+    value: function _addIceCandidate(candidate) {
+      var _this2 = this;
+
+      return Promise.resolve().then(function () {
+        candidate = new _this2._RTCIceCandidate(candidate);
+        return _this2._peerConnection.addIceCandidate(candidate);
+      });
     }
 
-    var updatedSdp = self._setCodecPreferences(
-      offer.sdp,
-      self._preferredAudioCodecs,
-      self._preferredVideoCodecs);
+    /**
+     * Add ICE candidates to the {@link PeerConnectionV2}.
+     * @private
+     * @param {Array<object>} candidates
+     * @returns {Promise<void>}
+     */
 
-    self._shouldOffer = false;
-    if (!self._negotiationRole) {
-      self._negotiationRole = 'offerer';
-      self._needsInitialAnswer = true;
+  }, {
+    key: '_addIceCandidates',
+    value: function _addIceCandidates(candidates) {
+      return Promise.all(candidates.map(this._addIceCandidate, this)).then(function () {});
     }
-    return self._setLocalDescription({
-      type: 'offer',
-      sdp: updatedSdp
-    });
-  });
-};
 
-/**
- * Set a local description on the {@link PeerConnectionV2}.
- * @param {RTCSessionDescription|RTCSessionDescriptionInit} description
- * @returns {Promise<void>}
- */
-PeerConnectionV2.prototype._setLocalDescription = function _setLocalDescription(description) {
-  var revision = description.revision;
-  var self = this;
-  var vp8SimulcastRequested = this._preferredVideoCodecs.some(function(codecSettings) {
-    return codecSettings.codec.toLowerCase() === 'vp8' && codecSettings.simulcast;
-  });
+    /**
+     * Check the {@link IceBox}.
+     * @private
+     * @param {RTCSessionDescriptionInit} description
+     * @returns {Promise<void>}
+     */
 
-  return Promise.resolve().then(function() {
-    if (description.sdp) {
-      // NOTE(mmalavalli): We do not directly modify "description.sdp" here as
-      // "description" might be an RTCSessionDescription, in which case its
-      // properties are immutable.
-      description = {
-        type: description.type,
-        sdp: isChrome && vp8SimulcastRequested
-          ? self._setSimulcast(description.sdp, self._trackIdsToAttributes)
-          : description.sdp
+  }, {
+    key: '_checkIceBox',
+    value: function _checkIceBox(description) {
+      var ufrag = getUfrag(description);
+      if (!ufrag) {
+        return Promise.resolve();
+      }
+      var candidates = this._remoteCandidates.setUfrag(ufrag);
+      return this._addIceCandidates(candidates);
+    }
+
+    /**
+     * Create an answer and set it on the {@link PeerConnectionV2}.
+     * @private
+     * @param {RTCSessionDescriptionInit} offer
+     * @returns {Promise<void>}
+     */
+
+  }, {
+    key: '_answer',
+    value: function _answer(offer) {
+      var _this3 = this;
+
+      return Promise.resolve().then(function () {
+        if (!_this3._negotiationRole) {
+          _this3._negotiationRole = 'answerer';
+        }
+        return _this3._setRemoteDescription(offer);
+      }).catch(function () {
+        throw new MediaClientRemoteDescFailedError();
+      }).then(function () {
+        return _this3._peerConnection.createAnswer();
+      }).then(function (answer) {
+        if (!isFirefox) {
+          answer = workaroundIssue8329(answer);
+        }
+        return _this3._setLocalDescription(answer);
+      }).then(function () {
+        return _this3._checkIceBox(offer);
+      }).then(function () {
+        return _this3._peerConnection.localDescription ? _this3._maybeReoffer(_this3._peerConnection.localDescription) : Promise.resolve();
+      }).catch(function (error) {
+        throw error instanceof MediaClientRemoteDescFailedError ? error : new MediaClientLocalDescFailedError();
+      });
+    }
+
+    /**
+     * Close the underlying RTCPeerConnection. Returns false if the
+     * RTCPeerConnection was already closed.
+     * @private
+     * @returns {boolean}
+     */
+
+  }, {
+    key: '_close',
+    value: function _close() {
+      if (this._peerConnection.signalingState !== 'closed') {
+        this._peerConnection.close();
+        return true;
+      }
+      return false;
+    }
+
+    /**
+     * Handle a "datachannel" event.
+     * @private
+     * @param {RTCDataChannelEvent} event
+     * @returns {void}
+     */
+
+  }, {
+    key: '_handleDataChannelEvent',
+    value: function _handleDataChannelEvent(event) {
+      var _this4 = this;
+
+      var dataChannel = event.channel;
+      var dataTrackReceiver = new DataTrackReceiver(dataChannel);
+      this._dataTrackReceivers.add(dataTrackReceiver);
+
+      dataChannel.addEventListener('close', function () {
+        _this4._dataTrackReceivers.delete(dataTrackReceiver);
+      });
+
+      this.emit('trackAdded', dataTrackReceiver);
+    }
+
+    /**
+     * Handle a glare scenario on the {@link PeerConnectionV2}.
+     * @private
+     * @param {RTCSessionDescriptionInit} offer
+     * @returns {Promise<void>}
+     */
+
+  }, {
+    key: '_handleGlare',
+    value: function _handleGlare(offer) {
+      var _this5 = this;
+
+      this._log.debug('Glare detected; rolling back');
+      if (this._isRestartingIce) {
+        this._log.debug('An ICE restart was in progress; we\'ll need to restart ICE again after rolling back');
+        this._isRestartingIce = false;
+        this._shouldRestartIce = true;
+      }
+      return Promise.resolve().then(function () {
+        return _this5._setLocalDescription({ type: 'rollback' });
+      }).then(function () {
+        return _this5._answer(offer);
+      }).then(function () {
+        return _this5._offer();
+      });
+    }
+
+    /**
+     * Handle an ICE candidate event.
+     * @private
+     * @param {Event} event
+     * @returns {void}
+     */
+
+  }, {
+    key: '_handleIceCandidateEvent',
+    value: function _handleIceCandidateEvent(event) {
+      if (event.candidate) {
+        this._localCandidates.push(event.candidate);
+      }
+      var peerConnectionState = {
+        ice: {
+          candidates: this._localCandidates.slice(),
+          revision: this._localCandidatesRevision++,
+          ufrag: this._localUfrag
+        },
+        id: this.id
+      };
+      if (!event.candidate) {
+        peerConnectionState.ice.complete = true;
+      }
+      this.emit('candidates', peerConnectionState);
+    }
+
+    /**
+     * Handle an ICE connection state change event.
+     * @private
+     * @returns {void}
+     */
+
+  }, {
+    key: '_handleIceConnectionStateChange',
+    value: function _handleIceConnectionStateChange() {
+      var iceConnectionState = this._peerConnection.iceConnectionState;
+
+
+      this._log.debug('ICE connection state is "' + iceConnectionState + '"');
+
+      // Case 1: Transition to "failed".
+      if (this._lastIceConnectionState !== 'failed' && iceConnectionState === 'failed' && !this._shouldRestartIce && !this._isRestartingIce) {
+        this._log.warn('ICE failed; attempting to restart ICE');
+        this._shouldRestartIce = true;
+        this.offer();
+      }
+
+      // Case 2: Transition from "failed".
+      else if (this._lastIceConnectionState === 'failed' && (iceConnectionState === 'connected' || iceConnectionState === 'completed')) {
+          this._log.info('ICE reconnected');
+        }
+
+      this._lastIceConnectionState = iceConnectionState;
+      this.emit('iceConnectionStateChanged');
+    }
+
+    /**
+     * Handle a signaling state change event.
+     * @private
+     * @param {Event}
+     * @returns {void}
+     */
+
+  }, {
+    key: '_handleSignalingStateChange',
+    value: function _handleSignalingStateChange() {
+      if (this._peerConnection.signalingState === 'closed' && this.state !== 'closed') {
+        this.preempt('closed');
+      }
+    }
+
+    /**
+     * Handle a track event.
+     * @private
+     * @param {Event} event
+     * @returns {void}
+     */
+
+  }, {
+    key: '_handleTrackEvent',
+    value: function _handleTrackEvent(event) {
+      var _this6 = this;
+
+      var sdp = this._peerConnection.remoteDescription ? this._peerConnection.remoteDescription.sdp : null;
+
+      if (!this._trackMatcher) {
+        this._trackMatcher = event.transceiver && event.transceiver.mid ? new MIDTrackMatcher() : isSafari ? new OrderedTrackMatcher() : new IdentityTrackMatcher();
+      }
+      this._trackMatcher.update(sdp);
+
+      var mediaStreamTrack = event.track;
+      var signaledTrackId = this._trackMatcher.match(event) || mediaStreamTrack.id;
+      var mediaTrackReceiver = new MediaTrackReceiver(signaledTrackId, mediaStreamTrack);
+      this._mediaTrackReceivers.add(mediaTrackReceiver);
+
+      mediaStreamTrack.addEventListener('ended', function () {
+        _this6._mediaTrackReceivers.delete(mediaTrackReceiver);
+      });
+
+      this.emit('trackAdded', mediaTrackReceiver);
+    }
+
+    /**
+     * Conditionally re-offer.
+     * @private
+     * @param {RTCSessionDescriptionInit} localDescription
+     * @returns {Promise<void>}
+     */
+
+  }, {
+    key: '_maybeReoffer',
+    value: function _maybeReoffer(localDescription) {
+      var shouldReoffer = this._shouldOffer;
+
+      // NOTE(mmalavalli): In Firefox, if the remote RTCPeerConnection sends
+      // an offer with fewer audio m= lines than the number of audio RTCRTPSenders
+      // in the local RTCPeerConnection, then the local RTCPeerConnection creates
+      // an answer with the same number of audio m= lines as in the offer. This
+      // behavior was triggered by the removal of 'offerToReceiveAudio' from the
+      // default RTCOfferOptions. Ideally, the local RTCPeerConnection should create
+      // an answer with the same number of audio m= lines as the number of
+      // RTCRTPSenders. In order to achieve this,the local RTCPeerConnection
+      // initiates renegotiation.
+      //
+      // We can reduce the number of cases where renegotiation is needed by
+      // re-introducing 'offerToReceiveAudio' to the default RTCOfferOptions with a
+      // value > 1.
+      if (isFirefox) {
+        var senders = this._peerConnection.getSenders().filter(function (sender) {
+          return sender.track;
+        });
+        shouldReoffer = ['audio', 'video'].reduce(function (shouldOffer, kind) {
+          var mediaSections = getMediaSections(localDescription.sdp, kind, '(sendrecv|sendonly)');
+          var sendersOfKind = senders.filter(isSenderOfKind.bind(null, kind));
+          return shouldOffer || mediaSections.length < sendersOfKind.length;
+        }, shouldReoffer);
+      }
+
+      // NOTE(mroberts): We also need to re-offer if we have a DataTrack to share
+      // but no m= application section.
+      var hasDataTrack = this._dataChannels.size > 0;
+      var hasApplicationMediaSection = getMediaSections(localDescription.sdp, 'application').length > 0;
+      var needsApplicationMediaSection = hasDataTrack && !hasApplicationMediaSection;
+      shouldReoffer = shouldReoffer || needsApplicationMediaSection;
+
+      return shouldReoffer ? this._offer() : Promise.resolve();
+    }
+
+    /**
+     * Create an offer and set it on the {@link PeerConnectionV2}.
+     * @private
+     * @returns {Promise<void>}
+     */
+
+  }, {
+    key: '_offer',
+    value: function _offer() {
+      var _this7 = this;
+
+      var offerOptions = Object.assign({}, this._offerOptions);
+      if (this._shouldRestartIce) {
+        this._shouldRestartIce = false;
+        this._isRestartingIce = true;
+        offerOptions.iceRestart = true;
+      }
+      return Promise.resolve().then(function () {
+        return _this7._peerConnection.createOffer(offerOptions);
+      }).catch(function () {
+        throw new MediaClientLocalDescFailedError();
+      }).then(function (offer) {
+        if (!isFirefox) {
+          offer = workaroundIssue8329(offer);
+        }
+
+        var updatedSdp = _this7._setCodecPreferences(offer.sdp, _this7._preferredAudioCodecs, _this7._preferredVideoCodecs);
+
+        _this7._shouldOffer = false;
+        if (!_this7._negotiationRole) {
+          _this7._negotiationRole = 'offerer';
+          _this7._needsInitialAnswer = true;
+        }
+        return _this7._setLocalDescription({
+          type: 'offer',
+          sdp: updatedSdp
+        });
+      });
+    }
+
+    /**
+     * Set a local description on the {@link PeerConnectionV2}.
+     * @private
+     * @param {RTCSessionDescription|RTCSessionDescriptionInit} description
+     * @returns {Promise<void>}
+     */
+
+  }, {
+    key: '_setLocalDescription',
+    value: function _setLocalDescription(description) {
+      var _this8 = this;
+
+      var revision = description.revision;
+      var vp8SimulcastRequested = this._preferredVideoCodecs.some(function (codecSettings) {
+        return codecSettings.codec.toLowerCase() === 'vp8' && codecSettings.simulcast;
+      });
+
+      return Promise.resolve().then(function () {
+        if (description.sdp) {
+          // NOTE(mmalavalli): We do not directly modify "description.sdp" here as
+          // "description" might be an RTCSessionDescription, in which case its
+          // properties are immutable.
+          description = {
+            type: description.type,
+            sdp: isChrome && vp8SimulcastRequested ? _this8._setSimulcast(description.sdp, _this8._trackIdsToAttributes) : description.sdp
+          };
+        }
+        description = new _this8._RTCSessionDescription(description);
+        if (description.type === 'answer') {
+          _this8._lastStableDescriptionRevision = revision;
+        }
+        return _this8._peerConnection.setLocalDescription(description);
+      }).catch(function (error) {
+        _this8._log.warn('Calling setLocalDescription with an RTCSessionDescription of type "' + description.type + '" failed with the error "' + error.message + '".');
+        if (description.sdp) {
+          _this8._log.warn('The SDP was ' + description.sdp);
+        }
+        throw new MediaClientLocalDescFailedError();
+      }).then(function () {
+        if (description.type !== 'rollback') {
+          _this8._localDescription = description;
+          _this8._localCandidates = [];
+          if (description.type === 'offer') {
+            _this8._descriptionRevision++;
+          }
+          _this8._localUfrag = getUfrag(description);
+          _this8.emit('description', _this8.getState());
+        }
+      });
+    }
+
+    /**
+     * Set a remote RTCSessionDescription on the {@link PeerConnectionV2}.
+     * @private
+     * @param {RTCSessionDescriptionInit} description
+     * @returns {Promise<void>}
+     */
+
+  }, {
+    key: '_setRemoteDescription',
+    value: function _setRemoteDescription(description) {
+      var _this9 = this;
+
+      if (description.sdp) {
+        description.sdp = this._setBitrateParameters(description.sdp, isFirefox ? 'TIAS' : 'AS', this._encodingParameters.maxAudioBitrate, this._encodingParameters.maxVideoBitrate);
+        description.sdp = this._setCodecPreferences(description.sdp, this._preferredAudioCodecs, this._preferredVideoCodecs);
+      }
+      description = new this._RTCSessionDescription(description);
+      return this._peerConnection.setRemoteDescription(description).then(function () {
+        if (description.type === 'answer' && _this9._isRestartingIce) {
+          _this9._log.debug('An ICE restart was in-progress and is now completed');
+          _this9._isRestartingIce = false;
+        }
+      }, function (error) {
+        _this9._log.warn('Calling setRemoteDescription with an RTCSessionDescription of type "' + description.type + '" failed with the error "' + error.message + '".');
+        if (description.sdp) {
+          _this9._log.warn('The SDP was ' + description.sdp);
+        }
+        throw error;
+      });
+    }
+
+    /**
+     * Update the {@link PeerConnectionV2}'s description.
+     * @private
+     * @param {RTCSessionDescriptionInit} description
+     * @returns {Promise<void>}
+     */
+
+  }, {
+    key: '_updateDescription',
+    value: function _updateDescription(description) {
+      var _this10 = this;
+
+      switch (description.type) {
+        case 'answer':
+        case 'pranswer':
+          if (description.revision !== this._descriptionRevision || this._peerConnection.signalingState !== 'have-local-offer') {
+            return Promise.resolve();
+          }
+          this._descriptionRevision = description.revision;
+          break;
+        case 'close':
+          return this._close();
+        case 'create-offer':
+          if (description.revision <= this._lastStableDescriptionRevision) {
+            return Promise.resolve();
+          } else if (this._needsInitialAnswer) {
+            this._queuedDescription = description;
+            return Promise.resolve();
+          }
+          this._descriptionRevision = description.revision;
+          return this._offer();
+        case 'offer':
+          if (description.revision <= this._lastStableDescriptionRevision || this._peerConnection.signalingState === 'closed') {
+            return Promise.resolve();
+          }
+          if (this._peerConnection.signalingState === 'have-local-offer') {
+            if (this._needsInitialAnswer) {
+              this._queuedDescription = description;
+              return Promise.resolve();
+            }
+            this._descriptionRevision = description.revision;
+            return this._handleGlare(description);
+          }
+          this._descriptionRevision = description.revision;
+          return this._answer(description);
+        default:
+        // Do nothing.
+      }
+
+      // Handle answer or pranswer.
+      var revision = description.revision;
+      return Promise.resolve().then(function () {
+        if (description.type === 'answer') {
+          _this10._lastStableDescriptionRevision = revision;
+        }
+        return _this10._setRemoteDescription(description);
+      }).catch(function () {
+        throw new MediaClientRemoteDescFailedError();
+      }).then(function () {
+        if (description.type === 'answer') {
+          _this10._needsInitialAnswer = false;
+        }
+        return _this10._checkIceBox(description);
+      }).then(function () {
+        return _this10._queuedDescription && _this10._updateDescription(_this10._queuedDescription);
+      }).then(function () {
+        _this10._queuedDescription = null;
+        return _this10._peerConnection.localDescription ? _this10._maybeReoffer(_this10._peerConnection.localDescription) : Promise.resolve();
+      });
+    }
+
+    /**
+     * Update the {@link PeerConnectionV2}'s ICE candidates.
+     * @private
+     * @param {object} iceState
+     * @returns {Promise<void>}
+     */
+
+  }, {
+    key: '_updateIce',
+    value: function _updateIce(iceState) {
+      var candidates = this._remoteCandidates.update(iceState);
+      return this._addIceCandidates(candidates);
+    }
+
+    /**
+     * Add a {@link DataTrackSender} to the {@link PeerConnectionV2}.
+     * @param {DataTrackSender} dataTrackSender
+     * @returns {void}
+     */
+
+  }, {
+    key: 'addDataTrackSender',
+    value: function addDataTrackSender(dataTrackSender) {
+      if (this._dataChannels.has(dataTrackSender)) {
+        return;
+      }
+      try {
+        var dataChannelDict = {
+          ordered: dataTrackSender.ordered
+        };
+        if (dataTrackSender.maxPacketLifeTime !== null) {
+          dataChannelDict.maxPacketLifeTime = dataTrackSender.maxPacketLifeTime;
+        }
+        if (dataTrackSender.maxRetransmits !== null) {
+          dataChannelDict.maxRetransmits = dataTrackSender.maxRetransmits;
+        }
+        var dataChannel = this._peerConnection.createDataChannel(dataTrackSender.id, dataChannelDict);
+        dataTrackSender.addDataChannel(dataChannel);
+        this._dataChannels.set(dataTrackSender, dataChannel);
+      } catch (error) {
+        // Do nothing.
+      }
+    }
+
+    /**
+     * Add the {@link MediaTrackSender} to the {@link PeerConnectionV2}.
+     * @param {MediaTrackSender} mediaTrackSender
+     * @returns {void}
+     */
+
+  }, {
+    key: 'addMediaTrackSender',
+    value: function addMediaTrackSender(mediaTrackSender) {
+      if (this._peerConnection.signalingState === 'closed' || this._rtpSenders.has(mediaTrackSender)) {
+        return;
+      }
+      this._localMediaStream.addTrack(mediaTrackSender.track);
+      var sender = this._peerConnection.addTrack(mediaTrackSender.track, this._localMediaStream);
+      mediaTrackSender.addSender(sender);
+      this._rtpSenders.set(mediaTrackSender, sender);
+    }
+
+    /**
+     * Close the {@link PeerConnectionV2}.
+     * @returns {void}
+     */
+
+  }, {
+    key: 'close',
+    value: function close() {
+      if (this._close()) {
+        this._descriptionRevision++;
+        this._localDescription = { type: 'close' };
+        this.emit('description', this.getState());
+      }
+    }
+
+    /**
+     * Get the {@link DataTrackReceiver}s and the {@link MediaTrackReceivers} on the
+     * {@link PeerConnectionV2}.
+     * @returns {Array<DataTrackReceiver|MediaTrackReceiver>} trackReceivers
+     */
+
+  }, {
+    key: 'getTrackReceivers',
+    value: function getTrackReceivers() {
+      return Array.from(this._dataTrackReceivers).concat(Array.from(this._mediaTrackReceivers));
+    }
+
+    /**
+     * Get the {@link PeerConnectionV2}'s state (specifically, its description).
+     * @returns {?object}
+     */
+
+  }, {
+    key: 'getState',
+    value: function getState() {
+      if (!this._localDescription) {
+        return null;
+      }
+      var localDescription = {
+        type: this._localDescription.type,
+        revision: this._descriptionRevision
+      };
+      if (this._localDescription.sdp) {
+        localDescription.sdp = this._localDescription.sdp;
+      }
+      return {
+        description: localDescription,
+        id: this.id
       };
     }
-    description = new self._RTCSessionDescription(description);
-    if (description.type === 'answer') {
-      self._lastStableDescriptionRevision = revision;
-    }
-    return self._peerConnection.setLocalDescription(description);
-  }).catch(function(error) {
-    if (self._log) {
-      self._log.warn('Calling setLocalDescription with an RTCSessionDescription ' +
-        'of type "' + description.type + '" failed with the error "' +
-        error.message + '".');
-      if (description.sdp) {
-        self._log.warn('The SDP was ' + description.sdp);
-      }
-    }
-    throw new MediaClientLocalDescFailedError();
-  }).then(function setLocalDescriptionSucceeded() {
-    if (description.type !== 'rollback') {
-      self._localDescription = description;
-      self._localCandidates = [];
-      if (description.type === 'offer') {
-        self._descriptionRevision++;
-      }
-      self._localUfrag = getUfrag(description);
-      self.emit('description', self.getState());
-    }
-  });
-};
 
-/**
- * Set a remote RTCSessionDescription on the {@link PeerConnectionV2}.
- * @param {RTCSessionDescriptionInit} description
- * @returns {Promise<void>}
- */
-PeerConnectionV2.prototype._setRemoteDescription = function _setRemoteDescription(description) {
-  if (description.sdp) {
-    description.sdp = this._setBitrateParameters(
-      description.sdp,
-      isFirefox ? 'TIAS' : 'AS',
-      this._encodingParameters.maxAudioBitrate,
-      this._encodingParameters.maxVideoBitrate);
-    description.sdp = this._setCodecPreferences(
-      description.sdp,
-      this._preferredAudioCodecs,
-      this._preferredVideoCodecs);
-  }
-  description = new this._RTCSessionDescription(description);
-  var self = this;
-  return this._peerConnection.setRemoteDescription(description).catch(function(error) {
-    if (self._log) {
-      self._log.warn('Calling setRemoteDescription with an RTCSessionDescription ' +
-        'of type "' + description.type + '" failed with the error "' +
-        error.message + '".');
-      if (description.sdp) {
-        self._log.warn('The SDP was ' + description.sdp);
+    /**
+     * Create an offer and set it on the {@link PeerConnectionV2}.
+     * @returns {Promise<void>}
+     */
+
+  }, {
+    key: 'offer',
+    value: function offer() {
+      var _this11 = this;
+
+      if (this._needsInitialAnswer || this._isRestartingIce) {
+        this._shouldOffer = true;
+        return Promise.resolve();
+      }
+
+      return this.bracket('offering', function (key) {
+        _this11.transition('updating', key);
+        return _this11._offer().then(function () {
+          _this11.tryTransition('open', key);
+        }, function (error) {
+          _this11.tryTransition('open', key);
+          throw error;
+        });
+      });
+    }
+
+    /**
+     * Remove a {@link DataTrackSender} from the {@link PeerConnectionV2}.
+     * @param {DataTrackSender} dataTrackSender
+     * @returns {void}
+     */
+
+  }, {
+    key: 'removeDataTrackSender',
+    value: function removeDataTrackSender(dataTrackSender) {
+      var dataChannel = this._dataChannels.get(dataTrackSender);
+      if (dataChannel) {
+        dataTrackSender.removeDataChannel(dataChannel);
+        this._dataChannels.delete(dataTrackSender);
+        dataChannel.close();
       }
     }
-    throw error;
-  });
-};
 
-/**
- * Update the {@link PeerConnectionV2}'s description.
- * @param {RTCSessionDescriptionInit} description
- * @returns {Promise<void>}
- */
-PeerConnectionV2.prototype._updateDescription = function _updateDescription(description) {
-  switch (description.type) {
-    case 'answer':
-    case 'pranswer':
-      if (description.revision !== this._descriptionRevision
-        || this._peerConnection.signalingState !== 'have-local-offer') {
-        return Promise.resolve();
+    /**
+     * Remove the {@link MediaTrackSender} from the {@link PeerConnectionV2}.
+     * @param {MediaTrackSender} mediaTrackSender
+     * @returns {void}
+     */
+
+  }, {
+    key: 'removeMediaTrackSender',
+    value: function removeMediaTrackSender(mediaTrackSender) {
+      if (this._peerConnection.signalingState === 'closed' || !this._rtpSenders.has(mediaTrackSender)) {
+        return;
       }
-      this._descriptionRevision = description.revision;
-      break;
-    case 'close':
-      return this._close();
-    case 'create-offer':
-      if (description.revision <= this._lastStableDescriptionRevision) {
-        return Promise.resolve();
-      } else if (this._needsInitialAnswer) {
-        this._queuedDescription = description;
-        return Promise.resolve();
+      var sender = this._rtpSenders.get(mediaTrackSender);
+      this._peerConnection.removeTrack(sender);
+      this._localMediaStream.removeTrack(mediaTrackSender.track);
+      mediaTrackSender.removeSender(sender);
+      this._rtpSenders.delete(mediaTrackSender);
+    }
+
+    /**
+     * Set the RTCConfiguration on the underlying RTCPeerConnection.
+     * @param {RTCConfiguration} configuration
+     * @returns {void}
+     */
+
+  }, {
+    key: 'setConfiguration',
+    value: function setConfiguration(configuration) {
+      if (typeof this._peerConnection.setConfiguration === 'function') {
+        this._peerConnection.setConfiguration(getConfiguration(configuration));
       }
-      this._descriptionRevision = description.revision;
-      return this._offer();
-    case 'offer':
-      if (description.revision <= this._lastStableDescriptionRevision
-        || this._peerConnection.signalingState === 'closed') {
-        return Promise.resolve();
-      }
-      if (this._peerConnection.signalingState === 'have-local-offer') {
-        if (this._needsInitialAnswer) {
-          this._queuedDescription = description;
+    }
+
+    /**
+     * Update the {@link PeerConnectionV2}.
+     * @param {object} peerConnectionState
+     * @returns {Promise<void>}
+     */
+
+  }, {
+    key: 'update',
+    value: function update(peerConnectionState) {
+      var _this12 = this;
+
+      return this.bracket('updating', function (key) {
+        if (_this12.state === 'closed') {
           return Promise.resolve();
         }
-        this._descriptionRevision = description.revision;
-        return this._handleGlare(description);
-      }
-      this._descriptionRevision = description.revision;
-      return this._answer(description);
-    default:
-      // Do nothing.
-  }
 
-  // Handle answer or pranswer.
-  var revision = description.revision;
-  var self = this;
-  return Promise.resolve().then(function() {
-    if (description.type === 'answer') {
-      self._lastStableDescriptionRevision = revision;
-    }
-    return self._setRemoteDescription(description);
-  }).catch(function() {
-    throw new MediaClientRemoteDescFailedError();
-  }).then(function() {
-    if (description.type === 'answer') {
-      self._needsInitialAnswer = false;
-    }
-    return self._checkIceBox(description);
-  }).then(function() {
-    return self._queuedDescription && self._updateDescription(self._queuedDescription);
-  }).then(function() {
-    self._queuedDescription = null;
-    return self._peerConnection.localDescription
-      ? self._maybeReoffer(self._peerConnection.localDescription)
-      : Promise.resolve();
-  });
-};
+        _this12.transition('updating', key);
 
-/**
- * Update the {@link PeerConnectionV2}'s ICE candidates.
- * @param {object} iceState
- * @returns {Promise<void>}
- */
-PeerConnectionV2.prototype._updateIce = function _updateIce(iceState) {
-  var candidates = this._remoteCandidates.update(iceState);
-  return this._addIceCandidates(candidates);
-};
+        var updates = [];
 
-/**
- * Add a {@link DataTrackSender} to the {@link PeerConnectionV2}.
- * @param {DataTrackSender} dataTrackSender
- * @returns {void}
- */
-PeerConnectionV2.prototype.addDataTrackSender = function addDataTrackSender(dataTrackSender) {
-  if (this._dataChannels.has(dataTrackSender)) {
-    return;
-  }
-  try {
-    var dataChannelDict = {
-      ordered: dataTrackSender.ordered
-    };
-    if (dataTrackSender.maxPacketLifeTime !== null) {
-      dataChannelDict.maxPacketLifeTime = dataTrackSender.maxPacketLifeTime;
-    }
-    if (dataTrackSender.maxRetransmits !== null) {
-      dataChannelDict.maxRetransmits = dataTrackSender.maxRetransmits;
-    }
-    var dataChannel = this._peerConnection.createDataChannel(dataTrackSender.id, dataChannelDict);
-    dataTrackSender.addDataChannel(dataChannel);
-    this._dataChannels.set(dataTrackSender, dataChannel);
-  } catch (error) {
-    // Do nothing.
-  }
-};
+        if (peerConnectionState.ice) {
+          updates.push(_this12._updateIce(peerConnectionState.ice));
+        }
 
-/**
- * Add the {@link MediaTrackSender} to the {@link PeerConnectionV2}.
- * @param {MediaTrackSender} mediaTrackSender
- * @returns {void}
- */
-PeerConnectionV2.prototype.addMediaTrackSender = function addMediaTrackSender(mediaTrackSender) {
-  if (this._peerConnection.signalingState === 'closed' || this._rtpSenders.has(mediaTrackSender)) {
-    return;
-  }
-  this._localMediaStream.addTrack(mediaTrackSender.track);
-  var sender = this._peerConnection.addTrack(mediaTrackSender.track, this._localMediaStream);
-  mediaTrackSender.addSender(sender);
-  this._rtpSenders.set(mediaTrackSender, sender);
-};
+        if (peerConnectionState.description) {
+          updates.push(_this12._updateDescription(peerConnectionState.description));
+        }
 
-/**
- * Close the {@link PeerConnectionV2}.
- * @returns {void}
- */
-PeerConnectionV2.prototype.close = function close() {
-  if (this._close()) {
-    this._descriptionRevision++;
-    this._localDescription = { type: 'close' };
-    this.emit('description', this.getState());
-  }
-};
-
-/**
- * Get the {@link DataTrackReceiver}s and the {@link MediaTrackReceivers} on the
- * {@link PeerConnectionV2}.
- * @returns {Array<DataTrackReceiver|MediaTrackReceiver>} trackReceivers
- */
-PeerConnectionV2.prototype.getTrackReceivers = function getTrackReceivers() {
-  return Array.from(this._dataTrackReceivers).concat(Array.from(this._mediaTrackReceivers));
-};
-
-/**
- * Get the {@link PeerConnectionV2}'s state (specifically, its description).
- * @returns {?object}
- */
-PeerConnectionV2.prototype.getState = function getState() {
-  if (!this._localDescription) {
-    return null;
-  }
-  var localDescription = {
-    type: this._localDescription.type,
-    revision: this._descriptionRevision
-  };
-  if (this._localDescription.sdp) {
-    localDescription.sdp = this._localDescription.sdp;
-  }
-  return {
-    description: localDescription,
-    id: this.id
-  };
-};
-
-/**
- * Create an offer and set it on the {@link PeerConnectionV2}.
- * @returns {Promise<void>}
- */
-PeerConnectionV2.prototype.offer = function offer() {
-  if (this._needsInitialAnswer) {
-    this._shouldOffer = true;
-    return Promise.resolve();
-  }
-
-  var self = this;
-  return this.bracket('offering', function transition(key) {
-    self.transition('updating', key);
-    return self._offer().then(function offerSucceeded() {
-      self.tryTransition('open', key);
-    }, function offerFailed(error) {
-      self.tryTransition('open', key);
-      throw error;
-    });
-  });
-};
-
-/**
- * Remove a {@link DataTrackSender} from the {@link PeerConnectionV2}.
- * @param {DataTrackSender} dataTrackSender
- * @returns {void}
- */
-PeerConnectionV2.prototype.removeDataTrackSender = function removeDataTrackSender(dataTrackSender) {
-  var dataChannel = this._dataChannels.get(dataTrackSender);
-  if (dataChannel) {
-    dataTrackSender.removeDataChannel(dataChannel);
-    this._dataChannels.delete(dataTrackSender);
-    dataChannel.close();
-  }
-};
-
-/**
- * Remove the {@link MediaTrackSender} from the {@link PeerConnectionV2}.
- * @param {MediaTrackSender} mediaTrackSender
- * @returns {void}
- */
-PeerConnectionV2.prototype.removeMediaTrackSender = function removeMediaTrackSender(mediaTrackSender) {
-  if (this._peerConnection.signalingState === 'closed' || !this._rtpSenders.has(mediaTrackSender)) {
-    return;
-  }
-  var sender = this._rtpSenders.get(mediaTrackSender);
-  this._peerConnection.removeTrack(sender);
-  this._localMediaStream.removeTrack(mediaTrackSender.track);
-  mediaTrackSender.removeSender(sender);
-  this._rtpSenders.delete(mediaTrackSender);
-};
-
-/**
- * Set the RTCConfiguration on the underlying RTCPeerConnection.
- * @param {RTCConfiguration} configuration
- * @returns {void}
- */
-PeerConnectionV2.prototype.setConfiguration = function setConfiguration(configuration) {
-  if (typeof this._peerConnection.setConfiguration === 'function') {
-    this._peerConnection.setConfiguration(getConfiguration(configuration));
-  }
-};
-
-/**
- * Update the {@link PeerConnectionV2}.
- * @param {object} peerConnectionState
- * @returns {Promise<void>}
- */
-PeerConnectionV2.prototype.update = function update(peerConnectionState) {
-  var self = this;
-  return this.bracket('updating', function transition(key) {
-    if (self.state === 'closed') {
-      return Promise.resolve();
+        return Promise.all(updates).then(function () {
+          _this12.tryTransition('open', key);
+        }, function (error) {
+          _this12.tryTransition('open', key);
+          throw error;
+        });
+      });
     }
 
-    self.transition('updating', key);
+    /**
+     * Get the {@link PeerConnectionV2}'s media statistics.
+     * @returns {Promise<StatsReport>}
+     */
 
-    var updates = [];
+  }, {
+    key: 'getStats',
+    value: function getStats() {
+      var _this13 = this;
 
-    if (peerConnectionState.ice) {
-      updates.push(self._updateIce(peerConnectionState.ice));
+      return getStatistics(this._peerConnection).then(function (statsResponse) {
+        return new StatsReport(_this13.id, statsResponse);
+      });
     }
-
-    if (peerConnectionState.description) {
-      updates.push(self._updateDescription(peerConnectionState.description));
+  }, {
+    key: 'iceConnectionState',
+    get: function get() {
+      return this._peerConnection.iceConnectionState;
     }
+  }]);
 
-    return Promise.all(updates).then(function updatesSucceeded() {
-      self.tryTransition('open', key);
-    }, function updatesFailed(error) {
-      self.tryTransition('open', key);
-      throw error;
-    });
-  });
-};
-
-/**
- * Get the {@link PeerConnectionV2}'s media statistics.
- * @returns {Promise<StatsReport>}
- */
-PeerConnectionV2.prototype.getStats = function getStats() {
-  var self = this;
-  return getStatistics(this._peerConnection).then(function(statsResponse) {
-    return new StatsReport(self.id, statsResponse);
-  });
-};
+  return PeerConnectionV2;
+}(StateMachine);
 
 /**
  * @event PeerConnectionV2#candidates
@@ -21794,6 +22880,10 @@ PeerConnectionV2.prototype.getStats = function getStats() {
 /**
  * @event PeerConnectionV2#description
  * @param {object} description
+ */
+
+/**
+ * @event PeerConnectionV2#iceConnectionStateChanged
  */
 
 /**
@@ -21839,11 +22929,21 @@ function isSenderOfKind(kind, sender) {
  */
 
 module.exports = PeerConnectionV2;
-
-},{"../../../lib/statemachine":116,"../../data/receiver":60,"../../media/track/receiver":80,"../../stats/statsreport":123,"../../util":129,"../../util/sdp":133,"../../util/sdp/issue8329":134,"../../util/sdp/trackmatcher/identity":136,"../../util/sdp/trackmatcher/mid":137,"../../util/sdp/trackmatcher/ordered":138,"../../util/twilio-video-errors":141,"./icebox":103,"@twilio/webrtc":37,"util":149}],108:[function(require,module,exports){
+},{"../../data/receiver":59,"../../media/track/receiver":82,"../../statemachine":118,"../../stats/statsreport":125,"../../util":131,"../../util/constants":129,"../../util/log":134,"../../util/sdp":135,"../../util/sdp/issue8329":136,"../../util/sdp/trackmatcher/identity":138,"../../util/sdp/trackmatcher/mid":139,"../../util/sdp/trackmatcher/ordered":140,"../../util/twilio-video-errors":143,"./icebox":105,"@twilio/webrtc":37}],110:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var PeerConnectionV2 = require('./peerconnection');
 var MediaTrackSender = require('../../media/track/sender');
 var QueueingEventEmitter = require('../../queueingeventemitter');
@@ -21852,275 +22952,338 @@ var util = require('../../util');
 var isFirefox = util.guessBrowser() === 'firefox';
 
 /**
- * Construct {@link PeerConnectionManager}.
- * @class
- * @classdesc {@link PeerConnectionManager} manages multiple
- * {@link PeerConnectionV2}s.
- * @extends {QueueingEventEmitter}
- * @param {IceServerSource} iceServerSource
- * @param {EncodingParametersImpl} encodingParameters
- * @param {PreferredCodecs} preferredCodecs
+ * {@link PeerConnectionManager} manages multiple {@link PeerConnectionV2}s.
+ * @extends QueueingEventEmitter
  * @emits PeerConnectionManager#candidates
  * @emits PeerConnectionManager#description
+ * @emits PeerConnectionManager#iceConnectionStateChanged
  * @emits PeerConnectionManager#trackAdded
  */
-function PeerConnectionManager(iceServerSource, encodingParameters, preferredCodecs, options) {
-  if (!(this instanceof PeerConnectionManager)) {
-    return new PeerConnectionManager(iceServerSource, encodingParameters, preferredCodecs, options);
-  }
-  QueueingEventEmitter.call(this);
 
-  options = Object.assign({
-    audioContextFactory: isFirefox
-      ? require('../../webaudio/audiocontext')
-      : null,
-    PeerConnectionV2: PeerConnectionV2
-  }, options);
+var PeerConnectionManager = function (_QueueingEventEmitter) {
+  _inherits(PeerConnectionManager, _QueueingEventEmitter);
 
-  var audioContext = options.audioContextFactory
-    ? options.audioContextFactory.getOrCreate(this)
-    : null;
+  /**
+   * Construct {@link PeerConnectionManager}.
+   * @param {IceServerSource} iceServerSource
+   * @param {EncodingParametersImpl} encodingParameters
+   * @param {PreferredCodecs} preferredCodecs
+   */
+  function PeerConnectionManager(iceServerSource, encodingParameters, preferredCodecs, options) {
+    _classCallCheck(this, PeerConnectionManager);
 
-  // NOTE(mroberts): If we're using an AudioContext, we don't need to specify
-  // `offerToReceiveAudio` in RTCOfferOptions.
-  var offerOptions = audioContext
-    ? { offerToReceiveVideo: true }
-    : { offerToReceiveAudio: true, offerToReceiveVideo: true };
+    var _this = _possibleConstructorReturn(this, (PeerConnectionManager.__proto__ || Object.getPrototypeOf(PeerConnectionManager)).call(this));
 
-  Object.defineProperties(this, {
-    _audioContextFactory: {
-      value: options.audioContextFactory
-    },
-    _closedPeerConnectionIds: {
-      value: new Set()
-    },
-    _configuration: {
-      writable: true,
-      value: null
-    },
-    _configurationDeferred: {
-      writable: true,
-      value: util.defer()
-    },
-    _dummyAudioTrackSender: {
-      value: audioContext
-        ? new MediaTrackSender(createDummyAudioMediaStreamTrack(audioContext))
-        : null
-    },
-    _encodingParameters: {
-      value: encodingParameters
-    },
-    _iceServerSource: {
-      value: iceServerSource
-    },
-    _dataTrackSenders: {
-      writable: true,
-      value: new Set()
-    },
-    _mediaTrackSenders: {
-      writable: true,
-      value: new Set()
-    },
-    _offerOptions: {
-      value: offerOptions
-    },
-    _peerConnections: {
-      value: new Map()
-    },
-    _preferredCodecs: {
-      value: preferredCodecs
-    },
-    _PeerConnectionV2: {
-      value: options.PeerConnectionV2
-    }
-  });
-}
+    options = Object.assign({
+      audioContextFactory: isFirefox ? require('../../webaudio/audiocontext') : null,
+      PeerConnectionV2: PeerConnectionV2
+    }, options);
 
-inherits(PeerConnectionManager, QueueingEventEmitter);
+    var audioContext = options.audioContextFactory ? options.audioContextFactory.getOrCreate(_this) : null;
 
-/**
- * Get the {@link PeerConnectionManager}'s configuration.
- * @returns {Promise<object>}
- */
-PeerConnectionManager.prototype._getConfiguration = function _getConfiguration() {
-  return this._configurationDeferred.promise;
-};
+    // NOTE(mroberts): If we're using an AudioContext, we don't need to specify
+    // `offerToReceiveAudio` in RTCOfferOptions.
+    var offerOptions = audioContext ? { offerToReceiveVideo: true } : { offerToReceiveAudio: true, offerToReceiveVideo: true };
 
-/**
- * Get or create a {@link PeerConnectionV2}.
- * @param {string} id
- * @param {object} [configuration]
- * @returns {PeerConnectionV2}
- */
-PeerConnectionManager.prototype._getOrCreate = function _getOrCreate(id, configuration) {
-  var self = this;
-  var peerConnection = this._peerConnections.get(id);
-  if (!peerConnection) {
-    var PeerConnectionV2 = this._PeerConnectionV2;
-
-    var options = Object.assign({
-      offerOptions: this._offerOptions
-    }, configuration);
-    peerConnection = new PeerConnectionV2(id, this._encodingParameters, this._preferredCodecs, options);
-
-    this._peerConnections.set(peerConnection.id, peerConnection);
-    peerConnection.on('candidates', this.queue.bind(this, 'candidates'));
-    peerConnection.on('description', this.queue.bind(this, 'description'));
-    peerConnection.on('trackAdded', this.queue.bind(this, 'trackAdded'));
-    peerConnection.on('stateChanged', function stateChanged(state) {
-      if (state === 'closed') {
-        peerConnection.removeListener('stateChanged', stateChanged);
-        self._peerConnections.delete(peerConnection.id);
-        self._closedPeerConnectionIds.add(peerConnection.id);
+    Object.defineProperties(_this, {
+      _audioContextFactory: {
+        value: options.audioContextFactory
+      },
+      _closedPeerConnectionIds: {
+        value: new Set()
+      },
+      _configuration: {
+        writable: true,
+        value: null
+      },
+      _configurationDeferred: {
+        writable: true,
+        value: util.defer()
+      },
+      _dummyAudioTrackSender: {
+        value: audioContext ? new MediaTrackSender(createDummyAudioMediaStreamTrack(audioContext)) : null
+      },
+      _encodingParameters: {
+        value: encodingParameters
+      },
+      _iceConnectionState: {
+        writable: true,
+        value: 'new'
+      },
+      _iceServerSource: {
+        value: iceServerSource
+      },
+      _dataTrackSenders: {
+        writable: true,
+        value: new Set()
+      },
+      _lastIceConnectionState: {
+        writable: true,
+        value: 'new'
+      },
+      _mediaTrackSenders: {
+        writable: true,
+        value: new Set()
+      },
+      _offerOptions: {
+        value: offerOptions
+      },
+      _peerConnections: {
+        value: new Map()
+      },
+      _preferredCodecs: {
+        value: preferredCodecs
+      },
+      _PeerConnectionV2: {
+        value: options.PeerConnectionV2
       }
     });
-
-    this._dataTrackSenders.forEach(peerConnection.addDataTrackSender, peerConnection);
-    this._mediaTrackSenders.forEach(peerConnection.addMediaTrackSender, peerConnection);
+    return _this;
   }
-  return peerConnection;
-};
 
-/**
- * Close all the {@link PeerConnectionV2}s in this {@link PeerConnectionManager}.
- * @returns {this}
- */
-PeerConnectionManager.prototype.close = function close() {
-  if (this._iceServerSource.isStarted) {
-    this._iceServerSource.stop();
-  }
-  this._peerConnections.forEach(function(peerConnection) {
-    peerConnection.close();
-  });
-  if (this._dummyAudioTrackSender) {
-    this._dummyAudioTrackSender.track.stop();
-  }
-  if (this._audioContextFactory) {
-    this._audioContextFactory.release(this);
-  }
-  return this;
-};
+  /**
+   * A summarized RTCIceConnectionState across all the
+   * {@link PeerConnectionManager}'s underlying {@link PeerConnectionV2}s.
+   * @property {RTCIceConnectionState}
+   */
 
-/**
- * Create a new {@link PeerConnectionV2} on this {@link PeerConnectionManager}.
- * Then, create a new offer with the newly-created {@link PeerConnectionV2}.
- * @return {Promise<this>}
- */
-PeerConnectionManager.prototype.createAndOffer = function createAndOffer() {
-  var self = this;
-  return this._getConfiguration().then(function getConfigurationSucceeded(configuration) {
-    var id;
-    do {
-      id = util.makeUUID();
-    } while (self._peerConnections.has(id));
 
-    return self._getOrCreate(id, configuration);
-  }).then(function createSucceeded(peerConnection) {
-    return peerConnection.offer();
-  }).then(function offerSucceeded() {
-    return self;
-  });
-};
+  _createClass(PeerConnectionManager, [{
+    key: '_getConfiguration',
 
-/**
- * Get the {@link DataTrackReceiver}s and {@link MediaTrackReceiver}s of all
- * the {@link PeerConnectionV2}s.
- * @returns {Array<DataTrackReceiver|MediaTrackReceiver>} trackReceivers
- */
-PeerConnectionManager.prototype.getTrackReceivers = function getTrackReceivers() {
-  return util.flatMap(this._peerConnections, function(peerConnection) {
-    return peerConnection.getTrackReceivers();
-  });
-};
 
-/**
- * Get the states of all {@link PeerConnectionV2}s.
- * @returns {Array<object>}
- */
-PeerConnectionManager.prototype.getStates = function getStates() {
-  var peerConnectionStates = [];
-  this._peerConnections.forEach(function(peerConnection) {
-    var peerConnectionState = peerConnection.getState();
-    if (peerConnectionState) {
-      peerConnectionStates.push(peerConnectionState);
+    /**
+     * Get the {@link PeerConnectionManager}'s configuration.
+     * @private
+     * @returns {Promise<object>}
+     */
+    value: function _getConfiguration() {
+      return this._configurationDeferred.promise;
     }
-  });
-  return peerConnectionStates;
-};
 
-/**
- * Set the {@link PeerConnectionManager}'s configuration.
- * @param {object} configuration
- * @returns {this}
- */
-PeerConnectionManager.prototype.setConfiguration = function setConfiguration(configuration) {
-  if (this._configuration) {
-    this._configurationDeferred = util.defer();
-    this._peerConnections.forEach(function(peerConnection) {
-      peerConnection.setConfiguration(configuration);
-    });
-  }
-  this._configuration = configuration;
-  this._configurationDeferred.resolve(configuration);
-  return this;
-};
+    /**
+     * Get or create a {@link PeerConnectionV2}.
+     * @private
+     * @param {string} id
+     * @param {object} [configuration]
+     * @returns {PeerConnectionV2}
+     */
 
-/**
- * Set the {@link DataTrackSender}s and {@link MediaTrackSenders} on the
- * {@link PeerConnectionManager}'s underlying {@link PeerConnectionV2}s.
- * @param {Array<DataTrackSender|MediaTrackSender>} trackSenders
- * @returns {this}
- */
-PeerConnectionManager.prototype.setTrackSenders = function setTrackSenders(trackSenders) {
-  var dataTrackSenders = new Set(trackSenders.filter(function(trackSender) {
-    return trackSender.kind === 'data';
-  }));
-  var mediaTrackSenders = new Set(trackSenders.filter(function(trackSender) {
-    return trackSender.kind === 'audio' || trackSender.kind === 'video';
-  }));
+  }, {
+    key: '_getOrCreate',
+    value: function _getOrCreate(id, configuration) {
+      var _this2 = this;
 
-  if (this._dummyAudioTrackSender) {
-    mediaTrackSenders.add(this._dummyAudioTrackSender);
-  }
+      var self = this;
+      var peerConnection = this._peerConnections.get(id);
+      if (!peerConnection) {
+        var _PeerConnectionV = this._PeerConnectionV2;
 
-  var changes = getTrackSenderChanges(this, dataTrackSenders, mediaTrackSenders);
-  this._dataTrackSenders = dataTrackSenders;
-  this._mediaTrackSenders = mediaTrackSenders;
-  applyTrackSenderChanges(this, changes);
+        var options = Object.assign({
+          offerOptions: this._offerOptions
+        }, configuration);
+        peerConnection = new _PeerConnectionV(id, this._encodingParameters, this._preferredCodecs, options);
 
-  return this;
-};
+        this._peerConnections.set(peerConnection.id, peerConnection);
+        peerConnection.on('candidates', this.queue.bind(this, 'candidates'));
+        peerConnection.on('description', this.queue.bind(this, 'description'));
+        peerConnection.on('trackAdded', this.queue.bind(this, 'trackAdded'));
+        peerConnection.on('stateChanged', function stateChanged(state) {
+          if (state === 'closed') {
+            peerConnection.removeListener('stateChanged', stateChanged);
+            self._peerConnections.delete(peerConnection.id);
+            self._closedPeerConnectionIds.add(peerConnection.id);
+            updateIceConnectionState(self);
+          }
+        });
+        peerConnection.on('iceConnectionStateChanged', function () {
+          return updateIceConnectionState(_this2);
+        });
 
-/**
- * Update the {@link PeerConnectionManager}.
- * @param {Array<object>} peerConnectionStates
- * @returns {Promise<this>}
- */
-PeerConnectionManager.prototype.update = function update(peerConnectionStates) {
-  var self = this;
-  return this._getConfiguration().then(function getConfigurationSucceeded(configuration) {
-    return Promise.all(peerConnectionStates.map(function(peerConnectionState) {
-      if (self._closedPeerConnectionIds.has(peerConnectionState.id)) {
-        return null;
+        this._dataTrackSenders.forEach(peerConnection.addDataTrackSender, peerConnection);
+        this._mediaTrackSenders.forEach(peerConnection.addMediaTrackSender, peerConnection);
+
+        updateIceConnectionState(this);
       }
-      var peerConnection = self._getOrCreate(peerConnectionState.id, configuration);
-      return peerConnection.update(peerConnectionState);
-    }));
-  }).then(function updatesSucceeded() {
-    return self;
-  });
-};
+      return peerConnection;
+    }
 
-/**
- * Get the {@link PeerConnectionManager}'s media statistics.
- * @returns {Promise.<Array<StatsReport>>}
- */
-PeerConnectionManager.prototype.getStats = function getStats() {
-  var peerConnections = Array.from(this._peerConnections.values());
-  return Promise.all(peerConnections.map(function(peerConnection) {
-    return peerConnection.getStats();
-  }));
-};
+    /**
+     * Close all the {@link PeerConnectionV2}s in this {@link PeerConnectionManager}.
+     * @returns {this}
+     */
+
+  }, {
+    key: 'close',
+    value: function close() {
+      if (this._iceServerSource.isStarted) {
+        this._iceServerSource.stop();
+      }
+      this._peerConnections.forEach(function (peerConnection) {
+        peerConnection.close();
+      });
+      if (this._dummyAudioTrackSender) {
+        this._dummyAudioTrackSender.track.stop();
+      }
+      if (this._audioContextFactory) {
+        this._audioContextFactory.release(this);
+      }
+      updateIceConnectionState(this);
+      return this;
+    }
+
+    /**
+     * Create a new {@link PeerConnectionV2} on this {@link PeerConnectionManager}.
+     * Then, create a new offer with the newly-created {@link PeerConnectionV2}.
+     * @return {Promise<this>}
+     */
+
+  }, {
+    key: 'createAndOffer',
+    value: function createAndOffer() {
+      var _this3 = this;
+
+      return this._getConfiguration().then(function (configuration) {
+        var id = void 0;
+        do {
+          id = util.makeUUID();
+        } while (_this3._peerConnections.has(id));
+
+        return _this3._getOrCreate(id, configuration);
+      }).then(function (peerConnection) {
+        return peerConnection.offer();
+      }).then(function () {
+        return _this3;
+      });
+    }
+
+    /**
+     * Get the {@link DataTrackReceiver}s and {@link MediaTrackReceiver}s of all
+     * the {@link PeerConnectionV2}s.
+     * @returns {Array<DataTrackReceiver|MediaTrackReceiver>} trackReceivers
+     */
+
+  }, {
+    key: 'getTrackReceivers',
+    value: function getTrackReceivers() {
+      return util.flatMap(this._peerConnections, function (peerConnection) {
+        return peerConnection.getTrackReceivers();
+      });
+    }
+
+    /**
+     * Get the states of all {@link PeerConnectionV2}s.
+     * @returns {Array<object>}
+     */
+
+  }, {
+    key: 'getStates',
+    value: function getStates() {
+      var peerConnectionStates = [];
+      this._peerConnections.forEach(function (peerConnection) {
+        var peerConnectionState = peerConnection.getState();
+        if (peerConnectionState) {
+          peerConnectionStates.push(peerConnectionState);
+        }
+      });
+      return peerConnectionStates;
+    }
+
+    /**
+     * Set the {@link PeerConnectionManager}'s configuration.
+     * @param {object} configuration
+     * @returns {this}
+     */
+
+  }, {
+    key: 'setConfiguration',
+    value: function setConfiguration(configuration) {
+      if (this._configuration) {
+        this._configurationDeferred = util.defer();
+        this._peerConnections.forEach(function (peerConnection) {
+          peerConnection.setConfiguration(configuration);
+        });
+      }
+      this._configuration = configuration;
+      this._configurationDeferred.resolve(configuration);
+      return this;
+    }
+
+    /**
+     * Set the {@link DataTrackSender}s and {@link MediaTrackSenders} on the
+     * {@link PeerConnectionManager}'s underlying {@link PeerConnectionV2}s.
+     * @param {Array<DataTrackSender|MediaTrackSender>} trackSenders
+     * @returns {this}
+     */
+
+  }, {
+    key: 'setTrackSenders',
+    value: function setTrackSenders(trackSenders) {
+      var dataTrackSenders = new Set(trackSenders.filter(function (trackSender) {
+        return trackSender.kind === 'data';
+      }));
+      var mediaTrackSenders = new Set(trackSenders.filter(function (trackSender) {
+        return trackSender.kind === 'audio' || trackSender.kind === 'video';
+      }));
+
+      if (this._dummyAudioTrackSender) {
+        mediaTrackSenders.add(this._dummyAudioTrackSender);
+      }
+
+      var changes = getTrackSenderChanges(this, dataTrackSenders, mediaTrackSenders);
+      this._dataTrackSenders = dataTrackSenders;
+      this._mediaTrackSenders = mediaTrackSenders;
+      applyTrackSenderChanges(this, changes);
+
+      return this;
+    }
+
+    /**
+     * Update the {@link PeerConnectionManager}.
+     * @param {Array<object>} peerConnectionStates
+     * @returns {Promise<this>}
+     */
+
+  }, {
+    key: 'update',
+    value: function update(peerConnectionStates) {
+      var _this4 = this;
+
+      return this._getConfiguration().then(function (configuration) {
+        return Promise.all(peerConnectionStates.map(function (peerConnectionState) {
+          if (_this4._closedPeerConnectionIds.has(peerConnectionState.id)) {
+            return null;
+          }
+          var peerConnection = _this4._getOrCreate(peerConnectionState.id, configuration);
+          return peerConnection.update(peerConnectionState);
+        }));
+      }).then(function () {
+        return _this4;
+      });
+    }
+
+    /**
+     * Get the {@link PeerConnectionManager}'s media statistics.
+     * @returns {Promise.<Array<StatsReport>>}
+     */
+
+  }, {
+    key: 'getStats',
+    value: function getStats() {
+      var peerConnections = Array.from(this._peerConnections.values());
+      return Promise.all(peerConnections.map(function (peerConnection) {
+        return peerConnection.getStats();
+      }));
+    }
+  }, {
+    key: 'iceConnectionState',
+    get: function get() {
+      return this._iceConnectionState;
+    }
+  }]);
+
+  return PeerConnectionManager;
+}(QueueingEventEmitter);
 
 /**
  * Create a dummy audio MediaStreamTrack with the given AudioContext.
@@ -22128,6 +23291,8 @@ PeerConnectionManager.prototype.getStats = function getStats() {
  * @param {AudioContext} audioContext
  * @return {MediaStreamTrack}
  */
+
+
 function createDummyAudioMediaStreamTrack(audioContext) {
   var mediaStreamDestination = audioContext.createMediaStreamDestination();
   return mediaStreamDestination.stream.getAudioTracks()[0];
@@ -22144,6 +23309,10 @@ function createDummyAudioMediaStreamTrack(audioContext) {
  */
 
 /**
+ * @event {PeerConnectionManager#iceConnectionStateChanged}
+ */
+
+/**
  * @event {PeerConnectionManager#trackAdded}
  * @param {MediaStreamTrack|DataTrackReceiver} mediaStreamTrackOrDataTrackReceiver
  */
@@ -22155,11 +23324,8 @@ function createDummyAudioMediaStreamTrack(audioContext) {
  * @returns {void}
  */
 function applyTrackSenderChanges(peerConnectionManager, changes) {
-  if (changes.data.add.size
-    || changes.data.remove.size
-    || changes.media.add.size
-    || changes.media.remove.size) {
-    peerConnectionManager._peerConnections.forEach(function(peerConnection) {
+  if (changes.data.add.size || changes.data.remove.size || changes.media.add.size || changes.media.remove.size) {
+    peerConnectionManager._peerConnections.forEach(function (peerConnection) {
       changes.data.remove.forEach(peerConnection.removeDataTrackSender, peerConnection);
       changes.media.remove.forEach(peerConnection.removeMediaTrackSender, peerConnection);
       changes.data.add.forEach(peerConnection.addDataTrackSender, peerConnection);
@@ -22231,45 +23397,127 @@ function getMediaTrackSenderChanges(peerConnectionManager, mediaTrackSenders) {
   };
 }
 
-module.exports = PeerConnectionManager;
-
-},{"../../media/track/sender":86,"../../queueingeventemitter":90,"../../util":129,"../../webaudio/audiocontext":143,"./peerconnection":107,"util":149}],109:[function(require,module,exports){
-'use strict';
-
-var inherits = require('util').inherits;
-var RecordingSignaling = require('../recording');
+/**
+ * This object maps RTCIceConnectionState values to a "rank".
+ */
+var toRank = {
+  new: 0,
+  checking: 1,
+  connected: 2,
+  completed: 3,
+  disconnected: -1,
+  failed: -2,
+  closed: -3
+};
 
 /**
- * Construct a {@link RecordingV2}.
- * @class
- * @extends RecordingSignaling
+ * This object maps "rank" back to RTCIceConnectionState values.
  */
-function RecordingV2() {
-  RecordingSignaling.call(this);
-  Object.defineProperties(this, {
-    _revision: {
-      value: 1,
-      writable: true
-    }
+var fromRank = void 0;
+
+/**
+ * `Object.keys` is not supported in older browsers, so we can't just
+ * synchronously call it in this module; we need to defer invoking it until we
+ * know we're in a modern environment (i.e., anything that supports WebRTC).
+ * @returns {object} fromRank
+ */
+function createFromRank() {
+  return Object.keys(toRank).reduce(function (fromRank, state) {
+    return Object.assign(fromRank, _defineProperty({}, toRank[state], state));
+  }, {});
+}
+
+/**
+ * Summarize ICE connection stats.
+ * @param {Array<RTCIceConnectionState>} states
+ * @returns {RTCIceConnectionState} summary
+ */
+function summarizeIceConnectionStates(states) {
+  if (!states.length) {
+    return 'new';
+  }
+  fromRank = fromRank || createFromRank();
+  return states.reduce(function (state1, state2) {
+    return fromRank[Math.max(toRank[state1], toRank[state2])];
   });
 }
 
-inherits(RecordingV2, RecordingSignaling);
+/**
+ * Update the {@link PeerConnectionManager}'s `iceConnectionState`, and emit an
+ * "iceConnectionStateChanged" event, if necessary.
+ * @param {PeerConnectionManager} pcm
+ * @returns {void}
+ */
+function updateIceConnectionState(pcm) {
+  pcm._lastIceConnectionState = pcm.iceConnectionState;
+  pcm._iceConnectionState = summarizeIceConnectionStates([].concat(_toConsumableArray(pcm._peerConnections.values())).map(function (pcv2) {
+    return pcv2.iceConnectionState;
+  }));
+  if (pcm.iceConnectionState !== pcm._lastIceConnectionState) {
+    pcm.emit('iceConnectionStateChanged');
+  }
+}
+
+module.exports = PeerConnectionManager;
+},{"../../media/track/sender":88,"../../queueingeventemitter":92,"../../util":131,"../../webaudio/audiocontext":145,"./peerconnection":109}],111:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var RecordingSignaling = require('../recording');
 
 /**
- * Compare the {@link RecordingV2} to a {@link RecordingV2#Representation}
- * of itself and perform any updates necessary.
- * @param {RecordingV2#Representation} recording
- * @returns {this}
- * @fires RecordingSignaling#updated
+ * @extends RecordingSignaling
  */
-RecordingV2.prototype.update = function update(recording) {
-  if (recording.revision < this._revision) {
-    return this;
+
+var RecordingV2 = function (_RecordingSignaling) {
+  _inherits(RecordingV2, _RecordingSignaling);
+
+  /**
+   * Construct a {@link RecordingV2}.
+   */
+  function RecordingV2() {
+    _classCallCheck(this, RecordingV2);
+
+    var _this = _possibleConstructorReturn(this, (RecordingV2.__proto__ || Object.getPrototypeOf(RecordingV2)).call(this));
+
+    Object.defineProperties(_this, {
+      _revision: {
+        value: 1,
+        writable: true
+      }
+    });
+    return _this;
   }
-  this._revision = recording.revision;
-  return this.enable(recording.enabled);
-};
+
+  /**
+   * Compare the {@link RecordingV2} to a {@link RecordingV2#Representation}
+   * of itself and perform any updates necessary.
+   * @param {RecordingV2#Representation} recording
+   * @returns {this}
+   * @fires RecordingSignaling#updated
+   */
+
+
+  _createClass(RecordingV2, [{
+    key: 'update',
+    value: function update(recording) {
+      if (recording.revision < this._revision) {
+        return this;
+      }
+      this._revision = recording.revision;
+      return this.enable(recording.enabled);
+    }
+  }]);
+
+  return RecordingV2;
+}(RecordingSignaling);
 
 /**
  * The Room Signaling Protocol (RSP) representation of a {@link RecordingV2}
@@ -22279,150 +23527,189 @@ RecordingV2.prototype.update = function update(recording) {
  */
 
 module.exports = RecordingV2;
-
-},{"../recording":97,"util":149}],110:[function(require,module,exports){
+},{"../recording":99}],112:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var RemoteParticipantSignaling = require('../remoteparticipant');
 var RemoteTrackV2 = require('./remotetrack');
 
 /**
- * Construct a {@link RemoteParticipantV2}.
- * @class
  * @extends RemoteParticipantSignaling
- * @param {object} participantState
- * @param {function(string): Promise<DataTrackReceiver|MediaTrackReceiver>} getTrackReceiver
- * @param {object} [options]
  * @property {?number} revision
  */
-function RemoteParticipantV2(participantState, getTrackReceiver, options) {
-  if (!(this instanceof RemoteParticipantV2)) {
-    return new RemoteParticipantV2(participantState, getTrackReceiver, options);
-  }
 
-  RemoteParticipantSignaling.call(this, participantState.sid, participantState.identity);
+var RemoteParticipantV2 = function (_RemoteParticipantSig) {
+  _inherits(RemoteParticipantV2, _RemoteParticipantSig);
 
-  options = Object.assign({
-    RemoteTrackV2: RemoteTrackV2
-  }, options);
+  /**
+   * Construct a {@link RemoteParticipantV2}.
+   * @param {object} participantState
+   * @param {function(string): Promise<DataTrackReceiver|MediaTrackReceiver>} getTrackReceiver
+   * @param {object} [options]
+   */
+  function RemoteParticipantV2(participantState, getTrackReceiver, options) {
+    var _ret;
 
-  Object.defineProperties(this, {
-    _revision: {
-      writable: true,
-      value: null
-    },
-    _RemoteTrackV2: {
-      value: options.RemoteTrackV2
-    },
-    _getTrackReceiver: {
-      value: getTrackReceiver
-    },
-    revision: {
-      enumerable: true,
-      get: function() {
-        return this._revision;
+    _classCallCheck(this, RemoteParticipantV2);
+
+    var _this = _possibleConstructorReturn(this, (RemoteParticipantV2.__proto__ || Object.getPrototypeOf(RemoteParticipantV2)).call(this, participantState.sid, participantState.identity));
+
+    options = Object.assign({
+      RemoteTrackV2: RemoteTrackV2
+    }, options);
+
+    Object.defineProperties(_this, {
+      _revision: {
+        writable: true,
+        value: null
+      },
+      _RemoteTrackV2: {
+        value: options.RemoteTrackV2
+      },
+      _getTrackReceiver: {
+        value: getTrackReceiver
+      },
+      revision: {
+        enumerable: true,
+        get: function get() {
+          return this._revision;
+        }
       }
+    });
+
+    return _ret = _this.update(participantState), _possibleConstructorReturn(_this, _ret);
+  }
+
+  /**
+   * @private
+   */
+
+
+  _createClass(RemoteParticipantV2, [{
+    key: '_getOrCreateTrack',
+    value: function _getOrCreateTrack(trackState) {
+      var RemoteTrackV2 = this._RemoteTrackV2;
+      var track = this.tracks.get(trackState.id);
+      if (!track) {
+        track = new RemoteTrackV2(trackState);
+        this.addTrack(track);
+      }
+      return track;
     }
-  });
 
-  return this.update(participantState);
-}
+    /**
+     * Update the {@link RemoteParticipantV2} with the new state.
+     * @param {object} participantState
+     * @returns {this}
+     */
 
-inherits(RemoteParticipantV2, RemoteParticipantSignaling);
+  }, {
+    key: 'update',
+    value: function update(participantState) {
+      if (this.revision !== null && participantState.revision <= this.revision) {
+        return this;
+      }
+      this._revision = participantState.revision;
 
-RemoteParticipantV2.prototype._getOrCreateTrack = function _getOrCreateTrack(trackState) {
-  var RemoteTrackV2 = this._RemoteTrackV2;
-  var track = this.tracks.get(trackState.id);
-  if (!track) {
-    track = new RemoteTrackV2(trackState);
-    this.addTrack(track);
-  }
-  return track;
-};
+      var tracksToKeep = new Set();
 
-/**
- * Update the {@link RemoteParticipantV2} with the new state.
- * @param {object} participantState
- * @returns {this}
- */
-RemoteParticipantV2.prototype.update = function update(participantState) {
-  if (this.revision !== null && participantState.revision <= this.revision) {
-    return this;
-  }
-  this._revision = participantState.revision;
+      participantState.tracks.forEach(function (trackState) {
+        var track = this._getOrCreateTrack(trackState);
+        track.update(trackState);
+        tracksToKeep.add(track);
+      }, this);
 
-  var tracksToKeep = new Set();
+      this.tracks.forEach(function (track) {
+        if (!tracksToKeep.has(track)) {
+          this.removeTrack(track);
+        }
+      }, this);
 
-  participantState.tracks.forEach(function(trackState) {
-    var track = this._getOrCreateTrack(trackState);
-    track.update(trackState);
-    tracksToKeep.add(track);
-  }, this);
+      if (participantState.state === 'disconnected' && this.state === 'connected') {
+        this.preempt('disconnected');
+      }
 
-  this.tracks.forEach(function(track) {
-    if (!tracksToKeep.has(track)) {
-      this.removeTrack(track);
+      return this;
     }
-  }, this);
 
-  if (participantState.state === 'disconnected' && this.state === 'connected') {
-    this.preempt('disconnected');
-  }
+    /**
+     * Add the {@link RemoteTrackV2} to the {@link RemoteParticipantV2}.
+     * @param {RemoteTrackV2} track
+     * @returns {this}
+     */
 
-  return this;
-};
+  }, {
+    key: 'addTrack',
+    value: function addTrack(track) {
+      _get(RemoteParticipantV2.prototype.__proto__ || Object.getPrototypeOf(RemoteParticipantV2.prototype), 'addTrack', this).call(this, track);
+      this._getTrackReceiver(track.id).then(track.setTrackTransceiver.bind(track));
+      return this;
+    }
+  }]);
 
-/**
- * Add the {@link RemoteTrackV2} to the {@link RemoteParticipantV2}.
- * @param {RemoteTrackV2} track
- * @returns {this}
- */
-RemoteParticipantV2.prototype.addTrack = function addTrack(track) {
-  RemoteParticipantSignaling.prototype.addTrack.call(this, track);
-  this._getTrackReceiver(track.id).then(track.setTrackTransceiver.bind(track));
-  return this;
-};
+  return RemoteParticipantV2;
+}(RemoteParticipantSignaling);
 
 module.exports = RemoteParticipantV2;
-
-},{"../remoteparticipant":98,"./remotetrack":111,"util":149}],111:[function(require,module,exports){
+},{"../remoteparticipant":100,"./remotetrack":113}],113:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var RemoteTrackSignaling = require('../remotetrack');
 
 /**
- * Construct a {@link RemoteTrackV2}.
- * @class
  * @extends RemoteTrackSignaling
- * @param {RemoteTrackV2#Representation} track
  */
-function RemoteTrackV2(track) {
-  if (!(this instanceof RemoteTrackV2)) {
-    return new RemoteTrackV2(track);
+
+var RemoteTrackV2 = function (_RemoteTrackSignaling) {
+  _inherits(RemoteTrackV2, _RemoteTrackSignaling);
+
+  /**
+   * Construct a {@link RemoteTrackV2}.
+   * @param {RemoteTrackV2#Representation} track
+   */
+  function RemoteTrackV2(track) {
+    _classCallCheck(this, RemoteTrackV2);
+
+    return _possibleConstructorReturn(this, (RemoteTrackV2.__proto__ || Object.getPrototypeOf(RemoteTrackV2)).call(this, track.sid, track.name, track.id, track.kind, track.enabled));
   }
-  RemoteTrackSignaling.call(this,
-    track.sid,
-    track.name,
-    track.id,
-    track.kind,
-    track.enabled);
-}
 
-inherits(RemoteTrackV2, RemoteTrackSignaling);
+  /**
+   * Compare the {@link RemoteTrackV2} to a {@link RemoteTrackV2#Representation} of itself
+   * and perform any updates necessary.
+   * @param {RemoteTrackV2#Representation} track
+   * @returns {this}
+   * @fires TrackSignaling#updated
+   */
 
-/**
- * Compare the {@link RemoteTrackV2} to a {@link RemoteTrackV2#Representation} of itself
- * and perform any updates necessary.
- * @param {RemoteTrackV2#Representation} track
- * @returns {this}
- * @fires TrackSignaling#updated
- */
-RemoteTrackV2.prototype.update = function update(track) {
-  this.enable(track.enabled);
-  return this;
-};
+
+  _createClass(RemoteTrackV2, [{
+    key: 'update',
+    value: function update(track) {
+      this.enable(track.enabled);
+      return this;
+    }
+  }]);
+
+  return RemoteTrackV2;
+}(RemoteTrackSignaling);
 
 /**
  * The Room Signaling Protocol (RSP) representation of a {@link RemoteTrackV2}
@@ -22431,11 +23718,19 @@ RemoteTrackV2.prototype.update = function update(track) {
  */
 
 module.exports = RemoteTrackV2;
-
-},{"../remotetrack":99,"util":149}],112:[function(require,module,exports){
+},{"../remotetrack":101}],114:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var RecordingV2 = require('./recording');
 var RoomSignaling = require('../room');
 var RemoteParticipantV2 = require('./remoteparticipant');
@@ -22444,237 +23739,329 @@ var createTwilioError = require('../../util/twilio-video-errors').createTwilioEr
 
 var STATS_PUBLISH_INTERVAL_MS = 1000;
 
-function RoomV2(localParticipant, initialState, transport, peerConnectionManager, options) {
-  if (!(this instanceof RoomV2)) {
-    return new RoomV2(localParticipant, initialState, transport, peerConnectionManager, options);
-  }
-  options = Object.assign({
-    RecordingSignaling: RecordingV2,
-    RemoteParticipantV2: RemoteParticipantV2,
-    statsPublishIntervalMs: STATS_PUBLISH_INTERVAL_MS
-  }, options);
-
-  RoomSignaling.call(this, localParticipant, initialState.sid, initialState.name, options);
-
-  Object.defineProperties(this, {
-    _disconnectedParticipantSids: {
-      value: new Set()
-    },
-    _peerConnectionManager: {
-      value: peerConnectionManager
-    },
-    _published: {
-      value: new Map()
-    },
-    _publishedRevision: {
-      value: 0,
-      writable: true
-    },
-    _RemoteParticipantV2: {
-      value: options.RemoteParticipantV2
-    },
-    _subscribed: {
-      value: new Map()
-    },
-    _subscribedRevision: {
-      value: 0,
-      writable: true
-    },
-    _subscriptionFailures: {
-      value: new Map()
-    },
-    _transport: {
-      value: transport
-    },
-    _trackReceiverDeferreds: {
-      value: new Map()
-    }
-  });
-
-  handleLocalParticipantEvents(this, localParticipant);
-  handlePeerConnectionEvents(this, peerConnectionManager);
-  handleTransportEvents(this, transport);
-  periodicallyPublishStats(this, localParticipant, transport, options.statsPublishIntervalMs);
-
-  this._update(initialState);
-}
-
-inherits(RoomV2, RoomSignaling);
-
-RoomV2.prototype._deleteTrackReceiverDeferred = function _deleteTrackReceiverDeferred(id) {
-  return this._trackReceiverDeferreds.delete(id);
-};
-
-RoomV2.prototype._getOrCreateTrackReceiverDeferred = function _getOrCreateTrackReceiverDeferred(id) {
-  var deferred = this._trackReceiverDeferreds.get(id) || util.defer();
-  var trackReceivers = this._peerConnectionManager.getTrackReceivers();
-
-  // NOTE(mmalavalli): In Firefox, there can be instances where a MediaStreamTrack
-  // for the given Track ID already exists, for example, when a Track is removed
-  // and added back. If that is the case, then we should resolve 'deferred'.
-  var trackReceiver = trackReceivers.find(function(trackReceiver) {
-    return trackReceiver.id === id && trackReceiver.readyState !== 'ended';
-  });
-
-  if (trackReceiver) {
-    deferred.resolve(trackReceiver);
-  } else {
-    // NOTE(mmalavalli): Only add the 'deferred' to the map if it's not
-    // resolved. This will prevent old copies of the MediaStreamTrack from
-    // being used when the remote peer removes and re-adds a MediaStreamTrack.
-    this._trackReceiverDeferreds.set(id, deferred);
-  }
-
-  return deferred;
-};
-
-RoomV2.prototype._addTrackReceiver = function _addTrackReceiver(trackReceiver) {
-  var deferred = this._getOrCreateTrackReceiverDeferred(trackReceiver.id);
-  deferred.resolve(trackReceiver);
-  return this;
-};
-
-RoomV2.prototype._disconnect = function _disconnect(error) {
-  var didDisconnect = RoomSignaling.prototype._disconnect.call(this, error);
-  if (didDisconnect) {
-    this._transport.disconnect();
-    this._peerConnectionManager.close();
-  }
-
-  this.localParticipant.tracks.forEach(function(track) {
-    track.publishFailed(error || new Error('LocalParticipant disconnected'));
-  });
-
-  return didDisconnect;
-};
-
-RoomV2.prototype._getTrackReceiver = function _getTrackReceiver(id) {
-  var self = this;
-  return this._getOrCreateTrackReceiverDeferred(id).promise.then(function(trackReceiver) {
-    self._deleteTrackReceiverDeferred(id);
-    return trackReceiver;
-  });
-};
-
-RoomV2.prototype._getOrCreateRemoteParticipant = function _getOrCreateRemoteParticipant(participantState) {
-  var RemoteParticipantV2 = this._RemoteParticipantV2;
-  var participant = this.participants.get(participantState.sid);
-  var self = this;
-  if (!participant) {
-    participant = new RemoteParticipantV2(participantState, this._getTrackReceiver.bind(this));
-    participant.on('stateChanged', function stateChanged(state) {
-      if (state === 'disconnected') {
-        participant.removeListener('stateChanged', stateChanged);
-        self.participants.delete(participant.sid);
-        self._disconnectedParticipantSids.add(participant.sid);
-      }
-    });
-    this.connectParticipant(participant);
-  }
-  return participant;
-};
-
-RoomV2.prototype._getState = function _getState() {
-  return {
-    participant: this.localParticipant.getState()
-  };
-};
-
-RoomV2.prototype._publishNewLocalParticipantState = function _publishNewLocalParticipantState() {
-  this.localParticipant.incrementRevision();
-  this._transport.publish(this._getState());
-};
-
-RoomV2.prototype._publishPeerConnectionState = function _publishPeerConnectionState(peerConnectionState) {
-  /* eslint camelcase:0 */
-  this._transport.publish(Object.assign({
-    peer_connections: [peerConnectionState]
-  }, this._getState()));
-};
-
-RoomV2.prototype._update = function _update(roomState) {
-  var participantsToKeep = new Set();
-
-  if (roomState.subscribed && roomState.subscribed.revision > this._subscribedRevision) {
-    this._subscribedRevision = roomState.subscribed.revision;
-    roomState.subscribed.tracks.forEach(function(trackState) {
-      if (trackState.id) {
-        this._subscriptionFailures.delete(trackState.sid);
-        this._subscribed.set(trackState.id, trackState.sid);
-      } else if (trackState.error && !this._subscriptionFailures.has(trackState.sid)) {
-        this._subscriptionFailures.set(trackState.sid, trackState.error);
-      }
-    }, this);
-  }
-
-  // TODO(mroberts): Remove me once the Server is fixed.
-  (roomState.participants || []).forEach(function(participantState) {
-    if (participantState.sid === this.localParticipant.sid ||
-        this._disconnectedParticipantSids.has(participantState.sid)) {
-      return;
-    }
-    var participant = this._getOrCreateRemoteParticipant(participantState);
-    participant.update(participantState);
-    participantsToKeep.add(participant);
-  }, this);
-
-  handleSubscriptionFailures(this);
-
-  // TODO(mroberts): Remove me once the Server is fixed.
-  /* eslint camelcase:0 */
-  if (roomState.peer_connections) {
-    this._peerConnectionManager.update(roomState.peer_connections);
-  }
-
-  if (roomState.recording) {
-    this.recording.update(roomState.recording);
-  }
-
-  if (roomState.published && roomState.published.revision > this._publishedRevision) {
-    this._publishedRevision = roomState.published.revision;
-    roomState.published.tracks.forEach(function(track) {
-      if (track.sid) {
-        this._published.set(track.id, track.sid);
-      }
-    }, this);
-    this.localParticipant.update(roomState.published);
-  }
-
-  if (roomState.participant) {
-    this.localParticipant.connect(
-      roomState.participant.sid,
-      roomState.participant.identity);
-  }
-
-  return this;
-};
-
 /**
- * Get the {@link RoomV2}'s media statistics.
- * @returns {Promise.<Array<StatsReport>>}
+ * @extends RoomSignaling
  */
-RoomV2.prototype.getStats = function getStats() {
-  var self = this;
 
-  function filterLocalTrackStats(trackStats) {
-    return self._published.has(trackStats.trackId);
-  }
+var RoomV2 = function (_RoomSignaling) {
+  _inherits(RoomV2, _RoomSignaling);
 
-  function filterRemoteTrackStats(trackStats) {
-    return self._subscribed.has(trackStats.trackId);
-  }
+  function RoomV2(localParticipant, initialState, transport, peerConnectionManager, options) {
+    _classCallCheck(this, RoomV2);
 
-  return this._peerConnectionManager.getStats().then(function(reports) {
-    return reports.map(function(report) {
-      return Object.assign({}, report, {
-        localAudioTrackStats: report.localAudioTrackStats.filter(filterLocalTrackStats),
-        localVideoTrackStats: report.localVideoTrackStats.filter(filterLocalTrackStats),
-        remoteAudioTrackStats: report.remoteAudioTrackStats.filter(filterRemoteTrackStats),
-        remoteVideoTrackStats: report.remoteVideoTrackStats.filter(filterRemoteTrackStats),
-      });
+    options = Object.assign({
+      RecordingSignaling: RecordingV2,
+      RemoteParticipantV2: RemoteParticipantV2,
+      statsPublishIntervalMs: STATS_PUBLISH_INTERVAL_MS
+    }, options);
+
+    var _this = _possibleConstructorReturn(this, (RoomV2.__proto__ || Object.getPrototypeOf(RoomV2)).call(this, localParticipant, initialState.sid, initialState.name, options));
+
+    Object.defineProperties(_this, {
+      _disconnectedParticipantSids: {
+        value: new Set()
+      },
+      _peerConnectionManager: {
+        value: peerConnectionManager
+      },
+      _published: {
+        value: new Map()
+      },
+      _publishedRevision: {
+        value: 0,
+        writable: true
+      },
+      _RemoteParticipantV2: {
+        value: options.RemoteParticipantV2
+      },
+      _subscribed: {
+        value: new Map()
+      },
+      _subscribedRevision: {
+        value: 0,
+        writable: true
+      },
+      _subscriptionFailures: {
+        value: new Map()
+      },
+      _transport: {
+        value: transport
+      },
+      _trackReceiverDeferreds: {
+        value: new Map()
+      }
     });
-  });
-};
+
+    handleLocalParticipantEvents(_this, localParticipant);
+    handlePeerConnectionEvents(_this, peerConnectionManager);
+    handleTransportEvents(_this, transport);
+    periodicallyPublishStats(_this, localParticipant, transport, options.statsPublishIntervalMs);
+
+    _this._update(initialState);
+    return _this;
+  }
+
+  /**
+   * The Signaling Connection State
+   * @property {string} - "connected", "reconnecting", "disconnected"
+   */
+
+
+  _createClass(RoomV2, [{
+    key: '_deleteTrackReceiverDeferred',
+
+
+    /**
+     * @private
+     */
+    value: function _deleteTrackReceiverDeferred(id) {
+      return this._trackReceiverDeferreds.delete(id);
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_getOrCreateTrackReceiverDeferred',
+    value: function _getOrCreateTrackReceiverDeferred(id) {
+      var deferred = this._trackReceiverDeferreds.get(id) || util.defer();
+      var trackReceivers = this._peerConnectionManager.getTrackReceivers();
+
+      // NOTE(mmalavalli): In Firefox, there can be instances where a MediaStreamTrack
+      // for the given Track ID already exists, for example, when a Track is removed
+      // and added back. If that is the case, then we should resolve 'deferred'.
+      var trackReceiver = trackReceivers.find(function (trackReceiver) {
+        return trackReceiver.id === id && trackReceiver.readyState !== 'ended';
+      });
+
+      if (trackReceiver) {
+        deferred.resolve(trackReceiver);
+      } else {
+        // NOTE(mmalavalli): Only add the 'deferred' to the map if it's not
+        // resolved. This will prevent old copies of the MediaStreamTrack from
+        // being used when the remote peer removes and re-adds a MediaStreamTrack.
+        this._trackReceiverDeferreds.set(id, deferred);
+      }
+
+      return deferred;
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_addTrackReceiver',
+    value: function _addTrackReceiver(trackReceiver) {
+      var deferred = this._getOrCreateTrackReceiverDeferred(trackReceiver.id);
+      deferred.resolve(trackReceiver);
+      return this;
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_disconnect',
+    value: function _disconnect(error) {
+      var didDisconnect = _get(RoomV2.prototype.__proto__ || Object.getPrototypeOf(RoomV2.prototype), '_disconnect', this).call(this, error);
+      if (didDisconnect) {
+        this._transport.disconnect();
+        this._peerConnectionManager.close();
+      }
+
+      this.localParticipant.tracks.forEach(function (track) {
+        track.publishFailed(error || new Error('LocalParticipant disconnected'));
+      });
+
+      return didDisconnect;
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_getTrackReceiver',
+    value: function _getTrackReceiver(id) {
+      var _this2 = this;
+
+      return this._getOrCreateTrackReceiverDeferred(id).promise.then(function (trackReceiver) {
+        _this2._deleteTrackReceiverDeferred(id);
+        return trackReceiver;
+      });
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_getOrCreateRemoteParticipant',
+    value: function _getOrCreateRemoteParticipant(participantState) {
+      var RemoteParticipantV2 = this._RemoteParticipantV2;
+      var participant = this.participants.get(participantState.sid);
+      var self = this;
+      if (!participant) {
+        participant = new RemoteParticipantV2(participantState, this._getTrackReceiver.bind(this));
+        participant.on('stateChanged', function stateChanged(state) {
+          if (state === 'disconnected') {
+            participant.removeListener('stateChanged', stateChanged);
+            self.participants.delete(participant.sid);
+            self._disconnectedParticipantSids.add(participant.sid);
+          }
+        });
+        this.connectParticipant(participant);
+      }
+      return participant;
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_getState',
+    value: function _getState() {
+      return {
+        participant: this.localParticipant.getState()
+      };
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_publishNewLocalParticipantState',
+    value: function _publishNewLocalParticipantState() {
+      this._transport.publish(this._getState());
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_publishPeerConnectionState',
+    value: function _publishPeerConnectionState(peerConnectionState) {
+      /* eslint camelcase:0 */
+      this._transport.publish(Object.assign({
+        peer_connections: [peerConnectionState]
+      }, this._getState()));
+    }
+
+    /**
+     * @private
+     */
+
+  }, {
+    key: '_update',
+    value: function _update(roomState) {
+      var participantsToKeep = new Set();
+
+      if (roomState.subscribed && roomState.subscribed.revision > this._subscribedRevision) {
+        this._subscribedRevision = roomState.subscribed.revision;
+        roomState.subscribed.tracks.forEach(function (trackState) {
+          if (trackState.id) {
+            this._subscriptionFailures.delete(trackState.sid);
+            this._subscribed.set(trackState.id, trackState.sid);
+          } else if (trackState.error && !this._subscriptionFailures.has(trackState.sid)) {
+            this._subscriptionFailures.set(trackState.sid, trackState.error);
+          }
+        }, this);
+      }
+
+      // TODO(mroberts): Remove me once the Server is fixed.
+      (roomState.participants || []).forEach(function (participantState) {
+        if (participantState.sid === this.localParticipant.sid || this._disconnectedParticipantSids.has(participantState.sid)) {
+          return;
+        }
+        var participant = this._getOrCreateRemoteParticipant(participantState);
+        participant.update(participantState);
+        participantsToKeep.add(participant);
+      }, this);
+
+      handleSubscriptionFailures(this);
+
+      // TODO(mroberts): Remove me once the Server is fixed.
+      /* eslint camelcase:0 */
+      if (roomState.peer_connections) {
+        this._peerConnectionManager.update(roomState.peer_connections);
+      }
+
+      if (roomState.recording) {
+        this.recording.update(roomState.recording);
+      }
+
+      if (roomState.published && roomState.published.revision > this._publishedRevision) {
+        this._publishedRevision = roomState.published.revision;
+        roomState.published.tracks.forEach(function (track) {
+          if (track.sid) {
+            this._published.set(track.id, track.sid);
+          }
+        }, this);
+        this.localParticipant.update(roomState.published);
+      }
+
+      if (roomState.participant) {
+        this.localParticipant.connect(roomState.participant.sid, roomState.participant.identity);
+      }
+
+      return this;
+    }
+
+    /**
+     * Get the {@link RoomV2}'s media statistics.
+     * @returns {Promise.<Array<StatsReport>>}
+     */
+
+  }, {
+    key: 'getStats',
+    value: function getStats() {
+      var self = this;
+
+      function filterLocalTrackStats(trackStats) {
+        return self._published.has(trackStats.trackId);
+      }
+
+      function filterRemoteTrackStats(trackStats) {
+        return self._subscribed.has(trackStats.trackId);
+      }
+
+      return this._peerConnectionManager.getStats().then(function (reports) {
+        return reports.map(function (report) {
+          return Object.assign({}, report, {
+            localAudioTrackStats: report.localAudioTrackStats.filter(filterLocalTrackStats),
+            localVideoTrackStats: report.localVideoTrackStats.filter(filterLocalTrackStats),
+            remoteAudioTrackStats: report.remoteAudioTrackStats.filter(filterRemoteTrackStats),
+            remoteVideoTrackStats: report.remoteVideoTrackStats.filter(filterRemoteTrackStats)
+          });
+        });
+      });
+    }
+  }, {
+    key: 'signalingConnectionState',
+    get: function get() {
+      return this._transport.state === 'syncing' ? 'reconnecting' : this._transport.state;
+    }
+
+    /**
+     * The Media Connection State
+     * @property {RTCIceConnectionState}
+     */
+
+  }, {
+    key: 'mediaConnectionState',
+    get: function get() {
+      return this._peerConnectionManager.iceConnectionState;
+    }
+  }]);
+
+  return RoomV2;
+}(RoomSignaling);
 
 /**
  * @typedef {object} RoomV2#Representation
@@ -22687,68 +24074,26 @@ RoomV2.prototype.getStats = function getStats() {
  */
 
 function handleLocalParticipantEvents(roomV2, localParticipant) {
-  var removeListeners = new Map();
-  var peerConnectionManager = roomV2._peerConnectionManager;
-
-  var updateLocalParticipantStateAndRenegotiate = util.oncePerTick(function() {
-    roomV2._publishNewLocalParticipantState();
-    renegotiate();
-  });
-
-  function renegotiate() {
-    var trackSenders = util.flatMap(localParticipant.tracks, function(trackV2) {
+  var renegotiate = util.oncePerTick(function () {
+    var trackSenders = util.flatMap(localParticipant.tracks, function (trackV2) {
       return trackV2.trackTransceiver;
     });
-    peerConnectionManager.setTrackSenders(trackSenders);
-  }
+    roomV2._peerConnectionManager.setTrackSenders(trackSenders);
+  });
 
-  function addListener(track) {
-    var trackSid = track.sid;
+  var localParticipantUpdated = util.oncePerTick(function () {
+    roomV2._publishNewLocalParticipantState();
+  });
 
-    function updated() {
-      // NOTE(mmalavalli): The LocalParticipantV2's state is only published if
-      // the "updated" event is emitted due to LocalTrackPublicationV2's
-      // .isEnabled being toggled. We do not publish if it is fired due to the
-      // LocalTrackPublicationV2's .sid being set.
-      if (trackSid === track.sid) {
-        roomV2._publishNewLocalParticipantState();
-      } else {
-        trackSid = track.sid;
-      }
-    }
-
-    track.on('updated', updated);
-
-    removeListener(track);
-    removeListeners.set(track, track.removeListener.bind(track, 'updated', updated));
-  }
-
-  function removeListener(track) {
-    var removeListener = removeListeners.get(track);
-    if (removeListener) {
-      removeListener();
-    }
-  }
-
-  function trackAdded(track) {
-    addListener(track);
-    updateLocalParticipantStateAndRenegotiate();
-  }
-
-  function trackRemoved(track) {
-    removeListener(track);
-    updateLocalParticipantStateAndRenegotiate();
-  }
-
-  localParticipant.on('trackAdded', trackAdded);
-  localParticipant.on('trackRemoved', trackRemoved);
-
-  localParticipant.tracks.forEach(addListener);
+  localParticipant.on('trackAdded', renegotiate);
+  localParticipant.on('trackRemoved', renegotiate);
+  localParticipant.on('updated', localParticipantUpdated);
 
   roomV2.on('stateChanged', function stateChanged(state) {
     if (state === 'disconnected') {
-      localParticipant.removeListener('trackAdded', trackAdded);
-      localParticipant.removeListener('trackRemoved', trackRemoved);
+      localParticipant.removeListener('trackAdded', renegotiate);
+      localParticipant.removeListener('trackRemoved', renegotiate);
+      localParticipant.removeListener('updated', localParticipantUpdated);
       roomV2.removeListener('stateChanged', stateChanged);
       localParticipant.disconnect();
     }
@@ -22769,17 +24114,22 @@ function handlePeerConnectionEvents(roomV2, peerConnectionManager) {
   peerConnectionManager.on('trackAdded', roomV2._addTrackReceiver.bind(roomV2));
   peerConnectionManager.dequeue('trackAdded');
   peerConnectionManager.getTrackReceivers().forEach(roomV2._addTrackReceiver, roomV2);
+
+  peerConnectionManager.on('iceConnectionStateChanged', function () {
+    return roomV2.emit('mediaConnectionStateChanged');
+  });
 }
 
 function handleTransportEvents(roomV2, transport) {
   transport.on('message', roomV2._update.bind(roomV2));
   transport.on('stateChanged', function stateChanged(state, error) {
     if (state === 'disconnected') {
-      if (roomV2.state === 'connected') {
+      if (roomV2.state !== 'disconnected') {
         roomV2._disconnect(error);
       }
       transport.removeListener('stateChanged', stateChanged);
     }
+    roomV2.emit('signalingConnectionStateChanged');
   });
 }
 
@@ -22792,9 +24142,9 @@ function handleTransportEvents(roomV2, transport) {
  * @param {Number} intervalMs
  */
 function periodicallyPublishStats(roomV2, localParticipant, transport, intervalMs) {
-  var interval = setInterval(function() {
-    roomV2.getStats().then(function(stats) {
-      stats.forEach(function(report) {
+  var interval = setInterval(function () {
+    roomV2.getStats().then(function (stats) {
+      stats.forEach(function (report) {
         transport.publishEvent('quality', 'stats-report', {
           audioTrackStats: report.remoteAudioTrackStats,
           localAudioTrackStats: report.localAudioTrackStats,
@@ -22805,7 +24155,7 @@ function periodicallyPublishStats(roomV2, localParticipant, transport, intervalM
           videoTrackStats: report.remoteVideoTrackStats
         });
       });
-    }, function() {
+    }, function () {
       // Do nothing.
     });
   }, intervalMs);
@@ -22819,13 +24169,13 @@ function periodicallyPublishStats(roomV2, localParticipant, transport, intervalM
 }
 
 function handleSubscriptionFailures(room) {
-  var remoteTracks = new Map(util.flatMap(room.participants, function(participant) {
-    return Array.from(participant.tracks.values()).map(function(track) {
+  var remoteTracks = new Map(util.flatMap(room.participants, function (participant) {
+    return Array.from(participant.tracks.values()).map(function (track) {
       return [track.sid, track];
     });
   }));
 
-  room._subscriptionFailures.forEach(function(error, trackSid) {
+  room._subscriptionFailures.forEach(function (error, trackSid) {
     var remoteTrack = remoteTracks.get(trackSid);
     if (remoteTrack) {
       room._subscriptionFailures.delete(trackSid);
@@ -22834,101 +24184,122 @@ function handleSubscriptionFailures(room) {
   });
 }
 module.exports = RoomV2;
-
-},{"../../util":129,"../../util/twilio-video-errors":141,"../room":100,"./recording":109,"./remoteparticipant":110,"util":149}],113:[function(require,module,exports){
+},{"../../util":131,"../../util/twilio-video-errors":143,"../room":102,"./recording":111,"./remoteparticipant":112}],115:[function(require,module,exports){
 'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var SIP = require('../../sip');
 
-function SIPJSMediaHandler(peerConnectionManager, createMessage) {
-  if (!(this instanceof SIPJSMediaHandler)) {
-    return new SIPJSMediaHandler(peerConnectionManager);
-  }
-  Object.defineProperties(this, {
-    createMessage: {
-      enumerable: true,
-      value: createMessage
-    },
-    peerConnectionManager: {
-      enumerable: true,
-      value: peerConnectionManager
-    }
-  });
-}
+var SIPJSMediaHandler = function () {
+  function SIPJSMediaHandler(peerConnectionManager, createMessage) {
+    _classCallCheck(this, SIPJSMediaHandler);
 
-SIPJSMediaHandler.defaultFactory = function defaultFactory() {
-  // NOTE(mroberts): We don't use SIP.js's defaultFactory functionality.
-};
+    Object.defineProperties(this, {
+      createMessage: {
+        enumerable: true,
+        value: createMessage
+      },
+      peerConnectionManager: {
+        enumerable: true,
+        value: peerConnectionManager
+      }
+    });
+  }
+
+  _createClass(SIPJSMediaHandler, [{
+    key: 'close',
+    value: function close() {
+      this.peerConnectionManager.close();
+    }
+  }, {
+    key: 'getDescription',
+    value: function getDescription() {
+      var connectMessage = Object.assign({
+        /* eslint camelcase:0 */
+        peer_connections: this.peerConnectionManager.getStates()
+      }, this.createMessage());
+      return Promise.resolve({
+        body: JSON.stringify(connectMessage),
+        contentType: 'application/room-signaling+json'
+      });
+    }
+  }, {
+    key: 'hasDescription',
+    value: function hasDescription() {
+      return true;
+    }
+  }, {
+    key: 'hold',
+    value: function hold() {
+      // NOTE(mroberts): We don't use SIP.js's hold functionality.
+    }
+  }, {
+    key: 'isReady',
+    value: function isReady() {
+      // NOTE(mroberts): We don't use SIP.js's isReady functionality.
+      return true;
+    }
+  }, {
+    key: 'isMuted',
+    value: function isMuted() {
+      // NOTE(mroberts): We don't use SIP.js's isMuted functionality.
+      return {
+        audio: false,
+        video: false
+      };
+    }
+  }, {
+    key: 'mute',
+    value: function mute() {
+      // NOTE(mroberts): We don't use SIP.js's mute functionality.
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      // NOTE(mroberts): We don't use SIP.js's render functionality.
+    }
+  }, {
+    key: 'setDescription',
+    value: function setDescription(message) {
+      var roomState = getRoomState(message);
+      if (roomState) {
+        var peerConnectionStates = roomState.peer_connections;
+        if (peerConnectionStates) {
+          return this.peerConnectionManager.update(peerConnectionStates);
+        }
+      }
+      return Promise.resolve();
+    }
+  }, {
+    key: 'unhold',
+    value: function unhold() {
+      // NOTE(mroberts): We don't use SIP.js's unhold functionality.
+    }
+  }, {
+    key: 'unmute',
+    value: function unmute() {
+      // NOTE(mroberts): We don't use SIP.js's unmute functionality.
+    }
+  }, {
+    key: 'updateIceServers',
+    value: function updateIceServers() {
+      // NOTE(mroberts): We don't use SIP.js's ICE server functionality.
+    }
+  }], [{
+    key: 'defaultFactory',
+    value: function defaultFactory() {
+      // NOTE(mroberts): We don't use SIP.js's defaultFactory functionality.
+    }
+  }]);
+
+  return SIPJSMediaHandler;
+}();
 
 SIPJSMediaHandler.defaultFactory.isSupported = function isSupported() {
   return SIP.WebRTC.isSupported();
-};
-
-SIPJSMediaHandler.prototype.close = function close() {
-  this.peerConnectionManager.close();
-};
-
-SIPJSMediaHandler.prototype.getDescription = function getDescription() {
-  var connectMessage = Object.assign({
-    /* eslint camelcase:0 */
-    peer_connections: this.peerConnectionManager.getStates()
-  }, this.createMessage());
-  return Promise.resolve({
-    body: JSON.stringify(connectMessage),
-    contentType: 'application/room-signaling+json'
-  });
-};
-
-SIPJSMediaHandler.prototype.hasDescription = function hasDescription() {
-  return true;
-};
-
-SIPJSMediaHandler.prototype.hold = function hold() {
-  // NOTE(mroberts): We don't use SIP.js's hold functionality.
-};
-
-SIPJSMediaHandler.prototype.isReady = function isReady() {
-  // NOTE(mroberts): We don't use SIP.js's isReady functionality.
-  return true;
-};
-
-SIPJSMediaHandler.prototype.isMuted = function isMuted() {
-  // NOTE(mroberts): We don't use SIP.js's isMuted functionality.
-  return {
-    audio: false,
-    video: false
-  };
-};
-
-SIPJSMediaHandler.prototype.mute = function mute() {
-  // NOTE(mroberts): We don't use SIP.js's mute functionality.
-};
-
-SIPJSMediaHandler.prototype.render = function render() {
-  // NOTE(mroberts): We don't use SIP.js's render functionality.
-};
-
-SIPJSMediaHandler.prototype.setDescription = function setDescription(message) {
-  var roomState = getRoomState(message);
-  if (roomState) {
-    var peerConnectionStates = roomState.peer_connections;
-    if (peerConnectionStates) {
-      return this.peerConnectionManager.update(peerConnectionStates);
-    }
-  }
-  return Promise.resolve();
-};
-
-SIPJSMediaHandler.prototype.unhold = function unhold() {
-  // NOTE(mroberts): We don't use SIP.js's unhold functionality.
-};
-
-SIPJSMediaHandler.prototype.unmute = function unmute() {
-  // NOTE(mroberts): We don't use SIP.js's unmute functionality.
-};
-
-SIPJSMediaHandler.prototype.updateIceServers = function updateIceServers() {
-  // NOTE(mroberts): We don't use SIP.js's ICE server functionality.
 };
 
 function getRoomState(message) {
@@ -22940,12 +24311,18 @@ function getRoomState(message) {
 }
 
 module.exports = SIPJSMediaHandler;
-
-},{"../../sip":115}],114:[function(require,module,exports){
+},{"../../sip":117}],116:[function(require,module,exports){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var constants = require('../../util/constants');
-var inherits = require('util').inherits;
 var packageInfo = require('../../../package.json');
 var InsightsPublisher = require('../../util/insightspublisher');
 var NullInsightsPublisher = require('../../util/insightspublisher/null');
@@ -22953,11 +24330,13 @@ var SIP = require('../../sip');
 var DefaultSIPJSMediaHandler = require('./sipjsmediahandler');
 var StateMachine = require('../../statemachine');
 var util = require('../../util');
-var TwilioErrors = require('../../util/twilio-video-errors');
-var createTwilioError = TwilioErrors.createTwilioError;
-var SignalingConnectionError = TwilioErrors.SignalingConnectionError;
-var SignalingConnectionTimeoutError = TwilioErrors.SignalingConnectionTimeoutError;
-var SignalingIncomingMessageInvalidError = TwilioErrors.SignalingIncomingMessageInvalidError;
+
+var _require = require('../../util/twilio-video-errors'),
+    SignalingConnectionDisconnectedError = _require.SignalingConnectionDisconnectedError,
+    SignalingConnectionError = _require.SignalingConnectionError,
+    SignalingConnectionTimeoutError = _require.SignalingConnectionTimeoutError,
+    SignalingIncomingMessageInvalidError = _require.SignalingIncomingMessageInvalidError,
+    createTwilioError = _require.createTwilioError;
 
 var SDK_NAME = packageInfo.name + '.js';
 var SDK_VERSION = packageInfo.version;
@@ -22988,154 +24367,156 @@ Transport States
 */
 
 var states = {
-  connecting: [
-    'connected',
-    'disconnected'
-  ],
-  connected: [
-    'disconnected',
-    'syncing'
-  ],
-  syncing: [
-    'connected',
-    'disconnected'
-  ],
+  connecting: ['connected', 'disconnected'],
+  connected: ['disconnected', 'syncing'],
+  syncing: ['connected', 'disconnected'],
   disconnected: []
 };
 
 /**
- * Construct a {@link Transport}.
+ * A {@link Transport} supports sending and receiving Room Signaling Protocol
+ * (RSP) messages. It also supports RSP requests, such as Sync and Disconnect.
  * @extends StateMachine
- * @class
- * @classdesc A {@link Transport} supports sending and receiving Room Signaling
- * Protocol (RSP) messages. It also supports RSP requests, such as Sync and
- * Disconnect.
- * @param {?string} name
- * @param {string} accessToken
- * @param {ParticipantSignaling} localParticipant
- * @param {PeerConnectionManager} peerConnectionManager
- * @param {object} ua
- * @param {object} [options]
  * @emits Transport#connected
  * @emits Transport#message
  */
-function Transport(name, accessToken, localParticipant, peerConnectionManager, ua, options) {
-  if (!(this instanceof Transport)) {
-    return new Transport(name, accessToken, localParticipant, peerConnectionManager, ua, options);
-  }
-  options = Object.assign({
-    InsightsPublisher: InsightsPublisher,
-    NullInsightsPublisher: NullInsightsPublisher,
-    SIPJSMediaHandler: DefaultSIPJSMediaHandler
-  }, options);
-  StateMachine.call(this, 'connecting', states);
 
-  var eventPublisherOptions = {};
-  if (options.wsServerInsights) {
-    eventPublisherOptions.gateway = options.wsServerInsights;
-  }
+var Transport = function (_StateMachine) {
+  _inherits(Transport, _StateMachine);
 
-  var session = createSession(this, name, accessToken, localParticipant, peerConnectionManager, ua, options.SIPJSMediaHandler);
-  var EventPublisher = options.insights ? options.InsightsPublisher : options.NullInsightsPublisher;
-  Object.defineProperties(this, {
-    _eventPublisher: {
-      value: new EventPublisher(
-        accessToken,
-        SDK_NAME,
-        SDK_VERSION,
-        options.environment,
-        options.realm,
-        eventPublisherOptions)
-    },
-    _session: {
-      value: session
-    },
-    _updatesReceived: {
-      value: []
-    },
-    _updatesToSend: {
-      value: []
+  /**
+   * Construct a {@link Transport}.
+   * @param {?string} name
+   * @param {string} accessToken
+   * @param {ParticipantSignaling} localParticipant
+   * @param {PeerConnectionManager} peerConnectionManager
+   * @param {object} ua
+   * @param {object} [options]
+   */
+  function Transport(name, accessToken, localParticipant, peerConnectionManager, ua, options) {
+    _classCallCheck(this, Transport);
+
+    options = Object.assign({
+      InsightsPublisher: InsightsPublisher,
+      NullInsightsPublisher: NullInsightsPublisher,
+      SIPJSMediaHandler: DefaultSIPJSMediaHandler
+    }, options);
+
+    var _this = _possibleConstructorReturn(this, (Transport.__proto__ || Object.getPrototypeOf(Transport)).call(this, 'connecting', states));
+
+    var eventPublisherOptions = {};
+    if (options.wsServerInsights) {
+      eventPublisherOptions.gateway = options.wsServerInsights;
     }
-  });
-  setupEventListeners(this, session, ua);
-}
 
-inherits(Transport, StateMachine);
-
-/**
- * Disconnect the {@link Transport}. Returns true if calling the method resulted
- * in disconnection.
- * @param {TwilioError} [error]
- * @returns {boolean}
- */
-Transport.prototype.disconnect = function disconnect(error) {
-  if (this.state !== 'disconnected') {
-    this.preempt('disconnected', null, [error]);
-    this._session.terminate({
-      body: JSON.stringify({
-        type: 'disconnect',
-        version: VERSION
-      }),
-      extraHeaders: [
-        'Content-Type: application/room-signaling+json'
-      ]
+    var session = createSession(_this, name, accessToken, localParticipant, peerConnectionManager, ua, options.SIPJSMediaHandler);
+    var EventPublisher = options.insights ? options.InsightsPublisher : options.NullInsightsPublisher;
+    Object.defineProperties(_this, {
+      _eventPublisher: {
+        value: new EventPublisher(accessToken, SDK_NAME, SDK_VERSION, options.environment, options.realm, eventPublisherOptions)
+      },
+      _session: {
+        value: session
+      },
+      _updatesReceived: {
+        value: []
+      },
+      _updatesToSend: {
+        value: []
+      }
     });
-    this._eventPublisher.disconnect();
-    return true;
+    setupEventListeners(_this, session, ua);
+    return _this;
   }
-  return false;
-};
 
-/**
- * Publish an RSP Update. Returns true if calling the method resulted in
- * publishing (or eventually publishing) the update.
- * @param {object} update
- * @returns {boolean}
- */
-Transport.prototype.publish = function publish(update) {
-  update = Object.assign({
-    type: 'update',
-    version: VERSION
-  }, update);
-  switch (this.state) {
-    case 'connected':
-      publishWithRetries(this, this._session, update);
-      return true;
-    case 'connecting':
-    case 'syncing':
-      this._updatesToSend.push(update);
-      return true;
-    case 'disconnected':
-    default:
+  /**
+   * Disconnect the {@link Transport}. Returns true if calling the method resulted
+   * in disconnection.
+   * @param {TwilioError} [error]
+   * @returns {boolean}
+   */
+
+
+  _createClass(Transport, [{
+    key: 'disconnect',
+    value: function disconnect(error) {
+      if (this.state !== 'disconnected') {
+        this.preempt('disconnected', null, [error]);
+        this._session.terminate({
+          body: JSON.stringify({
+            type: 'disconnect',
+            version: VERSION
+          }),
+          extraHeaders: ['Content-Type: application/room-signaling+json']
+        });
+        this._eventPublisher.disconnect();
+        return true;
+      }
       return false;
-  }
-};
+    }
 
-/**
- * Publish (or queue) an event to the Insights gateway.
- * @method
- * @param {string} groupName - Event group name
- * @param {string} eventName - Event name
- * @param {object} payload - Event payload
- * @returns {boolean} true if queued or published, false if disconnected from the Insights gateway
- */
-Transport.prototype.publishEvent = function publishEvent(groupName, eventName, payload) {
-  return this._eventPublisher.publish(groupName, eventName, payload);
-};
+    /**
+     * Publish an RSP Update. Returns true if calling the method resulted in
+     * publishing (or eventually publishing) the update.
+     * @param {object} update
+     * @returns {boolean}
+     */
 
-/**
- * Sync the {@link Transport}. Returns true if calling the method resulted in
- * syncing.
- * @returns {boolean}
- */
-Transport.prototype.sync = function sync() {
-  if (this.state === 'connected') {
-    this.preempt('syncing');
-    this._session.sendReinvite();
-    return true;
-  }
-  return false;
-};
+  }, {
+    key: 'publish',
+    value: function publish(update) {
+      update = Object.assign({
+        type: 'update',
+        version: VERSION
+      }, update);
+      switch (this.state) {
+        case 'connected':
+          publishWithRetries(this, this._session, update);
+          return true;
+        case 'connecting':
+        case 'syncing':
+          this._updatesToSend.push(update);
+          return true;
+        case 'disconnected':
+        default:
+          return false;
+      }
+    }
+
+    /**
+     * Publish (or queue) an event to the Insights gateway.
+     * @param {string} groupName - Event group name
+     * @param {string} eventName - Event name
+     * @param {object} payload - Event payload
+     * @returns {boolean} true if queued or published, false if disconnected from the Insights gateway
+     */
+
+  }, {
+    key: 'publishEvent',
+    value: function publishEvent(groupName, eventName, payload) {
+      return this._eventPublisher.publish(groupName, eventName, payload);
+    }
+
+    /**
+     * Sync the {@link Transport}. Returns true if calling the method resulted in
+     * syncing.
+     * @returns {boolean}
+     */
+
+  }, {
+    key: 'sync',
+    value: function sync() {
+      if (this.state === 'connected') {
+        this.preempt('syncing');
+        this._session.sendReinvite();
+        return true;
+      }
+      return false;
+    }
+  }]);
+
+  return Transport;
+}(StateMachine);
 
 /**
  * @event Transport#connected
@@ -23150,10 +24531,7 @@ Transport.prototype.sync = function sync() {
 function createSession(transport, name, accessToken, localParticipant, peerConnectionManager, ua, SIPJSMediaHandler) {
   var target = 'sip:' + util.makeServerSIPURI();
   return ua.invite(target, {
-    extraHeaders: [
-      constants.headers.X_TWILIO_ACCESSTOKEN + ': ' + accessToken,
-      'Session-Expires: 120'
-    ],
+    extraHeaders: [constants.headers.X_TWILIO_ACCESSTOKEN + ': ' + accessToken, 'Session-Expires: 120'],
     media: { stream: {} },
     mediaHandlerFactory: function mediaHandlerFactory() {
       return new SIPJSMediaHandler(peerConnectionManager, function createMessage() {
@@ -23204,7 +24582,7 @@ function withJitter(value, jitter) {
 
 function publishWithRetries(transport, session, payload, attempts) {
   attempts = attempts || 0;
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     function receiveResponse(response) {
       switch (Math.floor(response.status_code / 100)) {
         case 2:
@@ -23214,8 +24592,7 @@ function publishWithRetries(transport, session, payload, attempts) {
           if (attempts < constants.PUBLISH_MAX_ATTEMPTS) {
             resolve(publishWithRetries(transport, session, payload, ++attempts));
           } else {
-            reject(new Error('Transport failed to send a message even '
-              + 'after ' + constants.PUBLISH_MAX_ATTEMPTS + ' attempts'));
+            reject(new Error('Transport failed to send a message even after ' + constants.PUBLISH_MAX_ATTEMPTS + ' attempts'));
           }
           break;
         default:
@@ -23228,11 +24605,7 @@ function publishWithRetries(transport, session, payload, attempts) {
       }
       session.sendRequest('INFO', {
         body: JSON.stringify(payload),
-        extraHeaders: [
-          'Content-Type: application/room-signaling+json',
-          'Event: room-signaling',
-          'Info-Package: room-signaling'
-        ],
+        extraHeaders: ['Content-Type: application/room-signaling+json', 'Event: room-signaling', 'Info-Package: room-signaling'],
         receiveResponse: receiveResponse
       });
     }
@@ -23241,13 +24614,13 @@ function publishWithRetries(transport, session, payload, attempts) {
       return;
     }
 
-    var backOffMs = (1 << (attempts - 1)) * constants.PUBLISH_BACKOFF_MS;
+    var backOffMs = (1 << attempts - 1) * constants.PUBLISH_BACKOFF_MS;
     setTimeout(sendRequest, withJitter(backOffMs, constants.PUBLISH_BACKOFF_JITTER));
   });
 }
 
 function reducePeerConnections(peerConnections) {
-  return Array.from(peerConnections.reduce(function(peerConnectionsById, update) {
+  return Array.from(peerConnections.reduce(function (peerConnectionsById, update) {
     var reduced = peerConnectionsById.get(update.id) || update;
 
     // First, reduce the top-level `description` property.
@@ -23276,7 +24649,7 @@ function reducePeerConnections(peerConnections) {
 }
 
 function reduceUpdates(updates) {
-  return updates.reduce(function(reduced, update) {
+  return updates.reduce(function (reduced, update) {
     // First, reduce the top-level `participant` property.
     if (!reduced.participant && update.participant) {
       reduced.participant = update.participant;
@@ -23291,8 +24664,7 @@ function reduceUpdates(updates) {
     if (!reduced.peer_connections && update.peer_connections) {
       reduced.peer_connections = reducePeerConnections(update.peer_connections);
     } else if (reduced.peer_connections && update.peer_connections) {
-      reduced.peer_connections = reducePeerConnections(
-        reduced.peer_connections.concat(update.peer_connections));
+      reduced.peer_connections = reducePeerConnections(reduced.peer_connections.concat(update.peer_connections));
     }
 
     return reduced;
@@ -23327,9 +24699,7 @@ function parseRequestOrResponseBody(requestOrResponse) {
 function getTwilioErrorFromRequestOrResponseBody(requestOrResponse) {
   try {
     var message = parseRequestOrResponseBody(requestOrResponse);
-    return message && message.type === 'error'
-      ? createTwilioError(message.code, message.message)
-      : null;
+    return message && message.type === 'error' ? createTwilioError(message.code, message.message) : null;
   } catch (error) {
     return error;
   }
@@ -23357,13 +24727,12 @@ function getTwilioErrorFromRequestOrResponseHeaders(requestOrResponse) {
  * @returns {?TwilioError}
  */
 function getTwilioErrorFromRequestOrResponse(requestOrResponse) {
-  return getTwilioErrorFromRequestOrResponseHeaders(requestOrResponse)
-    || getTwilioErrorFromRequestOrResponseBody(requestOrResponse);
+  return getTwilioErrorFromRequestOrResponseHeaders(requestOrResponse) || getTwilioErrorFromRequestOrResponseBody(requestOrResponse);
 }
 
 function setupEventListeners(transport, session, ua) {
   function disconnect(requestOrResponse, cause) {
-    var twilioError;
+    var twilioError = void 0;
 
     if (requestOrResponse && !(requestOrResponse instanceof SIP.OutgoingRequest)) {
       twilioError = getTwilioErrorFromRequestOrResponse(requestOrResponse);
@@ -23376,6 +24745,8 @@ function setupEventListeners(transport, session, ua) {
         case SIP.C.causes.CONNECTION_ERROR:
           twilioError = new SignalingConnectionError();
           break;
+        default:
+          twilioError = new SignalingConnectionDisconnectedError();
       }
     }
 
@@ -23389,7 +24760,7 @@ function setupEventListeners(transport, session, ua) {
     }
 
     // Handle any errors first.
-    var error;
+    var error = void 0;
     try {
       error = getTwilioErrorFromRequestOrResponse(requestOrResponse);
     } catch (e) {
@@ -23407,12 +24778,12 @@ function setupEventListeners(transport, session, ua) {
     }
 
     // Otherwise, try to parse the RSP message.
-    var message;
+    var message = void 0;
     try {
       message = parseRequestOrResponseBody(requestOrResponse);
-    } catch (e) {
-      // Do nothing.
-    }
+    } catch (e) {}
+    // Do nothing.
+
 
     // If there's no RSP message to handle, just return.
     if (!message) {
@@ -23486,17 +24857,19 @@ function setupEventListeners(transport, session, ua) {
   transport.on('stateChanged', function stateChanged(state) {
     switch (state) {
       case 'connected':
-        session.removeListener('accepted', handleRequestOrResponse);
-        session.removeListener('failed', disconnect);
+        {
+          session.removeListener('accepted', handleRequestOrResponse);
+          session.removeListener('failed', disconnect);
 
-        var updates = transport._updatesToSend.splice(0);
-        if (updates.length) {
-          transport.publish(reduceUpdates(updates));
+          var updates = transport._updatesToSend.splice(0);
+          if (updates.length) {
+            transport.publish(reduceUpdates(updates));
+          }
+
+          transport._updatesReceived.splice(0).forEach(transport.emit.bind(transport, 'message'));
+
+          return;
         }
-
-        transport._updatesReceived.splice(0).forEach(transport.emit.bind(transport, 'message'));
-
-        return;
       case 'disconnected':
         session.removeListener('accepted', handleRequestOrResponse);
         session.removeListener('failed', disconnect);
@@ -23515,11 +24888,13 @@ function setupEventListeners(transport, session, ua) {
   });
 
   ua.once('disconnected', disconnect);
+  ua.once('keepAliveTimeout', function () {
+    return transport.disconnect(new SignalingConnectionTimeoutError());
+  });
 }
 
 module.exports = Transport;
-
-},{"../../../package.json":144,"../../sip":115,"../../statemachine":116,"../../util":129,"../../util/constants":127,"../../util/insightspublisher":130,"../../util/insightspublisher/null":131,"../../util/twilio-video-errors":141,"./sipjsmediahandler":113,"util":149}],115:[function(require,module,exports){
+},{"../../../package.json":146,"../../sip":117,"../../statemachine":118,"../../util":131,"../../util/constants":129,"../../util/insightspublisher":132,"../../util/insightspublisher/null":133,"../../util/twilio-video-errors":143,"./sipjsmediahandler":115}],117:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -23536,382 +24911,427 @@ module.exports = require('@twilio/sip.js/src/SIP')({
   timers: toplevel,
   Transport: Transport
 });
-
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"@twilio/sip.js/src/SIP":19,"@twilio/sip.js/src/Transport":28,"ws":145}],116:[function(require,module,exports){
+},{"@twilio/sip.js/src/SIP":19,"@twilio/sip.js/src/Transport":28,"ws":147}],118:[function(require,module,exports){
 'use strict';
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var EventEmitter = require('events').EventEmitter;
-var inherits = require('util').inherits;
 var util = require('./util');
 
 /**
- * Construct a {@link StateMachine}.
- * @class
- * @classdesc {@link StateMachine} represents a state machine. The state
- * machine supports a reentrant locking mechanism to allow asynchronous state
- * transitions to ensure they have not been preempted. Calls to
- * {@link StateMachine#takeLock} are guaranteed to be resolved in FIFO order.
- * @extends {EventEmitter}
- * @param {string} initialState - the intiial state
- * @param {object} states
+ * {@link StateMachine} represents a state machine. The state machine supports a
+ * reentrant locking mechanism to allow asynchronous state transitions to ensure
+ * they have not been preempted. Calls to {@link StateMachine#takeLock} are
+ * guaranteed to be resolved in FIFO order.
+ * @extends EventEmitter
  * @property {boolean} isLocked - whether or not the {@link StateMachine} is
- * locked performing asynchronous state transition
+ *   locked performing asynchronous state transition
  * @property {string} state - the current state
  * @emits {@link StateMachine#stateChanged}
  */
-function StateMachine(initialState, states) {
-  EventEmitter.call(this);
-  var lock = null;
-  var state = initialState;
-  states = transformStates(states);
-  Object.defineProperties(this, {
-    _lock: {
-      get: function() {
-        return lock;
+
+var StateMachine = function (_EventEmitter) {
+  _inherits(StateMachine, _EventEmitter);
+
+  /**
+   * Construct a {@link StateMachine}.
+   * @param {string} initialState - the intiial state
+   * @param {object} states
+   */
+  function StateMachine(initialState, states) {
+    _classCallCheck(this, StateMachine);
+
+    var _this = _possibleConstructorReturn(this, (StateMachine.__proto__ || Object.getPrototypeOf(StateMachine)).call(this));
+
+    var lock = null;
+    var state = initialState;
+    states = transformStates(states);
+    Object.defineProperties(_this, {
+      _lock: {
+        get: function get() {
+          return lock;
+        },
+        set: function set(_lock) {
+          lock = _lock;
+        }
       },
-      set: function(_lock) {
-        lock = _lock;
-      }
-    },
-    _reachableStates: {
-      value: reachable(states)
-    },
-    _state: {
-      get: function() {
-        return state;
+      _reachableStates: {
+        value: reachable(states)
       },
-      set: function(_state) {
-        state = _state;
+      _state: {
+        get: function get() {
+          return state;
+        },
+        set: function set(_state) {
+          state = _state;
+        }
+      },
+      _states: {
+        value: states
+      },
+      _whenDeferreds: {
+        value: new Set()
+      },
+      isLocked: {
+        enumerable: true,
+        get: function get() {
+          return lock !== null;
+        }
+      },
+      state: {
+        enumerable: true,
+        get: function get() {
+          return state;
+        }
       }
-    },
-    _states: {
-      value: states
-    },
-    _whenDeferreds: {
-      value: new Set()
-    },
-    isLocked: {
-      enumerable: true,
-      get: function() {
-        return lock !== null;
-      }
-    },
-    state: {
-      enumerable: true,
-      get: function() {
-        return state;
-      }
-    }
-  });
-
-  var self = this;
-
-  this.on('stateChanged', function(state) {
-    self._whenDeferreds.forEach(function(deferred) {
-      deferred.when(state, deferred.resolve, deferred.reject);
     });
-  });
-}
 
-inherits(StateMachine, EventEmitter);
-
-/**
- * Returns a promise whose executor function is called on each state change.
- * @param {function(state: string, resolve: function, reject: function): void} when
- * @returns {Promise.<*>}
- * @private
- */
-StateMachine.prototype._whenPromise = function _whenPromise(when) {
-  if (typeof when !== 'function') {
-    return Promise.reject(new Error('when() executor must be a function'));
-  }
-
-  var deferred = util.defer();
-  var self = this;
-
-  deferred.when = when;
-  this._whenDeferreds.add(deferred);
-
-  return deferred.promise.then(function(payload) {
-    self._whenDeferreds.delete(deferred);
-    return payload;
-  }, function(error) {
-    self._whenDeferreds.delete(deferred);
-    throw error;
-  });
-};
-
-/**
- * This method takes a lock and passes the {@link StateMachine#Key} to your
- * transition function. You may perform zero or more state transitions in your
- * transition function, but you should check for preemption in each tick. You
- * may also reenter the lock. Once the Promise returned by your transition
- * function resolves or rejects, this method releases the lock it acquired for
- * you.
- * @param {string} name - a name for the lock
- * @param {function(StateMachine#Key): Promise} transitionFunction
- * @returns {Promise}
- */
-// NOTE(mroberts): This method is named after a Haskell function:
-// https://hackage.haskell.org/package/base-4.8.2.0/docs/Control-Exception.html#v:bracket
-StateMachine.prototype.bracket = function bracket(name, transitionFunction) {
-  var key;
-  var self = this;
-
-  function releaseLock(error) {
-    if (self.hasLock(key)) {
-      self.releaseLockCompletely(key);
-    }
-    if (error) {
-      throw error;
-    }
-  }
-
-  return this.takeLock(name).then(function gotKey(_key) {
-    key = _key;
-    return transitionFunction(key);
-  }).then(function success(result) {
-    releaseLock();
-    return result;
-  }, releaseLock);
-};
-
-/**
- * Check whether or not a {@link StateMachine#Key} matches the lock.
- * @param {StateMachine#Key} key
- * @returns {boolean}
- */
-StateMachine.prototype.hasLock = function hasLock(key) {
-  return this._lock === key;
-};
-
-/**
- * Preempt any pending state transitions and immediately transition to the new
- * state. If a lock name is specified, take the lock and return the
- * {@link StateMachine#Key}.
- * @param {string} newState
- * @param {?string} [name=null] - a name for the lock
- * @param {Array<*>} [payload=[]]
- * @returns {?StateMachine#Key}
- */
-StateMachine.prototype.preempt = function preempt(newState, name, payload) {
-  // 1. Check that the new state is valid.
-  if (!isValidTransition(this._states, this.state, newState)) {
-    throw new Error('Cannot transition from "' + this.state +
-      '" to "' + newState + '"');
-  }
-
-  // 2. Release the old lock, if any.
-  var oldLock;
-  if (this.isLocked) {
-    oldLock = this._lock;
-    this._lock = null;
-  }
-
-  // 3. Take the lock, if requested.
-  var key = null;
-  if (name) {
-    key = this.takeLockSync(name);
-  }
-
-  // 4. If a lock wasn't requested, take a "preemption" lock in order to
-  // maintain FIFO order of those taking locks.
-  var preemptionKey = key ? null : this.takeLockSync('preemption');
-
-  // 5. Transition.
-  this.transition(newState, key || preemptionKey, payload);
-
-  // 6. Preempt anyone blocked on the old lock.
-  if (oldLock) {
-    oldLock.resolve();
-  }
-
-  // 7. Release the "preemption" lock, if we took it.
-  if (preemptionKey) {
-    this.releaseLock(preemptionKey);
-  }
-
-  return key;
-};
-
-/**
- * Release a lock. This method succeeds only if the {@link StateMachine} is
- * still locked and has not been preempted.
- * @param {StateMachine#Key} key
- * @throws Error
- */
-StateMachine.prototype.releaseLock = function releaseLock(key) {
-  if (!this.isLocked) {
-    throw new Error('Could not release the lock for ' + key.name +
-      ' because the StateMachine is not locked');
-  } else if (!this.hasLock(key)) {
-    throw new Error('Could not release the lock for ' + key.name +
-      ' because ' + this._lock.name + ' has the lock');
-  }
-  if (key.depth === 0) {
-    this._lock = null;
-    key.resolve();
-  } else {
-    key.depth--;
-  }
-};
-
-/**
- * Release a lock completely, even if it has been reentered. This method
- * succeeds only if the {@link StateMachine} is still locked and has not been
- * preempted.
- * @param {StateMachine#Key} key
- * @throws Error
- */
-StateMachine.prototype.releaseLockCompletely = function releaseLockCompletely(
-  key) {
-  if (!this.isLocked) {
-    throw new Error('Could not release the lock for ' + key.name +
-      ' because the StateMachine is not locked');
-  } else if (!this.hasLock(key)) {
-    throw new Error('Could not release the lock for ' + key.name +
-      ' because ' + this._lock.name + ' has the lock');
-  }
-  key.depth = 0;
-  this._lock = null;
-  key.resolve();
-};
-
-/**
- * Take a lock, returning a Promise for the {@link StateMachine#Key}. You should
- * take a lock anytime you intend to perform asynchronous transitions. Calls to
- * this method are guaranteed to be resolved in FIFO order. You may reenter
- * a lock by passing its {@link StateMachine#Key}.
- * @param {string|StateMachine#Key} nameOrKey - a name for the lock or an
- * existing {@link StateMachine#Key}
- * @returns {Promise<object>}
- */
-StateMachine.prototype.takeLock = function takeLock(nameOrKey) {
-  // Reentrant lock
-  if (typeof nameOrKey === 'object') {
-    var key = nameOrKey;
-    var self = this;
-    return new Promise(function takeReentrantLock(resolve) {
-      resolve(self.takeLockSync(key));
+    _this.on('stateChanged', function (state) {
+      _this._whenDeferreds.forEach(function (deferred) {
+        deferred.when(state, deferred.resolve, deferred.reject);
+      });
     });
+    return _this;
   }
 
-  // New lock
-  var name = nameOrKey;
-  if (this.isLocked) {
-    var takeLock = this.takeLock.bind(this, name);
-    return this._lock.promise.then(takeLock);
-  }
-  return Promise.resolve(this.takeLockSync(name));
-};
+  /**
+   * Returns a promise whose executor function is called on each state change.
+   * @param {function(state: string, resolve: function, reject: function): void} when
+   * @returns {Promise.<*>}
+   * @private
+   */
 
-/**
- * Take a lock, returning the {@Link StateMachine#Key}. This method throws if
- * the {@link StateMachine} is locked or the wrong {@link StateMachine#Key} is
- * provided. You may reenter a lock by passing its {@link StateMachine#Key}.
- * @param {string|StateMachine#Key} nameOrKey - a name for the lock or an
- * existing {@link StateMachine#Key}
- * @returns {object}
- * @throws Error
- */
-StateMachine.prototype.takeLockSync = function takeLockSync(nameOrKey) {
-  var key = typeof nameOrKey === 'string' ? null : nameOrKey;
-  var name = key ? key.name : nameOrKey;
 
-  if (key && !this.hasLock(key) || !key && this.isLocked) {
-    throw new Error('Could not take the lock for ' + name + ' ' +
-      'because the lock for ' + this._lock.name + ' was not released');
-  }
+  _createClass(StateMachine, [{
+    key: '_whenPromise',
+    value: function _whenPromise(when) {
+      var _this2 = this;
 
-  // Reentrant lock
-  if (key) {
-    key.depth++;
-    return key;
-  }
+      if (typeof when !== 'function') {
+        return Promise.reject(new Error('when() executor must be a function'));
+      }
 
-  // New lock
-  var lock = makeLock(name);
-  this._lock = lock;
-  return lock;
-};
+      var deferred = util.defer();
 
-/**
- * Transition to a new state. If the {@link StateMachine} is locked, you must
- * provide the {@link StateMachine#Key}. An invalid state or the wrong
- * {@link StateMachine#Key} will throw an error.
- * @param {string} newState
- * @param {?StateMachine#Key} [key=null]
- * @param {Array<*>} [payload=[]]
- * @throws {Error}
- */
-StateMachine.prototype.transition = function transition(newState, key, payload) {
-  payload = payload || [];
+      deferred.when = when;
+      this._whenDeferreds.add(deferred);
 
-  // 1. If we're locked, required the key.
-  if (this.isLocked) {
-    if (!key) {
-      throw new Error('You must provide the key in order to ' +
-        'transition');
-    } else if (!this.hasLock(key)) {
-      throw new Error('Could not transition using the key for ' +
-        key.name + ' because ' + this._lock.name + ' has the lock');
+      return deferred.promise.then(function (payload) {
+        _this2._whenDeferreds.delete(deferred);
+        return payload;
+      }, function (error) {
+        _this2._whenDeferreds.delete(deferred);
+        throw error;
+      });
     }
-  } else if (key) {
-    throw new Error('Key provided for ' + key.name + ', but the ' +
-      'StateMachine was not locked (possibly due to preemption)');
-  }
 
-  // 2. Check that the new state is valid.
-  if (!isValidTransition(this._states, this.state, newState)) {
-    throw new Error('Cannot transition from "' + this.state +
-      '" to "' + newState + '"');
-  }
+    /**
+     * This method takes a lock and passes the {@link StateMachine#Key} to your
+     * transition function. You may perform zero or more state transitions in your
+     * transition function, but you should check for preemption in each tick. You
+     * may also reenter the lock. Once the Promise returned by your transition
+     * function resolves or rejects, this method releases the lock it acquired for
+     * you.
+     * @param {string} name - a name for the lock
+     * @param {function(StateMachine#Key): Promise} transitionFunction
+     * @returns {Promise}
+     */
+    // NOTE(mroberts): This method is named after a Haskell function:
+    // https://hackage.haskell.org/package/base-4.8.2.0/docs/Control-Exception.html#v:bracket
 
-  // 3. Update the state and emit an event.
-  this._state = newState;
-  this.emit.apply(this, ['stateChanged', newState].concat(payload));
-};
+  }, {
+    key: 'bracket',
+    value: function bracket(name, transitionFunction) {
+      var key = void 0;
+      var self = this;
 
-/**
- * Attempt to transition to a new state. Unlike {@link StateMachine#transition},
- * this method does not throw.
- * @param {string} newState
- * @param {?StateMachine#Key} [key=null]
- * @param {Array<*>} [payload=[]]
- * @returns {boolean}
- */
-StateMachine.prototype.tryTransition = function tryTransition(newState, key, payload) {
-  try {
-    this.transition(newState, key, payload);
-  } catch (error) {
-    return false;
-  }
-  return true;
-};
+      function releaseLock(error) {
+        if (self.hasLock(key)) {
+          self.releaseLockCompletely(key);
+        }
+        if (error) {
+          throw error;
+        }
+      }
 
-/**
- * Return a Promise that resolves when the {@link StateMachine} transitions to
- * the specified state. If the {@link StateMachine} transitions such that the
- * requested state becomes unreachable, the Promise rejects.
- * @param {string} state
- * @returns {Promise<this>}
- */
-StateMachine.prototype.when = function when(state) {
-  var self = this;
-  if (this.state === state) {
-    return Promise.resolve(this);
-  } else if (!isValidTransition(this._reachableStates, this.state, state)) {
-    return Promise.reject(createUnreachableError(this.state, state));
-  }
-  return this._whenPromise(function when(newState, resolve, reject) {
-    if (newState === state) {
-      resolve(self);
-    } else if (!isValidTransition(self._reachableStates, newState, state)) {
-      reject(createUnreachableError(newState, state));
+      return this.takeLock(name).then(function gotKey(_key) {
+        key = _key;
+        return transitionFunction(key);
+      }).then(function success(result) {
+        releaseLock();
+        return result;
+      }, releaseLock);
     }
-  });
-};
+
+    /**
+     * Check whether or not a {@link StateMachine#Key} matches the lock.
+     * @param {StateMachine#Key} key
+     * @returns {boolean}
+     */
+
+  }, {
+    key: 'hasLock',
+    value: function hasLock(key) {
+      return this._lock === key;
+    }
+
+    /**
+     * Preempt any pending state transitions and immediately transition to the new
+     * state. If a lock name is specified, take the lock and return the
+     * {@link StateMachine#Key}.
+     * @param {string} newState
+     * @param {?string} [name=null] - a name for the lock
+     * @param {Array<*>} [payload=[]]
+     * @returns {?StateMachine#Key}
+     */
+
+  }, {
+    key: 'preempt',
+    value: function preempt(newState, name, payload) {
+      // 1. Check that the new state is valid.
+      if (!isValidTransition(this._states, this.state, newState)) {
+        throw new Error('Cannot transition from "' + this.state + '" to "' + newState + '"');
+      }
+
+      // 2. Release the old lock, if any.
+      var oldLock = void 0;
+      if (this.isLocked) {
+        oldLock = this._lock;
+        this._lock = null;
+      }
+
+      // 3. Take the lock, if requested.
+      var key = null;
+      if (name) {
+        key = this.takeLockSync(name);
+      }
+
+      // 4. If a lock wasn't requested, take a "preemption" lock in order to
+      // maintain FIFO order of those taking locks.
+      var preemptionKey = key ? null : this.takeLockSync('preemption');
+
+      // 5. Transition.
+      this.transition(newState, key || preemptionKey, payload);
+
+      // 6. Preempt anyone blocked on the old lock.
+      if (oldLock) {
+        oldLock.resolve();
+      }
+
+      // 7. Release the "preemption" lock, if we took it.
+      if (preemptionKey) {
+        this.releaseLock(preemptionKey);
+      }
+
+      return key;
+    }
+
+    /**
+     * Release a lock. This method succeeds only if the {@link StateMachine} is
+     * still locked and has not been preempted.
+     * @param {StateMachine#Key} key
+     * @throws Error
+     */
+
+  }, {
+    key: 'releaseLock',
+    value: function releaseLock(key) {
+      if (!this.isLocked) {
+        throw new Error('Could not release the lock for ' + key.name + ' because the StateMachine is not locked');
+      } else if (!this.hasLock(key)) {
+        throw new Error('Could not release the lock for ' + key.name + ' because ' + this._lock.name + ' has the lock');
+      }
+      if (key.depth === 0) {
+        this._lock = null;
+        key.resolve();
+      } else {
+        key.depth--;
+      }
+    }
+
+    /**
+     * Release a lock completely, even if it has been reentered. This method
+     * succeeds only if the {@link StateMachine} is still locked and has not been
+     * preempted.
+     * @param {StateMachine#Key} key
+     * @throws Error
+     */
+
+  }, {
+    key: 'releaseLockCompletely',
+    value: function releaseLockCompletely(key) {
+      if (!this.isLocked) {
+        throw new Error('Could not release the lock for ' + key.name + ' because the StateMachine is not locked');
+      } else if (!this.hasLock(key)) {
+        throw new Error('Could not release the lock for ' + key.name + ' because ' + this._lock.name + ' has the lock');
+      }
+      key.depth = 0;
+      this._lock = null;
+      key.resolve();
+    }
+
+    /**
+     * Take a lock, returning a Promise for the {@link StateMachine#Key}. You should
+     * take a lock anytime you intend to perform asynchronous transitions. Calls to
+     * this method are guaranteed to be resolved in FIFO order. You may reenter
+     * a lock by passing its {@link StateMachine#Key}.
+     * @param {string|StateMachine#Key} nameOrKey - a name for the lock or an
+     * existing {@link StateMachine#Key}
+     * @returns {Promise<object>}
+     */
+
+  }, {
+    key: 'takeLock',
+    value: function takeLock(nameOrKey) {
+      var _this3 = this;
+
+      // Reentrant lock
+      if ((typeof nameOrKey === 'undefined' ? 'undefined' : _typeof(nameOrKey)) === 'object') {
+        var key = nameOrKey;
+        return new Promise(function (resolve) {
+          resolve(_this3.takeLockSync(key));
+        });
+      }
+
+      // New lock
+      var name = nameOrKey;
+      if (this.isLocked) {
+        var takeLock = this.takeLock.bind(this, name);
+        return this._lock.promise.then(takeLock);
+      }
+      return Promise.resolve(this.takeLockSync(name));
+    }
+
+    /**
+     * Take a lock, returning the {@Link StateMachine#Key}. This method throws if
+     * the {@link StateMachine} is locked or the wrong {@link StateMachine#Key} is
+     * provided. You may reenter a lock by passing its {@link StateMachine#Key}.
+     * @param {string|StateMachine#Key} nameOrKey - a name for the lock or an
+     * existing {@link StateMachine#Key}
+     * @returns {object}
+     * @throws Error
+     */
+
+  }, {
+    key: 'takeLockSync',
+    value: function takeLockSync(nameOrKey) {
+      var key = typeof nameOrKey === 'string' ? null : nameOrKey;
+      var name = key ? key.name : nameOrKey;
+
+      if (key && !this.hasLock(key) || !key && this.isLocked) {
+        throw new Error('Could not take the lock for ' + name + ' because the lock for ' + this._lock.name + ' was not released');
+      }
+
+      // Reentrant lock
+      if (key) {
+        key.depth++;
+        return key;
+      }
+
+      // New lock
+      var lock = makeLock(name);
+      this._lock = lock;
+      return lock;
+    }
+
+    /**
+     * Transition to a new state. If the {@link StateMachine} is locked, you must
+     * provide the {@link StateMachine#Key}. An invalid state or the wrong
+     * {@link StateMachine#Key} will throw an error.
+     * @param {string} newState
+     * @param {?StateMachine#Key} [key=null]
+     * @param {Array<*>} [payload=[]]
+     * @throws {Error}
+     */
+
+  }, {
+    key: 'transition',
+    value: function transition(newState, key, payload) {
+      payload = payload || [];
+
+      // 1. If we're locked, required the key.
+      if (this.isLocked) {
+        if (!key) {
+          throw new Error('You must provide the key in order to ' + 'transition');
+        } else if (!this.hasLock(key)) {
+          throw new Error('Could not transition using the key for ' + key.name + ' because ' + this._lock.name + ' has the lock');
+        }
+      } else if (key) {
+        throw new Error('Key provided for ' + key.name + ', but the StateMachine was not locked (possibly due to preemption)');
+      }
+
+      // 2. Check that the new state is valid.
+      if (!isValidTransition(this._states, this.state, newState)) {
+        throw new Error('Cannot transition from "' + this.state + '" to "' + newState + '"');
+      }
+
+      // 3. Update the state and emit an event.
+      this._state = newState;
+      this.emit.apply(this, _toConsumableArray(['stateChanged', newState].concat(payload)));
+    }
+
+    /**
+     * Attempt to transition to a new state. Unlike {@link StateMachine#transition},
+     * this method does not throw.
+     * @param {string} newState
+     * @param {?StateMachine#Key} [key=null]
+     * @param {Array<*>} [payload=[]]
+     * @returns {boolean}
+     */
+
+  }, {
+    key: 'tryTransition',
+    value: function tryTransition(newState, key, payload) {
+      try {
+        this.transition(newState, key, payload);
+      } catch (error) {
+        return false;
+      }
+      return true;
+    }
+
+    /**
+     * Return a Promise that resolves when the {@link StateMachine} transitions to
+     * the specified state. If the {@link StateMachine} transitions such that the
+     * requested state becomes unreachable, the Promise rejects.
+     * @param {string} state
+     * @returns {Promise<this>}
+     */
+
+  }, {
+    key: 'when',
+    value: function when(state) {
+      var _this4 = this;
+
+      if (this.state === state) {
+        return Promise.resolve(this);
+      } else if (!isValidTransition(this._reachableStates, this.state, state)) {
+        return Promise.reject(createUnreachableError(this.state, state));
+      }
+      return this._whenPromise(function (newState, resolve, reject) {
+        if (newState === state) {
+          resolve(_this4);
+        } else if (!isValidTransition(_this4._reachableStates, newState, state)) {
+          reject(createUnreachableError(newState, state));
+        }
+      });
+    }
+  }]);
+
+  return StateMachine;
+}(EventEmitter);
 
 /**
  * @event StateMachine#stateChanged
@@ -23926,6 +25346,8 @@ StateMachine.prototype.when = function when(state) {
  * @param {*} to
  * @returns {boolean}
  */
+
+
 function isValidTransition(graph, from, to) {
   return graph.get(from).has(to);
 }
@@ -23949,7 +25371,7 @@ function makeLock(name) {
  * @returns {Map<*, Set<*>>}
  */
 function reachable(graph) {
-  return Array.from(graph.keys()).reduce(function(newGraph, from) {
+  return Array.from(graph.keys()).reduce(function (newGraph, from) {
     return newGraph.set(from, reachableFrom(graph, from));
   }, new Map());
 }
@@ -23964,7 +25386,7 @@ function reachable(graph) {
  */
 function reachableFrom(graph, from, to) {
   to = to || new Set();
-  graph.get(from).forEach(function(node) {
+  graph.get(from).forEach(function (node) {
     if (!to.has(node)) {
       to.add(node);
       reachableFrom(graph, node, to).forEach(to.add, to);
@@ -23992,11 +25414,15 @@ function createUnreachableError(here, there) {
 }
 
 module.exports = StateMachine;
-
-},{"./util":129,"events":54,"util":149}],117:[function(require,module,exports){
+},{"./util":131,"events":152}],119:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var LocalTrackStats = require('./localtrackstats');
 
 /**
@@ -24004,30 +25430,35 @@ var LocalTrackStats = require('./localtrackstats');
  * @extends LocalTrackStats
  * @property {?AudioLevel} audioLevel - Input {@link AudioLevel}
  * @property {?number} jitter - Audio jitter in milliseconds
- * @param {string} trackId - {@link LocalAudioTrack} ID
- * @param {StandardizedTrackStatsReport} statsReport
- * @constructor
  */
-function LocalAudioTrackStats(trackId, statsReport) {
-  LocalTrackStats.call(this, trackId, statsReport);
 
-  Object.defineProperties(this, {
-    audioLevel: {
-      value: typeof statsReport.audioInputLevel === 'number'
-        ? statsReport.audioInputLevel
-        : null,
-      enumerable: true
-    },
-    jitter: {
-      value: typeof statsReport.jitter === 'number'
-        ? statsReport.jitter
-        : null,
-      enumerable: true
-    }
-  });
-}
+var LocalAudioTrackStats = function (_LocalTrackStats) {
+  _inherits(LocalAudioTrackStats, _LocalTrackStats);
 
-inherits(LocalAudioTrackStats, LocalTrackStats);
+  /**
+   * @param {string} trackId - {@link LocalAudioTrack} ID
+   * @param {StandardizedTrackStatsReport} statsReport
+   */
+  function LocalAudioTrackStats(trackId, statsReport) {
+    _classCallCheck(this, LocalAudioTrackStats);
+
+    var _this = _possibleConstructorReturn(this, (LocalAudioTrackStats.__proto__ || Object.getPrototypeOf(LocalAudioTrackStats)).call(this, trackId, statsReport));
+
+    Object.defineProperties(_this, {
+      audioLevel: {
+        value: typeof statsReport.audioInputLevel === 'number' ? statsReport.audioInputLevel : null,
+        enumerable: true
+      },
+      jitter: {
+        value: typeof statsReport.jitter === 'number' ? statsReport.jitter : null,
+        enumerable: true
+      }
+    });
+    return _this;
+  }
+
+  return LocalAudioTrackStats;
+}(LocalTrackStats);
 
 /**
  * The maximum absolute amplitude of a set of audio samples in the
@@ -24036,11 +25467,15 @@ inherits(LocalAudioTrackStats, LocalTrackStats);
  */
 
 module.exports = LocalAudioTrackStats;
-
-},{"./localtrackstats":118,"util":149}],118:[function(require,module,exports){
+},{"./localtrackstats":120}],120:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var TrackStats = require('./trackstats');
 
 /**
@@ -24049,43 +25484,50 @@ var TrackStats = require('./trackstats');
  * @property {?number} bytesSent - Number of bytes sent
  * @property {?number} packetsSent - Number of packets sent
  * @property {?number} roundTripTime - Round trip time in milliseconds
- * @param {string} trackId - {@link LocalTrack} ID
- * @param {StandardizedTrackStatsReport} statsReport
- * @constructor
  */
-function LocalTrackStats(trackId, statsReport) {
-  TrackStats.call(this, trackId, statsReport);
 
-  Object.defineProperties(this, {
-    bytesSent: {
-      value: typeof statsReport.bytesSent === 'number'
-        ? statsReport.bytesSent
-        : null,
-      enumerable: true
-    },
-    packetsSent: {
-      value: typeof statsReport.packetsSent === 'number'
-        ? statsReport.packetsSent
-        : null,
-      enumerable: true
-    },
-    roundTripTime: {
-      value: typeof statsReport.roundTripTime === 'number'
-        ? statsReport.roundTripTime
-        : null,
-      enumerable: true
-    }
-  });
-}
+var LocalTrackStats = function (_TrackStats) {
+  _inherits(LocalTrackStats, _TrackStats);
 
-inherits(LocalTrackStats, TrackStats);
+  /**
+   * @param {string} trackId - {@link LocalTrack} ID
+   * @param {StandardizedTrackStatsReport} statsReport
+   */
+  function LocalTrackStats(trackId, statsReport) {
+    _classCallCheck(this, LocalTrackStats);
+
+    var _this = _possibleConstructorReturn(this, (LocalTrackStats.__proto__ || Object.getPrototypeOf(LocalTrackStats)).call(this, trackId, statsReport));
+
+    Object.defineProperties(_this, {
+      bytesSent: {
+        value: typeof statsReport.bytesSent === 'number' ? statsReport.bytesSent : null,
+        enumerable: true
+      },
+      packetsSent: {
+        value: typeof statsReport.packetsSent === 'number' ? statsReport.packetsSent : null,
+        enumerable: true
+      },
+      roundTripTime: {
+        value: typeof statsReport.roundTripTime === 'number' ? statsReport.roundTripTime : null,
+        enumerable: true
+      }
+    });
+    return _this;
+  }
+
+  return LocalTrackStats;
+}(TrackStats);
 
 module.exports = LocalTrackStats;
-
-},{"./trackstats":124,"util":149}],119:[function(require,module,exports){
+},{"./trackstats":126}],121:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var LocalTrackStats = require('./localtrackstats');
 
 /**
@@ -24095,79 +25537,86 @@ var LocalTrackStats = require('./localtrackstats');
  * @property {?VideoTrack#Dimensions} dimensions - Video encoding resolution
  * @property {?number} captureFrameRate - Video capture frame rate
  * @property {?number} frameRate - Video encoding frame rate
- * @param {string} trackId - {@link LocalVideoTrack} ID
- * @param {StandardizedTrackStatsReport} statsReport
- * @constructor
  */
-function LocalVideoTrackStats(trackId, statsReport) {
-  LocalTrackStats.call(this, trackId, statsReport);
 
-  var captureDimensions = null;
-  if (typeof statsReport.frameWidthInput === 'number' &&
-      typeof statsReport.frameHeightInput === 'number') {
-    captureDimensions = {};
+var LocalVideoTrackStats = function (_LocalTrackStats) {
+  _inherits(LocalVideoTrackStats, _LocalTrackStats);
 
-    Object.defineProperties(captureDimensions, {
-      width: {
-        value: statsReport.frameWidthInput,
-        enumerable: true
-      },
-      height: {
-        value: statsReport.frameHeightInput,
-        enumerable: true
-      }
-    });
-  }
+  /**
+   * @param {string} trackId - {@link LocalVideoTrack} ID
+   * @param {StandardizedTrackStatsReport} statsReport
+   */
+  function LocalVideoTrackStats(trackId, statsReport) {
+    _classCallCheck(this, LocalVideoTrackStats);
 
-  var dimensions = null;
-  if (typeof statsReport.frameWidthSent === 'number' &&
-      typeof statsReport.frameHeightSent === 'number') {
-    dimensions = {};
+    var _this = _possibleConstructorReturn(this, (LocalVideoTrackStats.__proto__ || Object.getPrototypeOf(LocalVideoTrackStats)).call(this, trackId, statsReport));
 
-    Object.defineProperties(dimensions, {
-      width: {
-        value: statsReport.frameWidthSent,
-        enumerable: true
-      },
-      height: {
-        value: statsReport.frameHeightSent,
-        enumerable: true
-      }
-    });
-  }
+    var captureDimensions = null;
+    if (typeof statsReport.frameWidthInput === 'number' && typeof statsReport.frameHeightInput === 'number') {
+      captureDimensions = {};
 
-  Object.defineProperties(this, {
-    captureDimensions: {
-      value: captureDimensions,
-      enumerable: true
-    },
-    dimensions: {
-      value: dimensions,
-      enumerable: true
-    },
-    captureFrameRate: {
-      value: typeof statsReport.frameRateInput === 'number'
-        ? statsReport.frameRateInput
-        : null,
-      enumerable: true
-    },
-    frameRate: {
-      value: typeof statsReport.frameRateSent === 'number'
-        ? statsReport.frameRateSent
-        : null,
-      enumerable: true
+      Object.defineProperties(captureDimensions, {
+        width: {
+          value: statsReport.frameWidthInput,
+          enumerable: true
+        },
+        height: {
+          value: statsReport.frameHeightInput,
+          enumerable: true
+        }
+      });
     }
-  });
-}
 
-inherits(LocalVideoTrackStats, LocalTrackStats);
+    var dimensions = null;
+    if (typeof statsReport.frameWidthSent === 'number' && typeof statsReport.frameHeightSent === 'number') {
+      dimensions = {};
+
+      Object.defineProperties(dimensions, {
+        width: {
+          value: statsReport.frameWidthSent,
+          enumerable: true
+        },
+        height: {
+          value: statsReport.frameHeightSent,
+          enumerable: true
+        }
+      });
+    }
+
+    Object.defineProperties(_this, {
+      captureDimensions: {
+        value: captureDimensions,
+        enumerable: true
+      },
+      dimensions: {
+        value: dimensions,
+        enumerable: true
+      },
+      captureFrameRate: {
+        value: typeof statsReport.frameRateInput === 'number' ? statsReport.frameRateInput : null,
+        enumerable: true
+      },
+      frameRate: {
+        value: typeof statsReport.frameRateSent === 'number' ? statsReport.frameRateSent : null,
+        enumerable: true
+      }
+    });
+    return _this;
+  }
+
+  return LocalVideoTrackStats;
+}(LocalTrackStats);
 
 module.exports = LocalVideoTrackStats;
-
-},{"./localtrackstats":118,"util":149}],120:[function(require,module,exports){
+},{"./localtrackstats":120}],122:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var RemoteTrackStats = require('./remotetrackstats');
 
 /**
@@ -24175,37 +25624,46 @@ var RemoteTrackStats = require('./remotetrackstats');
  * @extends RemoteTrackStats
  * @property {?AudioLevel} audioLevel - Output {@link AudioLevel}
  * @property {?number} jitter - Audio jitter in milliseconds
- * @param {string} trackId - {@link AudioTrack} ID
- * @param {StandardizedTrackStatsReport} statsReport
- * @constructor
  */
-function RemoteAudioTrackStats(trackId, statsReport) {
-  RemoteTrackStats.call(this, trackId, statsReport);
 
-  Object.defineProperties(this, {
-    audioLevel: {
-      value: typeof statsReport.audioOutputLevel === 'number'
-        ? statsReport.audioOutputLevel
-        : null,
-      enumerable: true
-    },
-    jitter: {
-      value: typeof statsReport.jitter === 'number'
-        ? statsReport.jitter
-        : null,
-      enumerable: true
-    }
-  });
-}
+var RemoteAudioTrackStats = function (_RemoteTrackStats) {
+  _inherits(RemoteAudioTrackStats, _RemoteTrackStats);
 
-inherits(RemoteAudioTrackStats, RemoteTrackStats);
+  /**
+   * @param {string} trackId - {@link AudioTrack} ID
+   * @param {StandardizedTrackStatsReport} statsReport
+   */
+  function RemoteAudioTrackStats(trackId, statsReport) {
+    _classCallCheck(this, RemoteAudioTrackStats);
+
+    var _this = _possibleConstructorReturn(this, (RemoteAudioTrackStats.__proto__ || Object.getPrototypeOf(RemoteAudioTrackStats)).call(this, trackId, statsReport));
+
+    Object.defineProperties(_this, {
+      audioLevel: {
+        value: typeof statsReport.audioOutputLevel === 'number' ? statsReport.audioOutputLevel : null,
+        enumerable: true
+      },
+      jitter: {
+        value: typeof statsReport.jitter === 'number' ? statsReport.jitter : null,
+        enumerable: true
+      }
+    });
+    return _this;
+  }
+
+  return RemoteAudioTrackStats;
+}(RemoteTrackStats);
 
 module.exports = RemoteAudioTrackStats;
-
-},{"./remotetrackstats":121,"util":149}],121:[function(require,module,exports){
+},{"./remotetrackstats":123}],123:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var TrackStats = require('./trackstats');
 
 /**
@@ -24213,37 +25671,46 @@ var TrackStats = require('./trackstats');
  * @extends TrackStats
  * @property {?number} bytesReceived - Number of bytes received
  * @property {?number} packetsReceived - Number of packets received
- * @param {string} trackId - {@link Track} ID
- * @param {StandardizedTrackStatsReport} statsReport
- * @constructor
  */
-function RemoteTrackStats(trackId, statsReport) {
-  TrackStats.call(this, trackId, statsReport);
 
-  Object.defineProperties(this, {
-    bytesReceived: {
-      value: typeof statsReport.bytesReceived === 'number'
-        ? statsReport.bytesReceived
-        : null,
-      enumerable: true
-    },
-    packetsReceived: {
-      value: typeof statsReport.packetsReceived === 'number'
-        ? statsReport.packetsReceived
-        : null,
-      enumerable: true
-    }
-  });
-}
+var RemoteTrackStats = function (_TrackStats) {
+  _inherits(RemoteTrackStats, _TrackStats);
 
-inherits(RemoteTrackStats, TrackStats);
+  /*
+   * @param {string} trackId - {@link Track} ID
+   * @param {StandardizedTrackStatsReport} statsReport
+   */
+  function RemoteTrackStats(trackId, statsReport) {
+    _classCallCheck(this, RemoteTrackStats);
+
+    var _this = _possibleConstructorReturn(this, (RemoteTrackStats.__proto__ || Object.getPrototypeOf(RemoteTrackStats)).call(this, trackId, statsReport));
+
+    Object.defineProperties(_this, {
+      bytesReceived: {
+        value: typeof statsReport.bytesReceived === 'number' ? statsReport.bytesReceived : null,
+        enumerable: true
+      },
+      packetsReceived: {
+        value: typeof statsReport.packetsReceived === 'number' ? statsReport.packetsReceived : null,
+        enumerable: true
+      }
+    });
+    return _this;
+  }
+
+  return RemoteTrackStats;
+}(TrackStats);
 
 module.exports = RemoteTrackStats;
-
-},{"./trackstats":124,"util":149}],122:[function(require,module,exports){
+},{"./trackstats":126}],124:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var RemoteTrackStats = require('./remotetrackstats');
 
 /**
@@ -24251,50 +25718,57 @@ var RemoteTrackStats = require('./remotetrackstats');
  * @extends RemoteTrackStats
  * @property {?VideoTrack#Dimensions} dimensions - Received video resolution
  * @property {?number} frameRate - Received video frame rate
- * @param {string} trackId - {@link VideoTrack} ID
- * @param {StandardizedTrackStatsReport} statsReport
- * @constructor
  */
-function RemoteVideoTrackStats(trackId, statsReport) {
-  RemoteTrackStats.call(this, trackId, statsReport);
 
-  var dimensions = null;
-  if (typeof statsReport.frameWidthReceived === 'number' &&
-      typeof statsReport.frameHeightReceived === 'number') {
-    dimensions = {};
+var RemoteVideoTrackStats = function (_RemoteTrackStats) {
+  _inherits(RemoteVideoTrackStats, _RemoteTrackStats);
 
-    Object.defineProperties(dimensions, {
-      width: {
-        value: statsReport.frameWidthReceived,
+  /**
+   * @param {string} trackId - {@link VideoTrack} ID
+   * @param {StandardizedTrackStatsReport} statsReport
+   */
+  function RemoteVideoTrackStats(trackId, statsReport) {
+    _classCallCheck(this, RemoteVideoTrackStats);
+
+    var _this = _possibleConstructorReturn(this, (RemoteVideoTrackStats.__proto__ || Object.getPrototypeOf(RemoteVideoTrackStats)).call(this, trackId, statsReport));
+
+    var dimensions = null;
+    if (typeof statsReport.frameWidthReceived === 'number' && typeof statsReport.frameHeightReceived === 'number') {
+      dimensions = {};
+
+      Object.defineProperties(dimensions, {
+        width: {
+          value: statsReport.frameWidthReceived,
+          enumerable: true
+        },
+        height: {
+          value: statsReport.frameHeightReceived,
+          enumerable: true
+        }
+      });
+    }
+
+    Object.defineProperties(_this, {
+      dimensions: {
+        value: dimensions,
         enumerable: true
       },
-      height: {
-        value: statsReport.frameHeightReceived,
+      frameRate: {
+        value: typeof statsReport.frameRateReceived === 'number' ? statsReport.frameRateReceived : null,
         enumerable: true
       }
     });
+    return _this;
   }
 
-  Object.defineProperties(this, {
-    dimensions: {
-      value: dimensions,
-      enumerable: true
-    },
-    frameRate: {
-      value: typeof statsReport.frameRateReceived === 'number'
-        ? statsReport.frameRateReceived
-        : null,
-      enumerable: true
-    }
-  });
-}
-
-inherits(RemoteVideoTrackStats, RemoteTrackStats);
+  return RemoteVideoTrackStats;
+}(RemoteTrackStats);
 
 module.exports = RemoteVideoTrackStats;
-
-},{"./remotetrackstats":121,"util":149}],123:[function(require,module,exports){
+},{"./remotetrackstats":123}],125:[function(require,module,exports){
 'use strict';
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var LocalAudioTrackStats = require('./localaudiotrackstats');
 var LocalVideoTrackStats = require('./localvideotrackstats');
@@ -24307,11 +25781,16 @@ var RemoteVideoTrackStats = require('./remotevideotrackstats');
  * @property {Array<LocalVideoTrackStats>} localVideoTrackStats - List of {@link LocalVideoTrackStats}
  * @property {Array<RemoteAudioTrackStats>} remoteAudioTrackStats - List of {@link RemoteAudioTrackStats}
  * @property {Array<RemoteVideoTrackStats>} remoteVideoTrackStats - List of {@link RemoteVideoTrackStats}
+ */
+
+var StatsReport =
+/**
  * @param {string} peerConnectionId - RTCPeerConnection ID
  * @param {StandardizedStatsResponse} statsResponse
- * @constructor
  */
 function StatsReport(peerConnectionId, statsResponse) {
+  _classCallCheck(this, StatsReport);
+
   if (typeof peerConnectionId !== 'string') {
     throw new Error('RTCPeerConnection id must be a string');
   }
@@ -24322,35 +25801,34 @@ function StatsReport(peerConnectionId, statsResponse) {
       enumerable: true
     },
     localAudioTrackStats: {
-      value: statsResponse.localAudioTrackStats.map(function(report) {
+      value: statsResponse.localAudioTrackStats.map(function (report) {
         return new LocalAudioTrackStats(report.trackId, report);
       }),
       enumerable: true
     },
     localVideoTrackStats: {
-      value: statsResponse.localVideoTrackStats.map(function(report) {
+      value: statsResponse.localVideoTrackStats.map(function (report) {
         return new LocalVideoTrackStats(report.trackId, report);
       }),
       enumerable: true
     },
     remoteAudioTrackStats: {
-      value: statsResponse.remoteAudioTrackStats.map(function(report) {
+      value: statsResponse.remoteAudioTrackStats.map(function (report) {
         return new RemoteAudioTrackStats(report.trackId, report);
       }),
       enumerable: true
     },
     remoteVideoTrackStats: {
-      value: statsResponse.remoteVideoTrackStats.map(function(report) {
+      value: statsResponse.remoteVideoTrackStats.map(function (report) {
         return new RemoteVideoTrackStats(report.trackId, report);
       }),
       enumerable: true
     }
   });
-}
+};
 
 module.exports = StatsReport;
-
-},{"./localaudiotrackstats":117,"./localvideotrackstats":119,"./remoteaudiotrackstats":120,"./remotevideotrackstats":122}],124:[function(require,module,exports){
+},{"./localaudiotrackstats":119,"./localvideotrackstats":121,"./remoteaudiotrackstats":122,"./remotevideotrackstats":124}],126:[function(require,module,exports){
 'use strict';
 
 /**
@@ -24360,11 +25838,18 @@ module.exports = StatsReport;
  * @property {string} ssrc - SSRC of the MediaStreamTrack
  * @property {?number} packetsLost - Then number of packets lost
  * @property {?string} codec - Name of the codec used to encode the MediaStreamTrack's media
+ */
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var TrackStats =
+/**
  * @param {string} trackId - {@link Track} ID
  * @param {StandardizedTrackStatsReport} statsReport
- * @constructor
  */
 function TrackStats(trackId, statsReport) {
+  _classCallCheck(this, TrackStats);
+
   if (typeof trackId !== 'string') {
     throw new Error('Track id must be a string');
   }
@@ -24383,177 +25868,222 @@ function TrackStats(trackId, statsReport) {
       enumerable: true
     },
     packetsLost: {
-      value: typeof statsReport.packetsLost === 'number'
-        ? statsReport.packetsLost
-        : null,
+      value: typeof statsReport.packetsLost === 'number' ? statsReport.packetsLost : null,
       enumerable: true
     },
     codec: {
-      value: typeof statsReport.codecName === 'string'
-        ? statsReport.codecName
-        : null,
+      value: typeof statsReport.codecName === 'string' ? statsReport.codecName : null,
       enumerable: true
     }
   });
-}
+};
 
 module.exports = TrackStats;
-
-},{}],125:[function(require,module,exports){
+},{}],127:[function(require,module,exports){
 'use strict';
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var EventEmitter = require('events').EventEmitter;
+
 /**
- * Construct a {@link TrackTransceiver}.
- * @class
- * @classdesc A {@link TrackTransceiver} represents either one or more
- *   local RTCRtpSenders or RTCDataChannels, or a single RTCRtpReceiver
- *   or remote RTCDataChannel.
- * @param {Track.ID} id
- * @param {Track.kind} kind
+ * A {@link TrackTransceiver} represents either one or more local RTCRtpSenders
+ * or RTCDataChannels, or a single RTCRtpReceiver or remote RTCDataChannel.
+ * @extends EventEmitter
  * @property {Track.ID} id
  * @property {Track.kind} kind
  */
-function TrackTransceiver(id, kind) {
-  Object.defineProperties(this, {
-    id: {
-      enumerable: true,
-      value: id
-    },
-    kind: {
-      enumerable: true,
-      value: kind
-    }
-  });
-}
+
+var TrackTransceiver = function (_EventEmitter) {
+  _inherits(TrackTransceiver, _EventEmitter);
+
+  /**
+   * Construct a {@link TrackTransceiver}.
+   * @param {Track.ID} id
+   * @param {Track.kind} kind
+   */
+  function TrackTransceiver(id, kind) {
+    _classCallCheck(this, TrackTransceiver);
+
+    var _this = _possibleConstructorReturn(this, (TrackTransceiver.__proto__ || Object.getPrototypeOf(TrackTransceiver)).call(this));
+
+    Object.defineProperties(_this, {
+      id: {
+        enumerable: true,
+        value: id
+      },
+      kind: {
+        enumerable: true,
+        value: kind
+      }
+    });
+    return _this;
+  }
+
+  return TrackTransceiver;
+}(EventEmitter);
 
 module.exports = TrackTransceiver;
-
-},{}],126:[function(require,module,exports){
+},{"events":152}],128:[function(require,module,exports){
 'use strict';
 
 /**
- * Construct a new {@link CancelablePromise}.
- * @class
- * @classdesc A Promise that can be canceled with {@link CancelablePromise#cancel}.
+ * A Promise that can be canceled with {@link CancelablePromise#cancel}.
  * @extends Promise
- * @param {CancelablePromise.OnCreate} onCreate
- * @param {CancelablePromise.OnCancel} onCancel
-*//**
- * A function to be called on {@link CancelablePromise} creation
- * @typedef {function} CancelablePromise.OnCreate
- * @param {function(*)} resolve
- * @param {function(*)} reject
- * @param {function(): boolean} isCanceled
-*//**
- * A function to be called when {@link CancelablePromise#cancel} is called
- * @typedef {function} CancelablePromise.OnCancel
- */
-function CancelablePromise(onCreate, onCancel) {
-  var self = this;
+*/
 
-  /* istanbul ignore next */
-  Object.defineProperties(this, {
-    _isCancelable: {
-      writable: true,
-      value: true
-    },
-    _isCanceled: {
-      writable: true,
-      value: false
-    },
-    _onCancel: {
-      value: onCancel
-    }
-  });
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-  Object.defineProperty(this, '_promise', {
-    value: new Promise(function(resolve, reject) {
-      onCreate(function _resolve(value) {
-        self._isCancelable = false;
-        resolve(value);
-      }, function _reject(reason) {
-        self._isCancelable = false;
-        reject(reason);
-      }, function isCanceled() {
-        return self._isCanceled;
-      });
-    })
-  });
-}
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-/**
- * Create a synchronously-rejected {@link CancelablePromise}.
- * @param {*} reason
- * @returns {Promise<*>}
- */
-CancelablePromise.reject = function reject(reason) {
-  return new CancelablePromise(function rejected(resolve, reject) {
-    reject(reason);
-  }, function onCancel() {
-    // Do nothing.
-  });
-};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/**
- * Create a synchronously-resolved {@link CancelablePromise}.
- * @param {*|Promise<*>|Thenable<*>} result
- * @returns {CancelablePromise<*>}
- */
-CancelablePromise.resolve = function resolve(result) {
-  return new CancelablePromise(function resolved(resolve) {
-    resolve(result);
-  }, function onCancel() {
-    // Do nothing.
-  });
-};
+var CancelablePromise = function () {
+  /**
+   * Construct a new {@link CancelablePromise}.
+   * @param {CancelablePromise.OnCreate} onCreate
+   * @param {CancelablePromise.OnCancel} onCancel
+  */ /**
+     * A function to be called on {@link CancelablePromise} creation
+     * @typedef {function} CancelablePromise.OnCreate
+     * @param {function(*)} resolve
+     * @param {function(*)} reject
+     * @param {function(): boolean} isCanceled
+     */ /**
+        * A function to be called when {@link CancelablePromise#cancel} is called
+        * @typedef {function} CancelablePromise.OnCancel
+        */
+  function CancelablePromise(onCreate, onCancel) {
+    var _this = this;
 
-/**
- * Attempt to cancel the {@link CancelablePromise}.
- * @returns {this}
- */
-CancelablePromise.prototype.cancel = function cancel() {
-  if (this._isCancelable) {
-    this._isCanceled = true;
-    this._onCancel();
+    _classCallCheck(this, CancelablePromise);
+
+    /* istanbul ignore next */
+    Object.defineProperties(this, {
+      _isCancelable: {
+        writable: true,
+        value: true
+      },
+      _isCanceled: {
+        writable: true,
+        value: false
+      },
+      _onCancel: {
+        value: onCancel
+      }
+    });
+
+    Object.defineProperty(this, '_promise', {
+      value: new Promise(function (resolve, reject) {
+        onCreate(function (value) {
+          _this._isCancelable = false;
+          resolve(value);
+        }, function (reason) {
+          _this._isCancelable = false;
+          reject(reason);
+        }, function () {
+          return _this._isCanceled;
+        });
+      })
+    });
   }
-  return this;
-};
 
-/**
- * @param {function} onRejected
- * @returns {CancelablePromise}
- */
-CancelablePromise.prototype.catch = function _catch() {
-  var args = [].slice.call(arguments);
-  var promise = this._promise;
-  return new CancelablePromise(function onCreate(resolve, reject) {
-    promise.catch.apply(promise, args).then(resolve, reject);
-  }, this._onCancel);
-};
+  /**
+   * Create a synchronously-rejected {@link CancelablePromise}.
+   * @param {*} reason
+   * @returns {Promise<*>}
+   */
 
-/**
- * @param {?function} onResolved
- * @param {function} [onRejected]
- * @returns {CancelablePromise}
- */
-CancelablePromise.prototype.then = function then() {
-  var args = [].slice.call(arguments);
-  var promise = this._promise;
-  return new CancelablePromise(function onCreate(resolve, reject) {
-    promise.then.apply(promise, args).then(resolve, reject);
-  }, this._onCancel);
-};
+
+  _createClass(CancelablePromise, [{
+    key: 'cancel',
+
+
+    /**
+     * Attempt to cancel the {@link CancelablePromise}.
+     * @returns {this}
+     */
+    value: function cancel() {
+      if (this._isCancelable) {
+        this._isCanceled = true;
+        this._onCancel();
+      }
+      return this;
+    }
+
+    /**
+     * @param {function} onRejected
+     * @returns {CancelablePromise}
+     */
+
+  }, {
+    key: 'catch',
+    value: function _catch() {
+      var args = [].slice.call(arguments);
+      var promise = this._promise;
+      return new CancelablePromise(function onCreate(resolve, reject) {
+        promise.catch.apply(promise, _toConsumableArray(args)).then(resolve, reject);
+      }, this._onCancel);
+    }
+
+    /**
+     * @param {?function} onResolved
+     * @param {function} [onRejected]
+     * @returns {CancelablePromise}
+     */
+
+  }, {
+    key: 'then',
+    value: function then() {
+      var args = [].slice.call(arguments);
+      var promise = this._promise;
+      return new CancelablePromise(function onCreate(resolve, reject) {
+        promise.then.apply(promise, _toConsumableArray(args)).then(resolve, reject);
+      }, this._onCancel);
+    }
+  }], [{
+    key: 'reject',
+    value: function reject(reason) {
+      return new CancelablePromise(function rejected(resolve, reject) {
+        reject(reason);
+      }, function onCancel() {
+        // Do nothing.
+      });
+    }
+
+    /**
+     * Create a synchronously-resolved {@link CancelablePromise}.
+     * @param {*|Promise<*>|Thenable<*>} result
+     * @returns {CancelablePromise<*>}
+     */
+
+  }, {
+    key: 'resolve',
+    value: function resolve(result) {
+      return new CancelablePromise(function resolved(resolve) {
+        resolve(result);
+      }, function onCancel() {
+        // Do nothing.
+      });
+    }
+  }]);
+
+  return CancelablePromise;
+}();
 
 module.exports = CancelablePromise;
-
-},{}],127:[function(require,module,exports){
+},{}],129:[function(require,module,exports){
 'use strict';
 
 module.exports.DEFAULT_ENVIRONMENT = 'prod';
 module.exports.DEFAULT_REALM = 'us1';
 module.exports.DEFAULT_LOG_LEVEL = 'warn';
 module.exports.REGISTRAR_SERVER = 'endpoint.twilio.com';
-module.exports.WS_SERVER = function(environment, realm) {
+module.exports.WS_SERVER = function (environment, realm) {
   switch (environment) {
     case 'prod':
       switch (realm) {
@@ -24566,7 +26096,7 @@ module.exports.WS_SERVER = function(environment, realm) {
       return 'wss://endpoint.' + environment + '-' + realm + '.twilio.com';
   }
 };
-module.exports.ECS_SERVER = function(environment, realm) {
+module.exports.ECS_SERVER = function (environment, realm) {
   switch (environment) {
     case 'prod':
       return 'https://ecs.' + realm + '.twilio.com';
@@ -24581,23 +26111,19 @@ module.exports.PUBLISH_BACKOFF_MS = 20;
 
 module.exports.ICE_SERVERS_TIMEOUT_MS = 3000;
 module.exports.ICE_SERVERS_DEFAULT_TTL = 3600;
-module.exports.DEFAULT_ICE_SERVERS = function(environment) {
+module.exports.DEFAULT_ICE_SERVERS = function (environment) {
   switch (environment) {
     case 'prod':
-      return [
-        { urls: 'stun:global.stun.twilio.com:3478?transport=udp' }
-      ];
+      return [{ urls: 'stun:global.stun.twilio.com:3478?transport=udp' }];
     default:
-      return [
-        { urls: 'stun:global.stun.' + environment + '.twilio.com:3478?transport=udp' }
-      ];
+      return [{ urls: 'stun:global.stun.' + environment + '.twilio.com:3478?transport=udp' }];
   }
 };
 
 // Headers
 /* eslint key-spacing:0 */
 module.exports.headers = {
-  X_TWILIO_ACCESSTOKEN:   'X-Twilio-AccessToken'
+  X_TWILIO_ACCESSTOKEN: 'X-Twilio-AccessToken'
 };
 
 /**
@@ -24609,73 +26135,92 @@ function article(word) {
   // NOTE(mmalavalli): This will not be accurate for words like "hour",
   // which have consonants as their first character, but are pronounced like
   // vowels. We can address this issue if the need arises.
-  return ['a', 'e', 'i', 'o', 'u'].indexOf(word.toLowerCase()[0]) >= 0 ? 'an' : 'a';
+  return ['a', 'e', 'i', 'o', 'u'].includes(word.toLowerCase()[0]) ? 'an' : 'a';
 }
 
 module.exports.typeErrors = {
-  INVALID_TYPE: function(name, type) {
+  INVALID_TYPE: function INVALID_TYPE(name, type) {
     return new TypeError(name + ' must be ' + article(type) + ' ' + type);
   },
-  INVALID_VALUE: function(name, values) {
+  INVALID_VALUE: function INVALID_VALUE(name, values) {
     return new RangeError(name + ' must be one of ', values.join(', '));
   },
-  REQUIRED_ARGUMENT: function(name) {
+  REQUIRED_ARGUMENT: function REQUIRED_ARGUMENT(name) {
     return new TypeError(name + ' must be specified');
   }
 };
-
-},{}],128:[function(require,module,exports){
+},{}],130:[function(require,module,exports){
 'use strict';
 
-function Filter(options) {
-  if (!(this instanceof Filter)) {
-    return new Filter(options);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Filter = function () {
+  function Filter(options) {
+    _classCallCheck(this, Filter);
+
+    options = Object.assign({
+      getKey: function defaultGetKey(a) {
+        return a;
+      },
+      getValue: function defaultGetValue(a) {
+        return a;
+      },
+      isLessThanOrEqualTo: function defaultIsLessThanOrEqualTo(a, b) {
+        return a <= b;
+      }
+    }, options);
+    Object.defineProperties(this, {
+      _getKey: {
+        value: options.getKey
+      },
+      _getValue: {
+        value: options.getValue
+      },
+      _isLessThanOrEqualTo: {
+        value: options.isLessThanOrEqualTo
+      },
+      _map: {
+        value: new Map()
+      }
+    });
   }
-  options = Object.assign({
-    getKey: function defaultGetKey(a) { return a; },
-    getValue: function defaultGetValue(a) { return a; },
-    isLessThanOrEqualTo: function defaultIsLessThanOrEqualTo(a, b) { return a <= b; }
-  }, options);
-  Object.defineProperties(this, {
-    _getKey: {
-      value: options.getKey
-    },
-    _getValue: {
-      value: options.getValue
-    },
-    _isLessThanOrEqualTo: {
-      value: options.isLessThanOrEqualTo
-    },
-    _map: {
-      value: new Map()
+
+  _createClass(Filter, [{
+    key: 'toMap',
+    value: function toMap() {
+      return new Map(this._map);
     }
-  });
-}
+  }, {
+    key: 'updateAndFilter',
+    value: function updateAndFilter(entries) {
+      return entries.filter(this.update, this);
+    }
+  }, {
+    key: 'update',
+    value: function update(entry) {
+      var key = this._getKey(entry);
+      var value = this._getValue(entry);
+      if (this._map.has(key) && this._isLessThanOrEqualTo(value, this._map.get(key))) {
+        return false;
+      }
+      this._map.set(key, value);
+      return true;
+    }
+  }]);
 
-Filter.prototype.toMap = function toMap() {
-  return new Map(this._map);
-};
-
-Filter.prototype.updateAndFilter = function filter(entries) {
-  return entries.filter(this.update, this);
-};
-
-Filter.prototype.update = function update(entry) {
-  var key = this._getKey(entry);
-  var value = this._getValue(entry);
-  if (this._map.has(key) &&
-      this._isLessThanOrEqualTo(value, this._map.get(key))) {
-    return false;
-  }
-  this._map.set(key, value);
-  return true;
-};
+  return Filter;
+}();
 
 module.exports = Filter;
-
-},{}],129:[function(require,module,exports){
+},{}],131:[function(require,module,exports){
 /* globals mozRTCPeerConnection */
 'use strict';
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var constants = require('./constants');
 
@@ -24688,18 +26233,13 @@ var constants = require('./constants');
  * @throws {TypeError}
  */
 function asLocalTrack(track, options) {
-  if (track instanceof options.LocalAudioTrack
-    || track instanceof options.LocalVideoTrack
-    || track instanceof options.LocalDataTrack) {
+  if (track instanceof options.LocalAudioTrack || track instanceof options.LocalVideoTrack || track instanceof options.LocalDataTrack) {
     return track;
   }
   if (track instanceof options.MediaStreamTrack) {
-    return track.kind === 'audio'
-      ? new options.LocalAudioTrack(track, options)
-      : new options.LocalVideoTrack(track, options);
+    return track.kind === 'audio' ? new options.LocalAudioTrack(track, options) : new options.LocalVideoTrack(track, options);
   }
-  throw new constants.typeErrors.INVALID_TYPE('track',
-    'LocalAudioTrack, LocalVideoTrack, LocalDataTrack, or MediaStreamTrack');
+  throw constants.typeErrors.INVALID_TYPE('track', 'LocalAudioTrack, LocalVideoTrack, LocalDataTrack, or MediaStreamTrack');
 }
 
 /**
@@ -24739,7 +26279,7 @@ function difference(list1, list2) {
 
   var difference = new Set();
 
-  list1.forEach(function(item) {
+  list1.forEach(function (item) {
     if (!list2.has(item)) {
       difference.add(item);
     }
@@ -24756,7 +26296,7 @@ function difference(list1, list2) {
  * @returns {object} - Filtered object
  */
 function filterObject(object, filterValue) {
-  return Object.keys(object).reduce(function(filtered, key) {
+  return Object.keys(object).reduce(function (filtered, key) {
     if (object[key] !== filterValue) {
       filtered[key] = object[key];
     }
@@ -24771,15 +26311,13 @@ function filterObject(object, filterValue) {
  * @returns Array<*>
  */
 function flatMap(list, mapFn) {
-  var listArray = list instanceof Map || list instanceof Set
-    ? Array.from(list.values())
-    : list;
+  var listArray = list instanceof Map || list instanceof Set ? Array.from(list.values()) : list;
 
   mapFn = mapFn || function mapFn(item) {
     return item;
   };
 
-  return listArray.reduce(function(flattened, item) {
+  return listArray.reduce(function (flattened, item) {
     var mapped = mapFn(item);
     return flattened.concat(mapped);
   }, []);
@@ -24822,9 +26360,9 @@ function makeServerSIPURI() {
 }
 
 function makeUUID() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     var r = Math.random() * 16 | 0;
-    var v = c === 'x' ? r : (r & 0x3 | 0x8);
+    var v = c === 'x' ? r : r & 0x3 | 0x8;
     return v.toString(16);
   });
 }
@@ -24851,18 +26389,18 @@ function oncePerTick(fn) {
 }
 
 function promiseFromEvents(operation, eventEmitter, successEvent, failureEvent) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     function onSuccess() {
       var args = [].slice.call(arguments);
       if (failureEvent) {
         eventEmitter.removeListener(failureEvent, onFailure);
       }
-      resolve.apply(null, args);
+      resolve.apply(undefined, _toConsumableArray(args));
     }
     function onFailure() {
       var args = [].slice.call(arguments);
       eventEmitter.removeListener(successEvent, onSuccess);
-      reject.apply(null, args);
+      reject.apply(undefined, _toConsumableArray(args));
     }
     eventEmitter.once(successEvent, onSuccess);
     if (failureEvent) {
@@ -24880,8 +26418,10 @@ function promiseFromEvents(operation, eventEmitter, successEvent, failureEvent) 
  * @returns {Any|null}
  */
 function getOrNull(obj, path) {
-  return path.split('.').reduce(function(output, step) {
-    if (!output) { return null; }
+  return path.split('.').reduce(function (output, step) {
+    if (!output) {
+      return null;
+    }
     return output[step];
   }, obj);
 }
@@ -24899,7 +26439,7 @@ function getOrNull(obj, path) {
  */
 function defer() {
   var deferred = {};
-  deferred.promise = new Promise(function(resolve, reject) {
+  deferred.promise = new Promise(function (resolve, reject) {
     deferred.resolve = resolve;
     deferred.reject = reject;
   });
@@ -24925,9 +26465,9 @@ function delegateMethod(source, wrapper, target, methodName) {
     return;
   }
 
-  var type;
+  var type = void 0;
   try {
-    type = typeof source[methodName];
+    type = _typeof(source[methodName]);
   } catch (error) {
     // NOTE(mroberts): Attempting to check the type of non-function members
     // on the prototype throws an error for some types.
@@ -24939,8 +26479,10 @@ function delegateMethod(source, wrapper, target, methodName) {
   }
 
   /* eslint no-loop-func:0 */
-  wrapper[methodName] = function() {
-    return this[target][methodName].apply(this[target], arguments);
+  wrapper[methodName] = function () {
+    var _target;
+
+    return (_target = this[target])[methodName].apply(_target, arguments);
   };
 }
 
@@ -24968,7 +26510,7 @@ function delegateMethods(source, wrapper, target) {
  * @returns {undefined}
  */
 function proxyProperties(source, wrapper, target) {
-  Object.getOwnPropertyNames(source).forEach(function(propertyName) {
+  Object.getOwnPropertyNames(source).forEach(function (propertyName) {
     proxyProperty(source, wrapper, target, propertyName);
   });
 }
@@ -24992,7 +26534,7 @@ function proxyProperty(source, wrapper, target, propertyName) {
       writable: true
     });
 
-    target.addEventListener(propertyName.slice(2), function() {
+    target.addEventListener(propertyName.slice(2), function () {
       wrapper.dispatchEvent.apply(wrapper, arguments);
     });
 
@@ -25001,7 +26543,7 @@ function proxyProperty(source, wrapper, target, propertyName) {
 
   Object.defineProperty(wrapper, propertyName, {
     enumerable: true,
-    get: function() {
+    get: function get() {
       return target[propertyName];
     }
   });
@@ -25017,9 +26559,9 @@ function proxyProperty(source, wrapper, target, propertyName) {
  */
 function legacyPromise(promise, onSuccess, onFailure) {
   if (onSuccess) {
-    return promise.then(function(result) {
+    return promise.then(function (result) {
       onSuccess(result);
-    }, function(error) {
+    }, function (error) {
       onFailure(error);
     });
   }
@@ -25051,9 +26593,9 @@ function buildLogLevels(logLevel) {
  */
 function trackClass(track, local) {
   local = local ? 'Local' : '';
-  return local + (track.kind || '').replace(/\w{1}/, function(m) {
-      return m.toUpperCase();
-    }) + 'Track';
+  return local + (track.kind || '').replace(/\w{1}/, function (m) {
+    return m.toUpperCase();
+  }) + 'Track';
 }
 
 /**
@@ -25063,12 +26605,8 @@ function trackClass(track, local) {
  * @param {object} options
  */
 function validateLocalTrack(track, options) {
-  if (!(track instanceof options.LocalAudioTrack
-    || track instanceof options.LocalDataTrack
-    || track instanceof options.LocalVideoTrack
-    || track instanceof options.MediaStreamTrack)) {
-    throw new constants.typeErrors.INVALID_TYPE('track',
-      'LocalAudioTrack, LocalVideoTrack, LocalDataTrack, or MediaStreamTrack');
+  if (!(track instanceof options.LocalAudioTrack || track instanceof options.LocalDataTrack || track instanceof options.LocalVideoTrack || track instanceof options.MediaStreamTrack)) {
+    throw constants.typeErrors.INVALID_TYPE('track', 'LocalAudioTrack, LocalVideoTrack, LocalDataTrack, or MediaStreamTrack');
   }
 }
 
@@ -25102,13 +26640,19 @@ exports.buildLogLevels = buildLogLevels;
 exports.trackClass = trackClass;
 exports.validateLocalTrack = validateLocalTrack;
 exports.getSdpFormat = getSdpFormat;
-
-},{"./constants":127}],130:[function(require,module,exports){
+},{"./constants":129}],132:[function(require,module,exports){
 (function (global){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var EventEmitter = require('events').EventEmitter;
-var inherits = require('util').inherits;
 
 var MAX_RECONNECT_ATTEMPTS = 5;
 var RECONNECT_INTERVAL_MS = 50;
@@ -25119,127 +26663,141 @@ var WebSocket = toplevel.WebSocket ? toplevel.WebSocket : require('ws');
 
 /**
  * Publish events to the Insights gateway.
- * @constructor
- * @param {string} token - Insights gateway token
- * @param {string} sdkName - Name of the SDK using the {@link InsightsPublisher}
- * @param {string} sdkVersion - Version of the SDK using the {@link InsightsPublisher}
- * @param {string} environment - One of 'dev', 'stage' or 'prod'
- * @param {string} realm - Region identifier
- * @param {InsightsPublisherOptions} options - Override default behavior
- * @fires InsightsPublisher#connected
- * @fires InsightsPublisher#disconnected
- * @fires InsightsPublisher#reconnecting
+ * @extends EventEmitter
+ * @emits InsightsPublisher#connected
+ * @emits InsightsPublisher#disconnected
+ * @emits InsightsPublisher#reconnecting
  */
-function InsightsPublisher(token, sdkName, sdkVersion, environment, realm, options) {
-  if (!(this instanceof InsightsPublisher)) {
-    return new InsightsPublisher(token, sdkName, sdkVersion, environment, realm, options);
+
+var InsightsPublisher = function (_EventEmitter) {
+  _inherits(InsightsPublisher, _EventEmitter);
+
+  /**
+   * @param {string} token - Insights gateway token
+   * @param {string} sdkName - Name of the SDK using the {@link InsightsPublisher}
+   * @param {string} sdkVersion - Version of the SDK using the {@link InsightsPublisher}
+   * @param {string} environment - One of 'dev', 'stage' or 'prod'
+   * @param {string} realm - Region identifier
+   * @param {InsightsPublisherOptions} options - Override default behavior
+   */
+  function InsightsPublisher(token, sdkName, sdkVersion, environment, realm, options) {
+    _classCallCheck(this, InsightsPublisher);
+
+    var _this = _possibleConstructorReturn(this, (InsightsPublisher.__proto__ || Object.getPrototypeOf(InsightsPublisher)).call(this));
+
+    options = Object.assign({
+      gateway: createGateway(environment, realm) + '/v1/VideoEvents',
+      maxReconnectAttempts: MAX_RECONNECT_ATTEMPTS,
+      reconnectIntervalMs: RECONNECT_INTERVAL_MS,
+      userAgent: navigator.userAgent,
+      WebSocket: WebSocket
+    }, options);
+
+    Object.defineProperties(_this, {
+      _connectTimestamp: {
+        value: 0,
+        writable: true
+      },
+      _eventQueue: {
+        value: []
+      },
+      _reconnectAttemptsLeft: {
+        value: options.maxReconnectAttempts,
+        writable: true
+      },
+      _ws: {
+        value: null,
+        writable: true
+      },
+      _WebSocket: {
+        value: options.WebSocket
+      }
+    });
+
+    var self = _this;
+
+    _this.on('disconnected', function maybeReconnect(error) {
+      self._session = null;
+      if (error && self._reconnectAttemptsLeft > 0) {
+        self.emit('reconnecting');
+        reconnect(self, token, sdkName, sdkVersion, options);
+        return;
+      }
+      self.removeListener('disconnected', maybeReconnect);
+    });
+
+    connect(_this, token, sdkName, sdkVersion, options);
+    return _this;
   }
-  EventEmitter.call(this);
 
-  options = Object.assign({
-    gateway: createGateway(environment, realm) + '/v1/VideoEvents',
-    maxReconnectAttempts: MAX_RECONNECT_ATTEMPTS,
-    reconnectIntervalMs: RECONNECT_INTERVAL_MS,
-    userAgent: navigator.userAgent,
-    WebSocket: WebSocket
-  }, options);
+  /**
+   * Publish an event to the Insights gateway.
+   * @private
+   * @param {*} event
+   */
 
-  Object.defineProperties(this, {
-    _connectTimestamp: {
-      value: 0,
-      writable: true
-    },
-    _eventQueue: {
-      value: []
-    },
-    _reconnectAttemptsLeft: {
-      value: options.maxReconnectAttempts,
-      writable: true
-    },
-    _ws: {
-      value: null,
-      writable: true
-    },
-    _WebSocket: {
-      value: options.WebSocket
+
+  _createClass(InsightsPublisher, [{
+    key: '_publish',
+    value: function _publish(event) {
+      event.session = this._session;
+      this._ws.send(JSON.stringify(event));
     }
-  });
 
-  var self = this;
+    /**
+     * Disconnect from the Insights gateway.
+     * @returns {boolean} true if called when connecting/open, false if not
+     */
 
-  this.on('disconnected', function maybeReconnect(error) {
-    self._session = null;
-    if (error && self._reconnectAttemptsLeft > 0) {
-      self.emit('reconnecting');
-      reconnect(self, token, sdkName, sdkVersion, options);
-      return;
+  }, {
+    key: 'disconnect',
+    value: function disconnect() {
+      if (this._ws.readyState === this._WebSocket.CLOSING || this._ws.readyState === this._WebSocket.CLOSED) {
+        return false;
+      }
+
+      try {
+        this._ws.close();
+      } catch (error) {
+        // Do nothing.
+      }
+      this.emit('disconnected');
+
+      return true;
     }
-    self.removeListener('disconnected', maybeReconnect);
-  });
 
-  connect(this, token, sdkName, sdkVersion, options);
-}
+    /**
+     * Publish (or queue, if not connected) an event to the Insights gateway.
+     * @param {string} groupName - Event group name
+     * @param {string} eventName - Event name
+     * @param {object} payload - Event payload
+     * @returns {boolean} true if queued or published, false if disconnect() called
+     */
 
-inherits(InsightsPublisher, EventEmitter);
+  }, {
+    key: 'publish',
+    value: function publish(groupName, eventName, payload) {
+      if (this._ws.readyState === this._WebSocket.CLOSING || this._ws.readyState === this._WebSocket.CLOSED) {
+        return false;
+      }
 
-/**
- * Publish an event to the Insights gateway.
- * @private
- * @param {*} event
- */
-InsightsPublisher.prototype._publish = function _publish(event) {
-  event.session = this._session;
-  this._ws.send(JSON.stringify(event));
-};
+      var publishOrEnqueue = typeof this._session === 'string' ? this._publish.bind(this) : this._eventQueue.push.bind(this._eventQueue);
 
-/**
- * Disconnect from the Insights gateway.
- * @method
- * @returns {boolean} true if called when connecting/open, false if not
- */
-InsightsPublisher.prototype.disconnect = function disconnect() {
-  if (this._ws.readyState === this._WebSocket.CLOSING || this._ws.readyState === this._WebSocket.CLOSED) {
-    return false;
-  }
+      publishOrEnqueue({
+        group: groupName,
+        name: eventName,
+        payload: payload,
+        timestamp: Date.now(),
+        type: 'event',
+        version: 1
+      });
 
-  try {
-    this._ws.close();
-  } catch (error) {
-    // Do nothing.
-  }
-  this.emit('disconnected');
+      return true;
+    }
+  }]);
 
-  return true;
-};
-
-/**
- * Publish (or queue, if not connected) an event to the Insights gateway.
- * @method
- * @param {string} groupName - Event group name
- * @param {string} eventName - Event name
- * @param {object} payload - Event payload
- * @returns {boolean} true if queued or published, false if disconnect() called
- */
-InsightsPublisher.prototype.publish = function publish(groupName, eventName, payload) {
-  if (this._ws.readyState === this._WebSocket.CLOSING || this._ws.readyState === this._WebSocket.CLOSED) {
-    return false;
-  }
-
-  var publishOrEnqueue = typeof this._session === 'string'
-    ? this._publish.bind(this)
-    : this._eventQueue.push.bind(this._eventQueue);
-
-  publishOrEnqueue({
-    group: groupName,
-    name: eventName,
-    payload: payload,
-    timestamp: Date.now(),
-    type: 'event',
-    version: 1
-  });
-
-  return true;
-};
+  return InsightsPublisher;
+}(EventEmitter);
 
 /**
  * Start connecting to the Insights gateway.
@@ -25251,13 +26809,15 @@ InsightsPublisher.prototype.publish = function publish(groupName, eventName, pay
  * @param {string} sdkVersion
  * @param {InsightsPublisherOptions} options
  */
+
+
 function connect(publisher, token, sdkName, sdkVersion, options) {
   publisher._connectTimestamp = Date.now();
   publisher._reconnectAttemptsLeft--;
   publisher._ws = new options.WebSocket(options.gateway);
   var ws = publisher._ws;
 
-  ws.addEventListener('close', function(event) {
+  ws.addEventListener('close', function (event) {
     if (event.code === WS_CLOSE_NORMAL) {
       publisher.emit('disconnected');
       return;
@@ -25265,11 +26825,11 @@ function connect(publisher, token, sdkName, sdkVersion, options) {
     publisher.emit('disconnected', new Error('WebSocket Error ' + event.code + ': ' + event.reason));
   });
 
-  ws.addEventListener('message', function(message) {
+  ws.addEventListener('message', function (message) {
     handleConnectResponse(publisher, JSON.parse(message.data), options);
   });
 
-  ws.addEventListener('open', function() {
+  ws.addEventListener('open', function () {
     var connectRequest = {
       type: 'connect',
       token: token,
@@ -25293,8 +26853,7 @@ function connect(publisher, token, sdkName, sdkVersion, options) {
  * @returns {string}
  */
 function createGateway(environment, realm) {
-  return environment === 'prod' ? 'wss://sdkgw.' + realm + '.twilio.com'
-    : 'wss://sdkgw.' + environment + '-' + realm + '.twilio.com';
+  return environment === 'prod' ? 'wss://sdkgw.' + realm + '.twilio.com' : 'wss://sdkgw.' + environment + '-' + realm + '.twilio.com';
 }
 
 /**
@@ -25333,7 +26892,7 @@ function reconnect(publisher, token, sdkName, sdkVersion, options) {
   var timeToWait = options.reconnectIntervalMs - connectInterval;
 
   if (timeToWait > 0) {
-    setTimeout(function() {
+    setTimeout(function () {
       connect(publisher, token, sdkName, sdkVersion, options);
     }, timeToWait);
     return;
@@ -25367,134 +26926,335 @@ function reconnect(publisher, token, sdkName, sdkVersion, options) {
  */
 
 module.exports = InsightsPublisher;
-
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"events":54,"util":149,"ws":145}],131:[function(require,module,exports){
+},{"events":152,"ws":147}],133:[function(require,module,exports){
+// TODO(mroberts): This should be described as implementing some
+// InsightsPublisher interface.
 'use strict';
 
 /**
  * Null Insights publisher.
- * @constructor
  */
-function InsightsPublisher() {
-  if (!(this instanceof InsightsPublisher)) {
-    return new InsightsPublisher();
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var InsightsPublisher = function () {
+  function InsightsPublisher() {
+    _classCallCheck(this, InsightsPublisher);
+
+    Object.defineProperties(this, {
+      _connected: {
+        writable: true,
+        value: true
+      }
+    });
   }
-  Object.defineProperties(this, {
-    _connected: {
-      writable: true,
-      value: true
+
+  /**
+   * Disconnect.
+   * @returns {boolean}
+   */
+
+
+  _createClass(InsightsPublisher, [{
+    key: 'disconnect',
+    value: function disconnect() {
+      if (this._connected) {
+        this._connected = false;
+        return true;
+      }
+      return false;
     }
-  });
-}
 
-/**
- * Disconnect.
- * @returns {boolean}
- */
-InsightsPublisher.prototype.disconnect = function disconnect() {
-  if (this._connected) {
-    this._connected = false;
-    return true;
-  }
-  return false;
-};
+    /**
+     * Publish.
+     * @returns {boolean}
+     */
 
-/**
- * Publish.
- * @returns {boolean}
- */
-InsightsPublisher.prototype.publish = function publish() {
-  return this._connected;
-};
+  }, {
+    key: 'publish',
+    value: function publish() {
+      return this._connected;
+    }
+  }]);
+
+  return InsightsPublisher;
+}();
 
 module.exports = InsightsPublisher;
-
-},{}],132:[function(require,module,exports){
-/* eslint no-console:0 */
+},{}],134:[function(require,module,exports){
+/* eslint new-cap:0, no-console:0 */
 'use strict';
 
-// Dependencies
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var constants = require('./constants');
 var DEFAULT_LOG_LEVEL = constants.DEFAULT_LOG_LEVEL;
 var E = require('./constants').typeErrors;
 
 /**
- * Construct a new {@link Log} object.
- * @class
- * @classdesc Selectively outputs messages to console.log
- *   based on specified minimum module specific log levels.
+ * Selectively outputs messages to console.log based on specified minimum module
+ * specific log levels.
  *
  * NOTE: The values in the logLevels object passed to the constructor is changed
  *       by subsequent calls to {@link Log#setLevels}.
- *
- * @param {String} moduleName - Name of the logging module (webrtc/media/signaling)
- * @param {object} component - Component owning this instance of {@link Log}
- * @param {LogLevels} logLevels - Logging levels. See {@link LogLevels}
  */
-function Log(moduleName, component, logLevels) {
-  if (!(this instanceof Log)) {
-    return new Log(moduleName, component, logLevels);
+
+var Log = function () {
+  /**
+   * Construct a new {@link Log} object.
+   * @param {String} moduleName - Name of the logging module (webrtc/media/signaling)
+   * @param {object} component - Component owning this instance of {@link Log}
+   * @param {LogLevels} logLevels - Logging levels. See {@link LogLevels}
+   */
+  function Log(moduleName, component, logLevels) {
+    _classCallCheck(this, Log);
+
+    if (typeof moduleName !== 'string') {
+      throw E.INVALID_TYPE('moduleName', 'string');
+    }
+
+    if (!component) {
+      throw E.REQUIRED_ARGUMENT('component');
+    }
+
+    if ((typeof logLevels === 'undefined' ? 'undefined' : _typeof(logLevels)) !== 'object') {
+      logLevels = {};
+    }
+
+    validateLogLevels(logLevels);
+
+    /* istanbul ignore next */
+    Object.defineProperties(this, {
+      _deprecationWarnings: {
+        value: new Set()
+      },
+      _logLevels: {
+        value: logLevels
+      },
+      _warnings: {
+        value: new Set()
+      },
+      logLevel: {
+        get: function get() {
+          return Log.getLevelByName(logLevels[moduleName] || DEFAULT_LOG_LEVEL);
+        }
+      },
+      name: { get: component.toString.bind(component) }
+    });
   }
 
-  if (typeof moduleName !== 'string') {
-    throw new E.INVALID_TYPE('moduleName', 'string');
-  }
+  /**
+   * Get the log level (number) by its name (string)
+   * @param {String} name - Name of the log level
+   * @returns {Number} Requested log level
+   * @throws {TwilioError} INVALID_LOG_LEVEL (32056)
+   * @public
+   */
 
-  if (!component) {
-    throw new E.REQUIRED_ARGUMENT('component');
-  }
 
-  if (typeof logLevels !== 'object') {
-    logLevels = {};
-  }
+  _createClass(Log, [{
+    key: 'createLog',
 
-  validateLogLevels(logLevels);
 
-  /* istanbul ignore next */
-  Object.defineProperties(this, {
-    _deprecationWarnings: {
-      value: new Set()
-    },
-    _logLevels: {
-      value: logLevels
-    },
-    _warnings: {
-      value: new Set()
-    },
-    logLevel: {
-      get: function get() {
-        return Log.getLevelByName(logLevels[moduleName] || DEFAULT_LOG_LEVEL);
+    /**
+     * Create a child {@link Log} instance with this._logLevels
+     * @param moduleName - Name of the logging module
+     * @param component - Component owning this instance of {@link Log}
+     * @returns {Log} this
+     */
+    value: function createLog(moduleName, component) {
+      return new Log(moduleName, component, this._logLevels);
+    }
+
+    /**
+     * Set new log levels.
+     * This changes the levels for all its ancestors,
+     * siblings, and children and descendants instances of {@link Log}.
+     * @param {LogLevels} levels - New log levels
+     * @throws {TwilioError} INVALID_ARGUMENT
+     * @returns {Log} this
+     */
+
+  }, {
+    key: 'setLevels',
+    value: function setLevels(levels) {
+      validateLogLevels(levels);
+      Object.assign(this._logLevels, levels);
+      return this;
+    }
+
+    /**
+     * Log a message using the console method appropriate for the specified logLevel
+     * @param {Number} logLevel - Log level of the message being logged
+     * @param {String} message - Message(s) to log
+     * @returns {Log} This instance of {@link Log}
+     * @public
+     */
+
+  }, {
+    key: 'log',
+    value: function log(logLevel, message) {
+      var logSpec = Log._levels[logLevel];
+      // eslint-disable-next-line no-use-before-define
+      if (!logSpec) {
+        throw E.INVALID_VALUE('logLevel', LOG_LEVEL_VALUES);
       }
-    },
-    name: { get: component.toString.bind(component) }
-  });
-}
+
+      if (this.logLevel <= logLevel) {
+        var levelName = logSpec.name;
+        var prefix = new Date().toISOString().split('T').concat(['|', levelName, 'in', this.name + ':']);
+        logSpec.logFn.apply(console, prefix.concat(message));
+      }
+
+      return this;
+    }
+
+    /**
+     * Log a debug message using console.log
+     * @param {...String} messages - Message(s) to pass to console.log
+     * @returns {Log} This instance of {@link Log}
+     * @public
+     */
+
+  }, {
+    key: 'debug',
+    value: function debug() {
+      return this.log(Log.DEBUG, [].slice.call(arguments));
+    }
+
+    /**
+     * Log a deprecation warning. Deprecation warnings are logged as warnings and
+     * they are only ever logged once.
+     * @param {String} deprecationWarning - The deprecation warning
+     * @returns {Log} This instance of {@link Log}
+     * @public
+     */
+
+  }, {
+    key: 'deprecated',
+    value: function deprecated(deprecationWarning) {
+      if (this._deprecationWarnings.has(deprecationWarning)) {
+        return this;
+      }
+      this._deprecationWarnings.add(deprecationWarning);
+      return this.warn(deprecationWarning);
+    }
+
+    /**
+     * Log an info message using console.info
+     * @param {...String} messages - Message(s) to pass to console.info
+     * @returns {Log} This instance of {@link Log}
+     * @public
+     */
+
+  }, {
+    key: 'info',
+    value: function info() {
+      return this.log(Log.INFO, [].slice.call(arguments));
+    }
+
+    /**
+     * Log a warn message using console.warn
+     * @param {...String} messages - Message(s) to pass to console.warn
+     * @returns {Log} This instance of {@link Log}
+     * @public
+     */
+
+  }, {
+    key: 'warn',
+    value: function warn() {
+      return this.log(Log.WARN, [].slice.call(arguments));
+    }
+
+    /**
+     * Log a warning once.
+     * @param {String} warning
+     * @returns {Log} This instance of {@link Log}
+     * @public
+     */
+
+  }, {
+    key: 'warnOnce',
+    value: function warnOnce(warning) {
+      if (this._warnings.has(warning)) {
+        return this;
+      }
+      this._warnings.add(warning);
+      return this.warn(warning);
+    }
+
+    /**
+     * Log an error message using console.error
+     * @param {...String} messages - Message(s) to pass to console.error
+     * @returns {Log} This instance of {@link Log}
+     * @public
+     */
+
+  }, {
+    key: 'error',
+    value: function error() {
+      return this.log(Log.ERROR, [].slice.call(arguments));
+    }
+
+    /**
+     * Log an error message using console.error and throw an exception
+     * @param {TwilioError} error - Error to throw
+     * @param {String} customMessage - Custom message for the error
+     * @public
+     */
+
+  }, {
+    key: 'throw',
+    value: function _throw(error, customMessage) {
+      if (error.clone) {
+        error = error.clone(customMessage);
+      }
+
+      this.log(Log.ERROR, error);
+      throw error;
+    }
+  }], [{
+    key: 'getLevelByName',
+    value: function getLevelByName(name) {
+      if (!isNaN(name)) {
+        return parseInt(name, 10);
+      }
+      name = name.toUpperCase();
+      validateLogLevel(name);
+      return Log[name];
+    }
+  }]);
+
+  return Log;
+}();
 
 // Singleton Constants
 /* eslint key-spacing:0 */
 /* istanbul ignore next */
+
+
 Object.defineProperties(Log, {
   DEBUG: { value: 0 },
-  INFO:  { value: 1 },
-  WARN:  { value: 2 },
+  INFO: { value: 1 },
+  WARN: { value: 2 },
   ERROR: { value: 3 },
-  OFF:   { value: 4 },
+  OFF: { value: 4 },
   _levels: {
-    value: [
-      { name: 'DEBUG', logFn: console.log },
-      { name: 'INFO',  logFn: console.info },
-      { name: 'WARN',  logFn: console.warn },
-      { name: 'ERROR', logFn: console.error },
-      { name: 'OFF', logFn: function noop() {} }
-    ]
+    value: [{ name: 'DEBUG', logFn: console.log }, { name: 'INFO', logFn: console.info }, { name: 'WARN', logFn: console.warn }, { name: 'ERROR', logFn: console.error }, { name: 'OFF', logFn: function noop() {} }]
   }
 });
 
 var LOG_LEVELS_SET = {};
 var LOG_LEVEL_VALUES = [];
 
-var LOG_LEVEL_NAMES = Log._levels.map(function(level, i) {
+var LOG_LEVEL_NAMES = Log._levels.map(function (level, i) {
   LOG_LEVELS_SET[level.name] = true;
   LOG_LEVEL_VALUES.push(i);
   return level.name;
@@ -25502,165 +27262,18 @@ var LOG_LEVEL_NAMES = Log._levels.map(function(level, i) {
 
 function validateLogLevel(level) {
   if (!(level in LOG_LEVELS_SET)) {
-    throw new E.INVALID_VALUE('level', LOG_LEVEL_NAMES);
+    throw E.INVALID_VALUE('level', LOG_LEVEL_NAMES);
   }
 }
 
 function validateLogLevels(levels) {
-  Object.keys(levels).forEach(function(moduleName) {
+  Object.keys(levels).forEach(function (moduleName) {
     validateLogLevel(levels[moduleName].toUpperCase());
   });
 }
 
-/**
- * Get the log level (number) by its name (string)
- * @param {String} name - Name of the log level
- * @returns {Number} Requested log level
- * @throws {TwilioError} INVALID_LOG_LEVEL (32056)
- * @public
- */
-Log.getLevelByName = function getLevelByName(name) {
-  if (!isNaN(name)) {
-    return parseInt(name, 10);
-  }
-  name = name.toUpperCase();
-  validateLogLevel(name);
-  return Log[name];
-};
-
-/**
- * Create a child {@link Log} instance with this._logLevels
- * @param moduleName - Name of the logging module
- * @param component - Component owning this instance of {@link Log}
- * @returns {Log} this
- */
-Log.prototype.createLog = function createLog(moduleName, component) {
-  return new Log(moduleName, component, this._logLevels);
-};
-
-/**
- * Set new log levels.
- * This changes the levels for all its ancestors,
- * siblings, and children and descendants instances of {@link Log}.
- * @param {LogLevels} levels - New log levels
- * @throws {TwilioError} INVALID_ARGUMENT
- * @returns {Log} this
- */
-Log.prototype.setLevels = function setLevels(levels) {
-  validateLogLevels(levels);
-  Object.assign(this._logLevels, levels);
-  return this;
-};
-
-/**
- * Log a message using the console method appropriate for the specified logLevel
- * @param {Number} logLevel - Log level of the message being logged
- * @param {String} message - Message(s) to log
- * @returns {Log} This instance of {@link Log}
- * @public
- */
-Log.prototype.log = function log(logLevel, message) {
-  var logSpec = Log._levels[logLevel];
-  if (!logSpec) { throw new E.INVALID_VALUE('logLevel', LOG_LEVEL_VALUES); }
-
-  if (this.logLevel <= logLevel) {
-    var levelName = logSpec.name;
-    var prefix = new Date().toISOString().split('T').concat([
-      '|', levelName, 'in', this.name + ':'
-    ]);
-    logSpec.logFn.apply(console, prefix.concat(message));
-  }
-
-  return this;
-};
-
-/**
- * Log a debug message using console.log
- * @param {...String} messages - Message(s) to pass to console.log
- * @returns {Log} This instance of {@link Log}
- * @public
- */
-Log.prototype.debug = function debug() {
-  return this.log(Log.DEBUG, [].slice.call(arguments));
-};
-
-/**
- * Log a deprecation warning. Deprecation warnings are logged as warnings and
- * they are only ever logged once.
- * @param {String} deprecationWarning - The deprecation warning
- * @returns {Log} This instance of {@link Log}
- * @public
- */
-Log.prototype.deprecated = function deprecated(deprecationWarning) {
-  if (this._deprecationWarnings.has(deprecationWarning)) {
-    return this;
-  }
-  this._deprecationWarnings.add(deprecationWarning);
-  return this.warn(deprecationWarning);
-};
-
-/**
- * Log an info message using console.info
- * @param {...String} messages - Message(s) to pass to console.info
- * @returns {Log} This instance of {@link Log}
- * @public
- */
-Log.prototype.info = function info() {
-  return this.log(Log.INFO, [].slice.call(arguments));
-};
-
-/**
- * Log a warn message using console.warn
- * @param {...String} messages - Message(s) to pass to console.warn
- * @returns {Log} This instance of {@link Log}
- * @public
- */
-Log.prototype.warn = function warn() {
-  return this.log(Log.WARN, [].slice.call(arguments));
-};
-
-/**
- * Log a warning once.
- * @param {String} warning
- * @returns {Log} This instance of {@link Log}
- * @public
- */
-Log.prototype.warnOnce = function warnOnce(warning) {
-  if (this._warnings.has(warning)) {
-    return this;
-  }
-  this._warnings.add(warning);
-  return this.warn(warning);
-};
-
-/**
- * Log an error message using console.error
- * @param {...String} messages - Message(s) to pass to console.error
- * @returns {Log} This instance of {@link Log}
- * @public
- */
-Log.prototype.error = function error() {
-  return this.log(Log.ERROR, [].slice.call(arguments));
-};
-
-/**
- * Log an error message using console.error and throw an exception
- * @param {TwilioError} error - Error to throw
- * @param {String} customMessage - Custom message for the error
- * @public
- */
-Log.prototype.throw = function throwFn(error, customMessage) {
-  if (error.clone) {
-    error = error.clone(customMessage);
-  }
-
-  this.log(Log.ERROR, error);
-  throw error;
-};
-
 module.exports = Log;
-
-},{"./constants":127}],133:[function(require,module,exports){
+},{"./constants":129}],135:[function(require,module,exports){
 'use strict';
 
 var difference = require('../').difference;
@@ -25701,9 +27314,7 @@ function createBLine(modifier, maxBitrate) {
   if (!maxBitrate) {
     return null;
   }
-  return '\r\nb=' + modifier + ':' + (modifier === 'AS'
-    ? Math.round((maxBitrate + RTCP_BITRATE) / 950)
-    : maxBitrate);
+  return '\r\nb=' + modifier + ':' + (modifier === 'AS' ? Math.round((maxBitrate + RTCP_BITRATE) / 950) : maxBitrate);
 }
 
 /**
@@ -25712,7 +27323,7 @@ function createBLine(modifier, maxBitrate) {
  * @returns {Map<Codec, Array<PT>>}
  */
 function createCodecMapForMediaSection(section) {
-  return Array.from(createPtToCodecName(section)).reduce(function(codecMap, pair) {
+  return Array.from(createPtToCodecName(section)).reduce(function (codecMap, pair) {
     var pt = pair[0];
     var codecName = pair[1];
     var pts = codecMap.get(codecName) || [];
@@ -25726,14 +27337,10 @@ function createCodecMapForMediaSection(section) {
  * @returns {Map<PT, Codec>} ptToCodecName
  */
 function createPtToCodecName(mediaSection) {
-  return getPayloadTypesInMediaSection(mediaSection).reduce(function(ptToCodecName, pt) {
+  return getPayloadTypesInMediaSection(mediaSection).reduce(function (ptToCodecName, pt) {
     var rtpmapPattern = new RegExp('a=rtpmap:' + pt + ' ([^/]+)');
     var matches = mediaSection.match(rtpmapPattern);
-    var codecName = matches
-      ? matches[1].toLowerCase()
-      : ptToFixedBitrateAudioCodecName[pt]
-        ? ptToFixedBitrateAudioCodecName[pt].toLowerCase()
-        : '';
+    var codecName = matches ? matches[1].toLowerCase() : ptToFixedBitrateAudioCodecName[pt] ? ptToFixedBitrateAudioCodecName[pt].toLowerCase() : '';
     return ptToCodecName.set(pt, codecName);
   }, new Map());
 }
@@ -25746,9 +27353,9 @@ function createPtToCodecName(mediaSection) {
  * @returns {Array<string>} mediaSections
  */
 function getMediaSections(sdp, kind, direction) {
-  return sdp.replace(/\r\n\r\n$/, '\r\n').split('\r\nm=').slice(1).map(function(mediaSection) {
+  return sdp.replace(/\r\n\r\n$/, '\r\n').split('\r\nm=').slice(1).map(function (mediaSection) {
     return 'm=' + mediaSection;
-  }).filter(function(mediaSection) {
+  }).filter(function (mediaSection) {
     var kindPattern = new RegExp('m=' + (kind || '.*'), 'gm');
     var directionPattern = new RegExp('a=' + (direction || '.*'), 'gm');
     return kindPattern.test(mediaSection) && directionPattern.test(mediaSection);
@@ -25774,7 +27381,7 @@ function getPayloadTypesInMediaSection(section) {
   }
 
   // Since only the PayloadTypes are needed, we discard the <port>.
-  return matches.slice(1).map(function(match) {
+  return matches.slice(1).map(function (match) {
     return parseInt(match, 10);
   });
 }
@@ -25786,16 +27393,16 @@ function getPayloadTypesInMediaSection(section) {
  * @returns {Array<PT>} Reordered Payload Types
  */
 function getReorderedPayloadTypes(codecMap, preferredCodecs) {
-  preferredCodecs = preferredCodecs.map(function(codecName) {
+  preferredCodecs = preferredCodecs.map(function (codecName) {
     return codecName.toLowerCase();
   });
 
-  var preferredPayloadTypes = flatMap(preferredCodecs, function(codecName) {
+  var preferredPayloadTypes = flatMap(preferredCodecs, function (codecName) {
     return codecMap.get(codecName) || [];
   });
 
   var remainingCodecs = difference(Array.from(codecMap.keys()), preferredCodecs);
-  var remainingPayloadTypes = flatMap(remainingCodecs, function(codecName) {
+  var remainingPayloadTypes = flatMap(remainingCodecs, function (codecName) {
     return codecMap.get(codecName);
   });
 
@@ -25837,7 +27444,7 @@ function setBitrateInMediaSection(modifier, maxBitrate, section) {
 function setBitrateParameters(sdp, modifier, maxAudioBitrate, maxVideoBitrate) {
   var mediaSections = getMediaSections(sdp);
   var session = sdp.split('\r\nm=')[0];
-  return [session].concat(mediaSections.map(function(section) {
+  return [session].concat(mediaSections.map(function (section) {
     // Bitrate parameters should not be applied to m=application sections
     // or to m=(audio|video) sections that do not receive media.
     if (!/^m=(audio|video)/.test(section) || !/a=(recvonly|sendrecv)/.test(section)) {
@@ -25875,14 +27482,14 @@ function setPayloadTypesInMediaSection(payloadTypes, section) {
 function setCodecPreferences(sdp, preferredAudioCodecs, preferredVideoCodecs) {
   var mediaSections = getMediaSections(sdp);
   var session = sdp.split('\r\nm=')[0];
-  return [session].concat(mediaSections.map(function(section) {
+  return [session].concat(mediaSections.map(function (section) {
     // Codec preferences should not be applied to m=application sections.
     if (!/^m=(audio|video)/.test(section)) {
       return section;
     }
     var kind = section.match(/^m=(audio|video)/)[1];
     var codecMap = createCodecMapForMediaSection(section);
-    var preferredCodecs = kind === 'audio' ? preferredAudioCodecs : preferredVideoCodecs.map(function(codec) {
+    var preferredCodecs = kind === 'audio' ? preferredAudioCodecs : preferredVideoCodecs.map(function (codec) {
       return codec.codec;
     });
     var payloadTypes = getReorderedPayloadTypes(codecMap, preferredCodecs);
@@ -25890,13 +27497,9 @@ function setCodecPreferences(sdp, preferredAudioCodecs, preferredVideoCodecs) {
 
     var pcmaPayloadTypes = codecMap.get('pcma') || [];
     var pcmuPayloadTypes = codecMap.get('pcmu') || [];
-    var fixedBitratePayloadTypes = kind === 'audio'
-      ? new Set(pcmaPayloadTypes.concat(pcmuPayloadTypes))
-      : new Set();
+    var fixedBitratePayloadTypes = kind === 'audio' ? new Set(pcmaPayloadTypes.concat(pcmuPayloadTypes)) : new Set();
 
-    return fixedBitratePayloadTypes.has(payloadTypes[0])
-      ? newSection.replace(/\r\nb=(AS|TIAS):([0-9]+)/g, '')
-      : newSection;
+    return fixedBitratePayloadTypes.has(payloadTypes[0]) ? newSection.replace(/\r\nb=(AS|TIAS):([0-9]+)/g, '') : newSection;
   })).join('\r\n');
 }
 
@@ -25909,7 +27512,7 @@ function setCodecPreferences(sdp, preferredAudioCodecs, preferredVideoCodecs) {
 function setSimulcast(sdp, trackIdsToAttributes) {
   var mediaSections = getMediaSections(sdp);
   var session = sdp.split('\r\nm=')[0];
-  return [session].concat(mediaSections.map(function(section) {
+  return [session].concat(mediaSections.map(function (section) {
     section = section.replace(/\r\n$/, '');
     if (!/^m=video/.test(section)) {
       return section;
@@ -25918,12 +27521,10 @@ function setSimulcast(sdp, trackIdsToAttributes) {
     var payloadTypes = getPayloadTypesInMediaSection(section);
     var vp8PayloadTypes = new Set(codecMap.get('vp8') || []);
 
-    var hasVP8PayloadType = payloadTypes.some(function(payloadType) {
+    var hasVP8PayloadType = payloadTypes.some(function (payloadType) {
       return vp8PayloadTypes.has(payloadType);
     });
-    return hasVP8PayloadType
-      ? setSimulcastInMediaSection(section, trackIdsToAttributes)
-      : section;
+    return hasVP8PayloadType ? setSimulcastInMediaSection(section, trackIdsToAttributes) : section;
   })).concat('').join('\r\n');
 }
 
@@ -25938,8 +27539,7 @@ exports.getMediaSections = getMediaSections;
 exports.setBitrateParameters = setBitrateParameters;
 exports.setCodecPreferences = setCodecPreferences;
 exports.setSimulcast = setSimulcast;
-
-},{"../":129,"./simulcast":135}],134:[function(require,module,exports){
+},{"../":131,"./simulcast":137}],136:[function(require,module,exports){
 'use strict';
 
 var RTCSessionDescription = require('@twilio/webrtc').RTCSessionDescription;
@@ -25982,9 +27582,7 @@ function workaround(description) {
 function sdpWorkaround(sdp) {
   var mediaSections = getMediaSections(sdp);
   var session = sdp.split('\r\nm=')[0];
-  return [session]
-    .concat(mediaSections.map(mediaSectionWorkaround))
-    .join('\r\n');
+  return [session].concat(mediaSections.map(mediaSectionWorkaround)).join('\r\n');
 }
 
 /**
@@ -25997,25 +27595,21 @@ function mediaSectionWorkaround(mediaSection) {
   var rtxPts = codecNameToPts.get('rtx') || new Set();
 
   var invalidRtxPts = new Set();
-  var rtxPtToAssociatedPt = createRtxPtToAssociatedPt(
-    mediaSection, ptToCodecName, rtxPts, invalidRtxPts);
-  var associatedPtToRtxPt = createAssociatedPtToRtxPt(
-    rtxPtToAssociatedPt, invalidRtxPts);
+  var rtxPtToAssociatedPt = createRtxPtToAssociatedPt(mediaSection, ptToCodecName, rtxPts, invalidRtxPts);
+  var associatedPtToRtxPt = createAssociatedPtToRtxPt(rtxPtToAssociatedPt, invalidRtxPts);
 
   var unassociatedRtxPts = Array.from(invalidRtxPts);
 
   // NOTE(mroberts): We normalize to lowercase.
   var knownCodecNames = ['h264', 'vp8', 'vp9'];
-  var unassociatedPts = knownCodecNames.reduce(function(unassociatedPts, codecName) {
+  var unassociatedPts = knownCodecNames.reduce(function (unassociatedPts, codecName) {
     var pts = codecNameToPts.get(codecName) || new Set();
-    return Array.from(pts).reduce(function(unassociatedPts, pt) {
-      return associatedPtToRtxPt.has(pt)
-        ? unassociatedPts
-        : unassociatedPts.add(pt);
+    return Array.from(pts).reduce(function (unassociatedPts, pt) {
+      return associatedPtToRtxPt.has(pt) ? unassociatedPts : unassociatedPts.add(pt);
     }, unassociatedPts);
   }, new Set());
 
-  unassociatedPts.forEach(function(pt) {
+  unassociatedPts.forEach(function (pt) {
     if (unassociatedRtxPts.length) {
       var rtxPt = unassociatedRtxPts.shift();
       mediaSection = deleteFmtpAttributesForRtxPt(mediaSection, rtxPt);
@@ -26023,7 +27617,7 @@ function mediaSectionWorkaround(mediaSection) {
     }
   });
 
-  unassociatedRtxPts.forEach(function(rtxPt) {
+  unassociatedRtxPts.forEach(function (rtxPt) {
     mediaSection = deleteFmtpAttributesForRtxPt(mediaSection, rtxPt);
     mediaSection = deleteRtpmapAttributesForRtxPt(mediaSection, rtxPt);
   });
@@ -26037,7 +27631,7 @@ function mediaSectionWorkaround(mediaSection) {
  */
 function createCodecNameToPts(ptToCodecName) {
   var codecNameToPts = new Map();
-  ptToCodecName.forEach(function(codecName, pt) {
+  ptToCodecName.forEach(function (codecName, pt) {
     var pts = codecNameToPts.get(codecName) || new Set();
     return codecNameToPts.set(codecName, pts.add(pt));
   });
@@ -26052,7 +27646,7 @@ function createCodecNameToPts(ptToCodecName) {
  * @returns {Map<RtxPT, NonRtxPT>} rtxPtToAssociatedPt
  */
 function createRtxPtToAssociatedPt(mediaSection, ptToCodecName, rtxPts, invalidRtxPts) {
-  return Array.from(rtxPts).reduce(function(rtxPtToAssociatedPt, rtxPt) {
+  return Array.from(rtxPts).reduce(function (rtxPtToAssociatedPt, rtxPt) {
     var fmtpPattern = new RegExp('a=fmtp:' + rtxPt + ' apt=(\\d+)');
     var matches = mediaSection.match(fmtpPattern);
     if (!matches) {
@@ -26086,7 +27680,7 @@ function createRtxPtToAssociatedPt(mediaSection, ptToCodecName, rtxPts, invalidR
  */
 function createAssociatedPtToRtxPt(rtxPtToAssociatedPt, invalidRtxPts) {
   // First, we construct a Map<NonRtxPT, NonEmptySet<RtxPT>>.
-  var associatedPtToRtxPts = Array.from(rtxPtToAssociatedPt).reduce(function(associatedPtToRtxPts, pair) {
+  var associatedPtToRtxPts = Array.from(rtxPtToAssociatedPt).reduce(function (associatedPtToRtxPts, pair) {
     var rtxPt = pair[0];
     var pt = pair[1];
     var rtxPts = associatedPtToRtxPts.get(pt) || new Set();
@@ -26095,11 +27689,11 @@ function createAssociatedPtToRtxPt(rtxPtToAssociatedPt, invalidRtxPts) {
 
   // Then, we filter down to a Map<NonRtxPT, RtxPt>. Any RtxPTs that map to the
   // same NonRtxPT are removed and added to invalidRtxPts.
-  return Array.from(associatedPtToRtxPts).reduce(function(associatedPtToRtxPt, pair) {
+  return Array.from(associatedPtToRtxPts).reduce(function (associatedPtToRtxPt, pair) {
     var pt = pair[0];
     var rtxPts = Array.from(pair[1]);
     if (rtxPts.length > 1) {
-      rtxPts.forEach(function(rtxPt) {
+      rtxPts.forEach(function (rtxPt) {
         invalidRtxPts.add(rtxPt);
       });
       return associatedPtToRtxPt;
@@ -26139,9 +27733,12 @@ function addFmtpAttributeForRtxPt(mediaSection, rtxPt, pt) {
 }
 
 module.exports = workaround;
-
-},{"./":133,"@twilio/webrtc":37}],135:[function(require,module,exports){
+},{"./":135,"@twilio/webrtc":37}],137:[function(require,module,exports){
 'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var difference = require('../').difference;
 var flatMap = require('../').flatMap;
@@ -26156,11 +27753,6 @@ function createSSRC() {
 }
 
 /**
- * Construct a {@link MediaStreamTrack} attribute store.
- * @class
- * @param {Track.ID} trackId - The MediaStreamTrack ID
- * @param {string} streamId - The MediaStream ID
- * @param {string} cName - The MediaStream cname
  * @property {string} cName
  * @property {boolean} isSimulcastEnabled
  * @property {Map<RtxSSRC, PrimarySSRC>} rtxPairs
@@ -26168,103 +27760,123 @@ function createSSRC() {
  * @property {string} streamId
  * @property {Track.ID} trackId
  */
-function TrackAttributes(trackId, streamId, cName) {
-  Object.defineProperties(this, {
-    cName: {
-      enumerable: true,
-      value: cName
-    },
-    isSimulcastEnabled: {
-      enumerable: true,
-      value: false,
-      writable: true
-    },
-    primarySSRCs: {
-      enumerable: true,
-      value: new Set()
-    },
-    rtxPairs: {
-      enumerable: true,
-      value: new Map()
-    },
-    streamId: {
-      enumerable: true,
-      value: streamId
-    },
-    trackId: {
-      enumerable: true,
-      value: trackId
+
+var TrackAttributes = function () {
+  /**
+   * Construct a {@link MediaStreamTrack} attribute store.
+   * @param {Track.ID} trackId - The MediaStreamTrack ID
+   * @param {string} streamId - The MediaStream ID
+   * @param {string} cName - The MediaStream cname
+   */
+  function TrackAttributes(trackId, streamId, cName) {
+    _classCallCheck(this, TrackAttributes);
+
+    Object.defineProperties(this, {
+      cName: {
+        enumerable: true,
+        value: cName
+      },
+      isSimulcastEnabled: {
+        enumerable: true,
+        value: false,
+        writable: true
+      },
+      primarySSRCs: {
+        enumerable: true,
+        value: new Set()
+      },
+      rtxPairs: {
+        enumerable: true,
+        value: new Map()
+      },
+      streamId: {
+        enumerable: true,
+        value: streamId
+      },
+      trackId: {
+        enumerable: true,
+        value: trackId
+      }
+    });
+  }
+
+  /**
+   * Add {@link SimSSRC}s to the {@link TrackAttributes}.
+   * @returns {void}
+   */
+
+
+  _createClass(TrackAttributes, [{
+    key: 'addSimulcastSSRCs',
+    value: function addSimulcastSSRCs() {
+      if (this.isSimulcastEnabled) {
+        return;
+      }
+      var simulcastSSRCs = [createSSRC(), createSSRC()];
+      simulcastSSRCs.forEach(function (ssrc) {
+        this.primarySSRCs.add(ssrc);
+      }, this);
+
+      if (this.rtxPairs.size) {
+        simulcastSSRCs.forEach(function (ssrc) {
+          this.rtxPairs.set(createSSRC(), ssrc);
+        }, this);
+      }
     }
-  });
-}
 
-/**
- * Add {@link SimSSRC}s to the {@link TrackAttributes}.
- * @returns {void}
- */
-TrackAttributes.prototype.addSimulcastSSRCs = function addSimulcastSSRCs() {
-  if (this.isSimulcastEnabled) {
-    return;
-  }
-  var simulcastSSRCs = [createSSRC(), createSSRC()];
-  simulcastSSRCs.forEach(function(ssrc) {
-    this.primarySSRCs.add(ssrc);
-  }, this);
+    /**
+     * Add the given {@link PrimarySSRC} or {@link RtxSSRC} to the {@link TrackAttributes}
+     * and update the "isSimulcastEnabled" flag if it is also a {@link SimSSRC}.
+     * @param {SSRC} ssrc - The {@link SSRC} to be added
+     * @param {?PrimarySSRC} primarySSRC - The {@link PrimarySSRC}; if the given
+     *   {@link SSRC} itself is the {@link PrimarySSRC}, then this is set to null
+     * @param {boolean} isSimSSRC - true if the given {@link SSRC} is a
+     *   {@link SimSSRC}; false otherwise
+     * @returns {void}
+     */
 
-  if (this.rtxPairs.size) {
-    simulcastSSRCs.forEach(function(ssrc) {
-      this.rtxPairs.set(createSSRC(), ssrc);
-    }, this);
-  }
-};
+  }, {
+    key: 'addSSRC',
+    value: function addSSRC(ssrc, primarySSRC, isSimSSRC) {
+      if (primarySSRC) {
+        this.rtxPairs.set(ssrc, primarySSRC);
+      } else {
+        this.primarySSRCs.add(ssrc);
+      }
+      this.isSimulcastEnabled = this.isSimulcastEnabled || isSimSSRC;
+    }
 
-/**
- * Add the given {@link PrimarySSRC} or {@link RtxSSRC} to the {@link TrackAttributes}
- * and update the "isSimulcastEnabled" flag if it is also a {@link SimSSRC}.
- * @param {SSRC} ssrc - The {@link SSRC} to be added
- * @param {?PrimarySSRC} primarySSRC - The {@link PrimarySSRC}; if the given
- *   {@link SSRC} itself is the {@link PrimarySSRC}, then this is set to null
- * @param {boolean} isSimSSRC - true if the given {@link SSRC} is a
- *   {@link SimSSRC}; false otherwise
- * @returns {void}
- */
-TrackAttributes.prototype.addSSRC = function addSSRC(ssrc, primarySSRC, isSimSSRC) {
-  if (primarySSRC) {
-    this.rtxPairs.set(ssrc, primarySSRC);
-  } else {
-    this.primarySSRCs.add(ssrc);
-  }
-  this.isSimulcastEnabled = this.isSimulcastEnabled || isSimSSRC;
-};
+    /**
+     * Construct the SDP lines for the {@link TrackAttributes}.
+     * @returns {Array<string>} Array of SDP lines
+     */
 
-/**
- * Construct the SDP lines for the {@link TrackAttributes}.
- * @returns {Array<string>} Array of SDP lines
- */
-TrackAttributes.prototype.toSdpLines = function toSdpLines() {
-  var rtxPairs = Array.from(this.rtxPairs.entries()).map(function(rtxPair) {
-    return rtxPair.reverse();
-  });
+  }, {
+    key: 'toSdpLines',
+    value: function toSdpLines() {
+      var _this = this;
 
-  var simSSRCs = Array.from(this.primarySSRCs.values());
-  var ssrcs = rtxPairs.length ? flatMap(rtxPairs) : simSSRCs;
-  var self = this;
+      var rtxPairs = Array.from(this.rtxPairs.entries()).map(function (rtxPair) {
+        return rtxPair.reverse();
+      });
 
-  var attrLines = flatMap(ssrcs, function(ssrc) {
-    return [
-      'a=ssrc:' + ssrc + ' cname:' + self.cName,
-      'a=ssrc:' + ssrc + ' msid:' + self.streamId + ' ' + self.trackId
-    ];
-  });
-  var rtxPairLines = rtxPairs.map(function(rtxPair) {
-    return 'a=ssrc-group:FID ' + rtxPair.join(' ');
-  });
-  var simGroupLines = [
-    'a=ssrc-group:SIM ' + simSSRCs.join(' ')
-  ];
+      var simSSRCs = Array.from(this.primarySSRCs.values());
+      var ssrcs = rtxPairs.length ? flatMap(rtxPairs) : simSSRCs;
 
-  return rtxPairLines.concat(attrLines).concat(simGroupLines);
-};
+      var attrLines = flatMap(ssrcs, function (ssrc) {
+        return ['a=ssrc:' + ssrc + ' cname:' + _this.cName, 'a=ssrc:' + ssrc + ' msid:' + _this.streamId + ' ' + _this.trackId];
+      });
+      var rtxPairLines = rtxPairs.map(function (rtxPair) {
+        return 'a=ssrc-group:FID ' + rtxPair.join(' ');
+      });
+      var simGroupLines = ['a=ssrc-group:SIM ' + simSSRCs.join(' ')];
+
+      return rtxPairLines.concat(attrLines).concat(simGroupLines);
+    }
+  }]);
+
+  return TrackAttributes;
+}();
 
 /**
  * Get the matches for a given RegEx pattern.
@@ -26272,9 +27884,11 @@ TrackAttributes.prototype.toSdpLines = function toSdpLines() {
  * @param {string} pattern - RegEx pattern
  * @returns {Array<Array<string>>} - Array of pattern matches
  */
+
+
 function getMatches(section, pattern) {
   var matches = section.match(new RegExp(pattern, 'gm')) || [];
-  return matches.map(function(match) {
+  return matches.map(function (match) {
     var matches = match.match(new RegExp(pattern)) || [];
     return matches.slice(1);
   });
@@ -26310,7 +27924,7 @@ function getSSRCAttribute(section, ssrc, attribute) {
  */
 function getSSRCRtxPairs(section) {
   var rtxPairPattern = '^a=ssrc-group:FID ([0-9]+) ([0-9]+)$';
-  return new Map(getMatches(section, rtxPairPattern).map(function(pair) {
+  return new Map(getMatches(section, rtxPairPattern).map(function (pair) {
     return pair.reverse();
   }));
 }
@@ -26325,15 +27939,12 @@ function createTrackIdsToAttributes(section) {
   var ssrcAttrTuples = getMatches(section, '^a=ssrc:([0-9]+) msid:([^\\s]+) ([^\\s]+)$');
   var rtxPairs = getSSRCRtxPairs(section);
 
-  return ssrcAttrTuples.reduce(function(trackIdsToSSRCs, tuple) {
+  return ssrcAttrTuples.reduce(function (trackIdsToSSRCs, tuple) {
     var ssrc = tuple[0];
     var streamId = tuple[1];
     var trackId = tuple[2];
 
-    var trackAttributes = trackIdsToSSRCs.get(trackId) || new TrackAttributes(
-      trackId,
-      streamId,
-      getSSRCAttribute(section, ssrc, 'cname'));
+    var trackAttributes = trackIdsToSSRCs.get(trackId) || new TrackAttributes(trackId, streamId, getSSRCAttribute(section, ssrc, 'cname'));
 
     var primarySSRC = rtxPairs.get(ssrc) || null;
     trackAttributes.addSSRC(ssrc, primarySSRC, simSSRCs.has(ssrc));
@@ -26357,10 +27968,10 @@ function setSimulcastInMediaSection(section, trackIdsToAttributes) {
 
   // Update "trackIdsToAttributes" with TrackAttributes for new
   // MediaStreamTrack IDs.
-  var trackAttributesToAdd = flatMap(trackIdsToAdd, function(trackId) {
+  var trackAttributesToAdd = flatMap(trackIdsToAdd, function (trackId) {
     return newTrackIdsToAttributes.get(trackId);
   });
-  trackAttributesToAdd.forEach(function(trackAttributes) {
+  trackAttributesToAdd.forEach(function (trackAttributes) {
     trackAttributes.addSimulcastSSRCs();
     trackIdsToAttributes.set(trackAttributes.trackId, trackAttributes);
   });
@@ -26369,10 +27980,10 @@ function setSimulcastInMediaSection(section, trackIdsToAttributes) {
   // "trackIdsToAttributes".
   trackIds = Array.from(trackIdsToAttributes.keys());
   var relevantTrackIds = difference(trackIds, trackIdsToIgnore);
-  var relevantTrackAttributes = flatMap(relevantTrackIds, function(trackId) {
+  var relevantTrackAttributes = flatMap(relevantTrackIds, function (trackId) {
     return trackIdsToAttributes.get(trackId);
   });
-  var relevantSdpLines = flatMap(relevantTrackAttributes, function(trackAttributes) {
+  var relevantSdpLines = flatMap(relevantTrackAttributes, function (trackAttributes) {
     return trackAttributes.toSdpLines();
   });
 
@@ -26404,90 +28015,120 @@ function setSimulcastInMediaSection(section, trackIdsToAttributes) {
  */
 
 module.exports = setSimulcastInMediaSection;
-
-},{"../":129}],136:[function(require,module,exports){
+},{"../":131}],138:[function(require,module,exports){
 'use strict';
 
 /**
- * Construct an {@link IdentityTrackMatcher}.
- * @class
- * @classdesc An {@link IdentityTrackMatcher} matches RTCTrackEvents
- *   with their respective MediaStreamTrack IDs.
+ * An {@link IdentityTrackMatcher} matches RTCTrackEvents with their respective
+ * MediaStreamTrack IDs.
  */
-function IdentityTrackMatcher() {
-  if (!(this instanceof IdentityTrackMatcher)) {
-    return new IdentityTrackMatcher();
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var IdentityTrackMatcher = function () {
+  function IdentityTrackMatcher() {
+    _classCallCheck(this, IdentityTrackMatcher);
   }
-}
 
-/**
- * Match a given MediaStreamTrack with its ID.
- * @param {RTCTrackEvent} event
- * @returns {Track.ID}
- */
-IdentityTrackMatcher.prototype.match = function match(event) {
-  return event.track.id;
-};
+  _createClass(IdentityTrackMatcher, [{
+    key: 'match',
 
-/**
- * Update the {@link IdentityTrackMatcher} with a new SDP.
- * @param {string} sdp
- */
-IdentityTrackMatcher.prototype.update = function update(/* sdp */) {};
+    /**
+     * Match a given MediaStreamTrack with its ID.
+     * @param {RTCTrackEvent} event
+     * @returns {Track.ID}
+     */
+    value: function match(event) {
+      return event.track.id;
+    }
+
+    /**
+     * Update the {@link IdentityTrackMatcher} with a new SDP.
+     * @param {string} sdp
+     */
+
+  }, {
+    key: 'update',
+    value: function update() {}
+  }]);
+
+  return IdentityTrackMatcher;
+}();
 
 module.exports = IdentityTrackMatcher;
-
-},{}],137:[function(require,module,exports){
+},{}],139:[function(require,module,exports){
 'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var getMediaSections = require('../').getMediaSections;
 
 /**
- * Construct an {@link MIDTrackMatcher}.
- * @class
- * @classdesc An {@link MIDTrackMatcher} matches an RTCTrackEvent with a
- *   MediaStreamTrack ID based on the MID of the underlying RTCRtpTransceiver.
+ * An {@link MIDTrackMatcher} matches an RTCTrackEvent with a MediaStreamTrack
+ * ID based on the MID of the underlying RTCRtpTransceiver.
  */
-function MIDTrackMatcher() {
-  if (!(this instanceof MIDTrackMatcher)) {
-    return new MIDTrackMatcher();
+
+var MIDTrackMatcher = function () {
+  /**
+   * Construct an {@link MIDTrackMatcher}.
+   */
+  function MIDTrackMatcher() {
+    _classCallCheck(this, MIDTrackMatcher);
+
+    Object.defineProperties(this, {
+      _midsToTrackIds: {
+        value: new Map(),
+        writable: true
+      }
+    });
   }
-  Object.defineProperties(this, {
-    _midsToTrackIds: {
-      value: new Map(),
-      writable: true
+
+  /**
+   * Match a given MediaStreamTrack with its ID.
+   * @param {RTCTrackEvent} event
+   * @returns {?Track.ID}
+   */
+
+
+  _createClass(MIDTrackMatcher, [{
+    key: 'match',
+    value: function match(event) {
+      return this._midsToTrackIds.get(event.transceiver.mid) || null;
     }
-  });
-}
 
-/**
- * Match a given MediaStreamTrack with its ID.
- * @param {RTCTrackEvent} event
- * @returns {?Track.ID}
- */
-MIDTrackMatcher.prototype.match = function match(event) {
-  return this._midsToTrackIds.get(event.transceiver.mid) || null;
-};
+    /**
+     * Update the {@link MIDTrackMatcher} with a new SDP.
+     * @param {string} sdp
+     */
 
-/**
- * Update the {@link MIDTrackMatcher} with a new SDP.
- * @param {string} sdp
- */
-MIDTrackMatcher.prototype.update = function update(sdp) {
-  var sections = getMediaSections(sdp, '(audio|video)');
-  this._midsToTrackIds = sections.reduce(function(midsToTrackIds, section) {
-    var midMatches = section.match(/^a=mid:(.+)$/m) || [];
-    var trackIdMatches = section.match(/^a=msid:.+ (.+)$/m) || [];
-    var mid = midMatches[1];
-    var trackId = trackIdMatches[1];
-    return mid && trackId ? midsToTrackIds.set(mid, trackId) : midsToTrackIds;
-  }, this._midsToTrackIds);
-};
+  }, {
+    key: 'update',
+    value: function update(sdp) {
+      var sections = getMediaSections(sdp, '(audio|video)');
+      this._midsToTrackIds = sections.reduce(function (midsToTrackIds, section) {
+        var midMatches = section.match(/^a=mid:(.+)$/m) || [];
+        var trackIdMatches = section.match(/^a=msid:.+ (.+)$/m) || [];
+        var mid = midMatches[1];
+        var trackId = trackIdMatches[1];
+        return mid && trackId ? midsToTrackIds.set(mid, trackId) : midsToTrackIds;
+      }, this._midsToTrackIds);
+    }
+  }]);
+
+  return MIDTrackMatcher;
+}();
 
 module.exports = MIDTrackMatcher;
-
-},{"../":133}],138:[function(require,module,exports){
+},{"../":135}],140:[function(require,module,exports){
 'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var util = require('../../');
 var getMediaSections = require('../').getMediaSections;
@@ -26527,7 +28168,7 @@ function create() {
  * @param {MatchedAndUnmatched} mAndM
  * @returns {?Track.ID} id
  */
-function match(mAndM) {
+function _match(mAndM) {
   var unmatched = Array.from(mAndM.unmatched);
   if (!unmatched.length) {
     return null;
@@ -26544,7 +28185,7 @@ function match(mAndM) {
  * @param {Set<Track.ID>} ids
  * @returns {void}
  */
-function update(mAndM, ids) {
+function _update(mAndM, ids) {
   ids = new Set(ids);
   var removedMatchedIds = util.difference(mAndM.matched, ids);
   removedMatchedIds.forEach(mAndM.matched.delete, mAndM.matched);
@@ -26560,9 +28201,9 @@ function update(mAndM, ids) {
 function parse(kind, sdp) {
   var mediaSections = getMediaSections(sdp, kind);
   var pattern = 'msid: ?(.+) +(.+) ?$';
-  return new Set(util.flatMap(mediaSections, function(mediaSection) {
+  return new Set(util.flatMap(mediaSections, function (mediaSection) {
     return mediaSection.match(new RegExp(pattern, 'mg')) || [];
-  }).map(function(msid) {
+  }).map(function (msid) {
     return msid.match(new RegExp(pattern))[2];
   }));
 }
@@ -26572,45 +28213,59 @@ function parse(kind, sdp) {
  * @property {MatchedAndUnmatched} audio
  * @property {MatchedAndUnmatched} video
  */
-function OrderedTrackMatcher() {
-  if (!(this instanceof OrderedTrackMatcher)) {
-    return new OrderedTrackMatcher();
-  }
-  Object.defineProperties(this, {
-    audio: {
-      enumerable: true,
-      value: create()
-    },
-    video: {
-      enumerable: true,
-      value: create()
+
+var OrderedTrackMatcher = function () {
+  function OrderedTrackMatcher() {
+    _classCallCheck(this, OrderedTrackMatcher);
+
+    if (!(this instanceof OrderedTrackMatcher)) {
+      return new OrderedTrackMatcher();
     }
-  });
-}
+    Object.defineProperties(this, {
+      audio: {
+        enumerable: true,
+        value: create()
+      },
+      video: {
+        enumerable: true,
+        value: create()
+      }
+    });
+  }
 
-/**
- * Attempt to match a new MediaStreamTrack ID.
- * @param {RTCTrackEvent} event
- * @returns {?Track.ID} id
- */
-OrderedTrackMatcher.prototype.match = function(event) {
-  return match(this[event.track.kind]);
-};
+  /**
+   * Attempt to match a new MediaStreamTrack ID.
+   * @param {RTCTrackEvent} event
+   * @returns {?Track.ID} id
+   */
 
-/**
- * Update the {@link OrderedTrackMatcher} with a new SDP.
- * @param {string} sdp
- * @returns {void}
- */
-OrderedTrackMatcher.prototype.update = function(sdp) {
-  ['audio', 'video'].forEach(function(kind) {
-    update(this[kind], parse(kind, sdp));
-  }, this);
-};
+
+  _createClass(OrderedTrackMatcher, [{
+    key: 'match',
+    value: function match(event) {
+      return _match(this[event.track.kind]);
+    }
+
+    /**
+     * Update the {@link OrderedTrackMatcher} with a new SDP.
+     * @param {string} sdp
+     * @returns {void}
+     */
+
+  }, {
+    key: 'update',
+    value: function update(sdp) {
+      ['audio', 'video'].forEach(function (kind) {
+        _update(this[kind], parse(kind, sdp));
+      }, this);
+    }
+  }]);
+
+  return OrderedTrackMatcher;
+}();
 
 module.exports = OrderedTrackMatcher;
-
-},{"../":133,"../../":129}],139:[function(require,module,exports){
+},{"../":135,"../../":131}],141:[function(require,module,exports){
 /* globals RTCPeerConnection, webkitRTCPeerConnection, mozRTCPeerConnection, navigator */
 'use strict';
 
@@ -26621,9 +28276,7 @@ var guessBrowser = require('./').guessBrowser;
  * @returns {boolean}
  */
 function isRTCPeerConnectionSupported() {
-  return typeof RTCPeerConnection !== 'undefined'
-    || typeof webkitRTCPeerConnection !== 'undefined'
-    || typeof mozRTCPeerConnection !== 'undefined';
+  return typeof RTCPeerConnection !== 'undefined' || typeof webkitRTCPeerConnection !== 'undefined' || typeof mozRTCPeerConnection !== 'undefined';
 }
 
 /**
@@ -26631,10 +28284,7 @@ function isRTCPeerConnectionSupported() {
  * @returns {boolean}
  */
 function isGetUserMediaSupported() {
-  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
-    || !!(navigator.getUserMedia)
-    || !!(navigator.webkitGetUserMedia)
-    || !!(navigator.mozGetUserMedia);
+  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) || !!navigator.getUserMedia || !!navigator.webkitGetUserMedia || !!navigator.mozGetUserMedia;
 }
 
 /**
@@ -26642,141 +28292,163 @@ function isGetUserMediaSupported() {
  * @returns {boolean}
  */
 function isSupported() {
-  return !!guessBrowser()
-    && isGetUserMediaSupported()
-    && isRTCPeerConnectionSupported();
+  return !!guessBrowser() && isGetUserMediaSupported() && isRTCPeerConnectionSupported();
 }
 
 module.exports = isSupported;
-
-},{"./":129}],140:[function(require,module,exports){
+},{"./":131}],142:[function(require,module,exports){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var EventEmitter = require('events').EventEmitter;
-var inherits = require('util').inherits;
 var util = require('./');
 
 /**
- * Construct a new {@link TimeoutPromise}.
- * @class
- * @classdesc A Promise that can time out.
- * @extends Promise
- * @param {Promise} original - a Promise
- * @param {?number} [timeout] - the timeout, in milliseconds; providing this in
- *   the constructor invokes {@link TimeoutPromise#start} (otherwise, you must
- *   call {@link TimeoutPromise#start} yourself)
+ * A Promise that can time out.
+ * @extends EventEmitter
+ * @implements Promise
  * @property {?number} timeout - the timeout, in milliseconds
  * @property {boolean} isTimedOut - whether or not the
  *   {@link TimeoutPromise} timed out
- * @fires TimeoutPromise#timedOut
+ * @emits TimeoutPromise#timedOut
  */
-function TimeoutPromise(original, initialTimeout) {
-  if (!(this instanceof TimeoutPromise)) {
-    return new TimeoutPromise(original, initialTimeout);
-  }
-  EventEmitter.call(this);
 
-  var deferred = util.defer();
-  var isTimedOut = false;
-  var timedOut = new Error('Timed out');
-  var timeout = null;
-  var timer = null;
+var TimeoutPromise = function (_EventEmitter) {
+  _inherits(TimeoutPromise, _EventEmitter);
 
-  /* istanbul ignore next */
-  Object.defineProperties(this, {
-    _deferred: {
-      value: deferred
-    },
-    _isTimedOut: {
-      get: function() {
-        return isTimedOut;
+  /**
+   * Construct a new {@link TimeoutPromise}.
+   * @param {Promise} original - a Promise
+   * @param {?number} [timeout] - the timeout, in milliseconds; providing this in
+   *   the constructor invokes {@link TimeoutPromise#start} (otherwise, you must
+   *   call {@link TimeoutPromise#start} yourself)
+   */
+  function TimeoutPromise(original, initialTimeout) {
+    _classCallCheck(this, TimeoutPromise);
+
+    var _this = _possibleConstructorReturn(this, (TimeoutPromise.__proto__ || Object.getPrototypeOf(TimeoutPromise)).call(this));
+
+    var deferred = util.defer();
+    var isTimedOut = false;
+    var timedOut = new Error('Timed out');
+    var timeout = null;
+    var timer = null;
+
+    /* istanbul ignore next */
+    Object.defineProperties(_this, {
+      _deferred: {
+        value: deferred
       },
-      set: function(_isTimedOut) {
-        isTimedOut = _isTimedOut;
-      }
-    },
-    _timedOut: {
-      value: timedOut
-    },
-    _timeout: {
-      get: function() {
-        return timeout;
+      _isTimedOut: {
+        get: function get() {
+          return isTimedOut;
+        },
+        set: function set(_isTimedOut) {
+          isTimedOut = _isTimedOut;
+        }
       },
-      set: function(_timeout) {
-        timeout = _timeout;
-      }
-    },
-    _timer: {
-      get: function() {
-        return timer;
+      _timedOut: {
+        value: timedOut
       },
-      set: function(_timer) {
-        timer = _timer;
+      _timeout: {
+        get: function get() {
+          return timeout;
+        },
+        set: function set(_timeout) {
+          timeout = _timeout;
+        }
+      },
+      _timer: {
+        get: function get() {
+          return timer;
+        },
+        set: function set(_timer) {
+          timer = _timer;
+        }
+      },
+      _promise: {
+        value: deferred.promise
+      },
+      isTimedOut: {
+        enumerable: true,
+        get: function get() {
+          return isTimedOut;
+        }
+      },
+      timeout: {
+        enumerable: true,
+        get: function get() {
+          return timeout;
+        }
       }
-    },
-    _promise: {
-      value: deferred.promise
-    },
-    isTimedOut: {
-      enumerable: true,
-      get: function() {
-        return isTimedOut;
-      }
-    },
-    timeout: {
-      enumerable: true,
-      get: function() {
-        return timeout;
-      }
+    });
+
+    original.then(function (result) {
+      clearTimeout(_this._timer);
+      deferred.resolve(result);
+    }, function (reason) {
+      clearTimeout(_this._timer);
+      deferred.reject(reason);
+    });
+
+    if (initialTimeout) {
+      _this.start(initialTimeout);
     }
-  });
-
-  var self = this;
-  original.then(function originalResolved() {
-    clearTimeout(self._timer);
-    deferred.resolve.apply(deferred.promise, arguments);
-  }, function originalRejected() {
-    clearTimeout(self._timer);
-    deferred.reject.apply(deferred.promise, arguments);
-  });
-
-  if (initialTimeout) {
-    this.start(initialTimeout);
+    return _this;
   }
-}
 
-inherits(TimeoutPromise, EventEmitter);
+  _createClass(TimeoutPromise, [{
+    key: 'catch',
+    value: function _catch() {
+      var _promise;
 
-TimeoutPromise.prototype.catch = function _catch() {
-  return this._promise.catch.apply(this._promise, arguments);
-};
-
-/**
- * Start the timer that will time out the {@link TimeoutPromise} if the
- * original Promise has neither resolved nor rejected. Subsequent calls have no
- * effect once the {@link TimeoutPromise} is started.
- * @param {number} timeout - the timeout, in milliseconds
- * @returns {this}
- */
-TimeoutPromise.prototype.start = function start(timeout) {
-  if (this._timer) {
-    return this;
-  }
-  var self = this;
-  this._timeout = timeout;
-  this._timer = setTimeout(function timer() {
-    if (self._timer) {
-      self._isTimedOut = true;
-      self.emit('timedOut', self);
-      self._deferred.reject(self._timedOut);
+      return (_promise = this._promise).catch.apply(_promise, arguments);
     }
-  }, this.timeout);
-  return this;
-};
 
-TimeoutPromise.prototype.then = function then() {
-  return this._promise.then.apply(this._promise, arguments);
-};
+    /**
+     * Start the timer that will time out the {@link TimeoutPromise} if the
+     * original Promise has neither resolved nor rejected. Subsequent calls have no
+     * effect once the {@link TimeoutPromise} is started.
+     * @param {number} timeout - the timeout, in milliseconds
+     * @returns {this}
+     */
+
+  }, {
+    key: 'start',
+    value: function start(timeout) {
+      var _this2 = this;
+
+      if (this._timer) {
+        return this;
+      }
+      this._timeout = timeout;
+      this._timer = setTimeout(function () {
+        if (_this2._timer) {
+          _this2._isTimedOut = true;
+          _this2.emit('timedOut', _this2);
+          _this2._deferred.reject(_this2._timedOut);
+        }
+      }, this.timeout);
+      return this;
+    }
+  }, {
+    key: 'then',
+    value: function then() {
+      var _promise2;
+
+      return (_promise2 = this._promise).then.apply(_promise2, arguments);
+    }
+  }]);
+
+  return TimeoutPromise;
+}(EventEmitter);
 
 /**
  * The {@link TimeoutPromise} timed out.
@@ -26785,14 +28457,18 @@ TimeoutPromise.prototype.then = function then() {
  */
 
 module.exports = TimeoutPromise;
+},{"./":131,"events":152}],143:[function(require,module,exports){
+'use strict';
 
-},{"./":129,"events":54,"util":149}],141:[function(require,module,exports){
 // NOTE: Do not edit this file. This code is auto-generated. Contact the
 // Twilio SDK Team for more information.
 
-'use strict';
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var inherits = require('util').inherits;
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var TwilioError = require('./twilioerror');
 var TwilioErrorByCode = {};
 
@@ -26816,13 +28492,19 @@ exports.createTwilioError = function createTwilioError(code, message) {
  * @property {number} code - 20101
  * @property {string} message - 'Invalid Access Token'
  */
-function AccessTokenInvalidError() {
-  TwilioError.call(this,
-    20101,
-    'Invalid Access Token'
-  );
-}
-inherits(AccessTokenInvalidError, TwilioError);
+
+var AccessTokenInvalidError = function (_TwilioError) {
+  _inherits(AccessTokenInvalidError, _TwilioError);
+
+  function AccessTokenInvalidError() {
+    _classCallCheck(this, AccessTokenInvalidError);
+
+    return _possibleConstructorReturn(this, (AccessTokenInvalidError.__proto__ || Object.getPrototypeOf(AccessTokenInvalidError)).call(this, 20101, 'Invalid Access Token'));
+  }
+
+  return AccessTokenInvalidError;
+}(TwilioError);
+
 exports.AccessTokenInvalidError = AccessTokenInvalidError;
 Object.defineProperty(TwilioErrorByCode, 20101, { value: AccessTokenInvalidError });
 
@@ -26833,13 +28515,19 @@ Object.defineProperty(TwilioErrorByCode, 20101, { value: AccessTokenInvalidError
  * @property {number} code - 20102
  * @property {string} message - 'Invalid Access Token header'
  */
-function AccessTokenHeaderInvalidError() {
-  TwilioError.call(this,
-    20102,
-    'Invalid Access Token header'
-  );
-}
-inherits(AccessTokenHeaderInvalidError, TwilioError);
+
+var AccessTokenHeaderInvalidError = function (_TwilioError2) {
+  _inherits(AccessTokenHeaderInvalidError, _TwilioError2);
+
+  function AccessTokenHeaderInvalidError() {
+    _classCallCheck(this, AccessTokenHeaderInvalidError);
+
+    return _possibleConstructorReturn(this, (AccessTokenHeaderInvalidError.__proto__ || Object.getPrototypeOf(AccessTokenHeaderInvalidError)).call(this, 20102, 'Invalid Access Token header'));
+  }
+
+  return AccessTokenHeaderInvalidError;
+}(TwilioError);
+
 exports.AccessTokenHeaderInvalidError = AccessTokenHeaderInvalidError;
 Object.defineProperty(TwilioErrorByCode, 20102, { value: AccessTokenHeaderInvalidError });
 
@@ -26850,13 +28538,19 @@ Object.defineProperty(TwilioErrorByCode, 20102, { value: AccessTokenHeaderInvali
  * @property {number} code - 20103
  * @property {string} message - 'Invalid Access Token issuer/subject'
  */
-function AccessTokenIssuerInvalidError() {
-  TwilioError.call(this,
-    20103,
-    'Invalid Access Token issuer/subject'
-  );
-}
-inherits(AccessTokenIssuerInvalidError, TwilioError);
+
+var AccessTokenIssuerInvalidError = function (_TwilioError3) {
+  _inherits(AccessTokenIssuerInvalidError, _TwilioError3);
+
+  function AccessTokenIssuerInvalidError() {
+    _classCallCheck(this, AccessTokenIssuerInvalidError);
+
+    return _possibleConstructorReturn(this, (AccessTokenIssuerInvalidError.__proto__ || Object.getPrototypeOf(AccessTokenIssuerInvalidError)).call(this, 20103, 'Invalid Access Token issuer/subject'));
+  }
+
+  return AccessTokenIssuerInvalidError;
+}(TwilioError);
+
 exports.AccessTokenIssuerInvalidError = AccessTokenIssuerInvalidError;
 Object.defineProperty(TwilioErrorByCode, 20103, { value: AccessTokenIssuerInvalidError });
 
@@ -26867,13 +28561,19 @@ Object.defineProperty(TwilioErrorByCode, 20103, { value: AccessTokenIssuerInvali
  * @property {number} code - 20104
  * @property {string} message - 'Access Token expired or expiration date invalid'
  */
-function AccessTokenExpiredError() {
-  TwilioError.call(this,
-    20104,
-    'Access Token expired or expiration date invalid'
-  );
-}
-inherits(AccessTokenExpiredError, TwilioError);
+
+var AccessTokenExpiredError = function (_TwilioError4) {
+  _inherits(AccessTokenExpiredError, _TwilioError4);
+
+  function AccessTokenExpiredError() {
+    _classCallCheck(this, AccessTokenExpiredError);
+
+    return _possibleConstructorReturn(this, (AccessTokenExpiredError.__proto__ || Object.getPrototypeOf(AccessTokenExpiredError)).call(this, 20104, 'Access Token expired or expiration date invalid'));
+  }
+
+  return AccessTokenExpiredError;
+}(TwilioError);
+
 exports.AccessTokenExpiredError = AccessTokenExpiredError;
 Object.defineProperty(TwilioErrorByCode, 20104, { value: AccessTokenExpiredError });
 
@@ -26884,13 +28584,19 @@ Object.defineProperty(TwilioErrorByCode, 20104, { value: AccessTokenExpiredError
  * @property {number} code - 20105
  * @property {string} message - 'Access Token not yet valid'
  */
-function AccessTokenNotYetValidError() {
-  TwilioError.call(this,
-    20105,
-    'Access Token not yet valid'
-  );
-}
-inherits(AccessTokenNotYetValidError, TwilioError);
+
+var AccessTokenNotYetValidError = function (_TwilioError5) {
+  _inherits(AccessTokenNotYetValidError, _TwilioError5);
+
+  function AccessTokenNotYetValidError() {
+    _classCallCheck(this, AccessTokenNotYetValidError);
+
+    return _possibleConstructorReturn(this, (AccessTokenNotYetValidError.__proto__ || Object.getPrototypeOf(AccessTokenNotYetValidError)).call(this, 20105, 'Access Token not yet valid'));
+  }
+
+  return AccessTokenNotYetValidError;
+}(TwilioError);
+
 exports.AccessTokenNotYetValidError = AccessTokenNotYetValidError;
 Object.defineProperty(TwilioErrorByCode, 20105, { value: AccessTokenNotYetValidError });
 
@@ -26901,13 +28607,19 @@ Object.defineProperty(TwilioErrorByCode, 20105, { value: AccessTokenNotYetValidE
  * @property {number} code - 20106
  * @property {string} message - 'Invalid Access Token grants'
  */
-function AccessTokenGrantsInvalidError() {
-  TwilioError.call(this,
-    20106,
-    'Invalid Access Token grants'
-  );
-}
-inherits(AccessTokenGrantsInvalidError, TwilioError);
+
+var AccessTokenGrantsInvalidError = function (_TwilioError6) {
+  _inherits(AccessTokenGrantsInvalidError, _TwilioError6);
+
+  function AccessTokenGrantsInvalidError() {
+    _classCallCheck(this, AccessTokenGrantsInvalidError);
+
+    return _possibleConstructorReturn(this, (AccessTokenGrantsInvalidError.__proto__ || Object.getPrototypeOf(AccessTokenGrantsInvalidError)).call(this, 20106, 'Invalid Access Token grants'));
+  }
+
+  return AccessTokenGrantsInvalidError;
+}(TwilioError);
+
 exports.AccessTokenGrantsInvalidError = AccessTokenGrantsInvalidError;
 Object.defineProperty(TwilioErrorByCode, 20106, { value: AccessTokenGrantsInvalidError });
 
@@ -26918,13 +28630,19 @@ Object.defineProperty(TwilioErrorByCode, 20106, { value: AccessTokenGrantsInvali
  * @property {number} code - 20107
  * @property {string} message - 'Invalid Access Token signature'
  */
-function AccessTokenSignatureInvalidError() {
-  TwilioError.call(this,
-    20107,
-    'Invalid Access Token signature'
-  );
-}
-inherits(AccessTokenSignatureInvalidError, TwilioError);
+
+var AccessTokenSignatureInvalidError = function (_TwilioError7) {
+  _inherits(AccessTokenSignatureInvalidError, _TwilioError7);
+
+  function AccessTokenSignatureInvalidError() {
+    _classCallCheck(this, AccessTokenSignatureInvalidError);
+
+    return _possibleConstructorReturn(this, (AccessTokenSignatureInvalidError.__proto__ || Object.getPrototypeOf(AccessTokenSignatureInvalidError)).call(this, 20107, 'Invalid Access Token signature'));
+  }
+
+  return AccessTokenSignatureInvalidError;
+}(TwilioError);
+
 exports.AccessTokenSignatureInvalidError = AccessTokenSignatureInvalidError;
 Object.defineProperty(TwilioErrorByCode, 20107, { value: AccessTokenSignatureInvalidError });
 
@@ -26935,13 +28653,19 @@ Object.defineProperty(TwilioErrorByCode, 20107, { value: AccessTokenSignatureInv
  * @property {number} code - 53000
  * @property {string} message - 'Signaling connection error'
  */
-function SignalingConnectionError() {
-  TwilioError.call(this,
-    53000,
-    'Signaling connection error'
-  );
-}
-inherits(SignalingConnectionError, TwilioError);
+
+var SignalingConnectionError = function (_TwilioError8) {
+  _inherits(SignalingConnectionError, _TwilioError8);
+
+  function SignalingConnectionError() {
+    _classCallCheck(this, SignalingConnectionError);
+
+    return _possibleConstructorReturn(this, (SignalingConnectionError.__proto__ || Object.getPrototypeOf(SignalingConnectionError)).call(this, 53000, 'Signaling connection error'));
+  }
+
+  return SignalingConnectionError;
+}(TwilioError);
+
 exports.SignalingConnectionError = SignalingConnectionError;
 Object.defineProperty(TwilioErrorByCode, 53000, { value: SignalingConnectionError });
 
@@ -26952,13 +28676,19 @@ Object.defineProperty(TwilioErrorByCode, 53000, { value: SignalingConnectionErro
  * @property {number} code - 53001
  * @property {string} message - 'Signaling connection disconnected'
  */
-function SignalingConnectionDisconnectedError() {
-  TwilioError.call(this,
-    53001,
-    'Signaling connection disconnected'
-  );
-}
-inherits(SignalingConnectionDisconnectedError, TwilioError);
+
+var SignalingConnectionDisconnectedError = function (_TwilioError9) {
+  _inherits(SignalingConnectionDisconnectedError, _TwilioError9);
+
+  function SignalingConnectionDisconnectedError() {
+    _classCallCheck(this, SignalingConnectionDisconnectedError);
+
+    return _possibleConstructorReturn(this, (SignalingConnectionDisconnectedError.__proto__ || Object.getPrototypeOf(SignalingConnectionDisconnectedError)).call(this, 53001, 'Signaling connection disconnected'));
+  }
+
+  return SignalingConnectionDisconnectedError;
+}(TwilioError);
+
 exports.SignalingConnectionDisconnectedError = SignalingConnectionDisconnectedError;
 Object.defineProperty(TwilioErrorByCode, 53001, { value: SignalingConnectionDisconnectedError });
 
@@ -26969,13 +28699,19 @@ Object.defineProperty(TwilioErrorByCode, 53001, { value: SignalingConnectionDisc
  * @property {number} code - 53002
  * @property {string} message - 'Signaling connection timed out'
  */
-function SignalingConnectionTimeoutError() {
-  TwilioError.call(this,
-    53002,
-    'Signaling connection timed out'
-  );
-}
-inherits(SignalingConnectionTimeoutError, TwilioError);
+
+var SignalingConnectionTimeoutError = function (_TwilioError10) {
+  _inherits(SignalingConnectionTimeoutError, _TwilioError10);
+
+  function SignalingConnectionTimeoutError() {
+    _classCallCheck(this, SignalingConnectionTimeoutError);
+
+    return _possibleConstructorReturn(this, (SignalingConnectionTimeoutError.__proto__ || Object.getPrototypeOf(SignalingConnectionTimeoutError)).call(this, 53002, 'Signaling connection timed out'));
+  }
+
+  return SignalingConnectionTimeoutError;
+}(TwilioError);
+
 exports.SignalingConnectionTimeoutError = SignalingConnectionTimeoutError;
 Object.defineProperty(TwilioErrorByCode, 53002, { value: SignalingConnectionTimeoutError });
 
@@ -26986,13 +28722,19 @@ Object.defineProperty(TwilioErrorByCode, 53002, { value: SignalingConnectionTime
  * @property {number} code - 53003
  * @property {string} message - 'Client received an invalid signaling message'
  */
-function SignalingIncomingMessageInvalidError() {
-  TwilioError.call(this,
-    53003,
-    'Client received an invalid signaling message'
-  );
-}
-inherits(SignalingIncomingMessageInvalidError, TwilioError);
+
+var SignalingIncomingMessageInvalidError = function (_TwilioError11) {
+  _inherits(SignalingIncomingMessageInvalidError, _TwilioError11);
+
+  function SignalingIncomingMessageInvalidError() {
+    _classCallCheck(this, SignalingIncomingMessageInvalidError);
+
+    return _possibleConstructorReturn(this, (SignalingIncomingMessageInvalidError.__proto__ || Object.getPrototypeOf(SignalingIncomingMessageInvalidError)).call(this, 53003, 'Client received an invalid signaling message'));
+  }
+
+  return SignalingIncomingMessageInvalidError;
+}(TwilioError);
+
 exports.SignalingIncomingMessageInvalidError = SignalingIncomingMessageInvalidError;
 Object.defineProperty(TwilioErrorByCode, 53003, { value: SignalingIncomingMessageInvalidError });
 
@@ -27003,13 +28745,19 @@ Object.defineProperty(TwilioErrorByCode, 53003, { value: SignalingIncomingMessag
  * @property {number} code - 53004
  * @property {string} message - 'Client sent an invalid signaling message'
  */
-function SignalingOutgoingMessageInvalidError() {
-  TwilioError.call(this,
-    53004,
-    'Client sent an invalid signaling message'
-  );
-}
-inherits(SignalingOutgoingMessageInvalidError, TwilioError);
+
+var SignalingOutgoingMessageInvalidError = function (_TwilioError12) {
+  _inherits(SignalingOutgoingMessageInvalidError, _TwilioError12);
+
+  function SignalingOutgoingMessageInvalidError() {
+    _classCallCheck(this, SignalingOutgoingMessageInvalidError);
+
+    return _possibleConstructorReturn(this, (SignalingOutgoingMessageInvalidError.__proto__ || Object.getPrototypeOf(SignalingOutgoingMessageInvalidError)).call(this, 53004, 'Client sent an invalid signaling message'));
+  }
+
+  return SignalingOutgoingMessageInvalidError;
+}(TwilioError);
+
 exports.SignalingOutgoingMessageInvalidError = SignalingOutgoingMessageInvalidError;
 Object.defineProperty(TwilioErrorByCode, 53004, { value: SignalingOutgoingMessageInvalidError });
 
@@ -27020,13 +28768,19 @@ Object.defineProperty(TwilioErrorByCode, 53004, { value: SignalingOutgoingMessag
  * @property {number} code - 53100
  * @property {string} message - 'Room name is invalid'
  */
-function RoomNameInvalidError() {
-  TwilioError.call(this,
-    53100,
-    'Room name is invalid'
-  );
-}
-inherits(RoomNameInvalidError, TwilioError);
+
+var RoomNameInvalidError = function (_TwilioError13) {
+  _inherits(RoomNameInvalidError, _TwilioError13);
+
+  function RoomNameInvalidError() {
+    _classCallCheck(this, RoomNameInvalidError);
+
+    return _possibleConstructorReturn(this, (RoomNameInvalidError.__proto__ || Object.getPrototypeOf(RoomNameInvalidError)).call(this, 53100, 'Room name is invalid'));
+  }
+
+  return RoomNameInvalidError;
+}(TwilioError);
+
 exports.RoomNameInvalidError = RoomNameInvalidError;
 Object.defineProperty(TwilioErrorByCode, 53100, { value: RoomNameInvalidError });
 
@@ -27037,13 +28791,19 @@ Object.defineProperty(TwilioErrorByCode, 53100, { value: RoomNameInvalidError })
  * @property {number} code - 53101
  * @property {string} message - 'Room name is too long'
  */
-function RoomNameTooLongError() {
-  TwilioError.call(this,
-    53101,
-    'Room name is too long'
-  );
-}
-inherits(RoomNameTooLongError, TwilioError);
+
+var RoomNameTooLongError = function (_TwilioError14) {
+  _inherits(RoomNameTooLongError, _TwilioError14);
+
+  function RoomNameTooLongError() {
+    _classCallCheck(this, RoomNameTooLongError);
+
+    return _possibleConstructorReturn(this, (RoomNameTooLongError.__proto__ || Object.getPrototypeOf(RoomNameTooLongError)).call(this, 53101, 'Room name is too long'));
+  }
+
+  return RoomNameTooLongError;
+}(TwilioError);
+
 exports.RoomNameTooLongError = RoomNameTooLongError;
 Object.defineProperty(TwilioErrorByCode, 53101, { value: RoomNameTooLongError });
 
@@ -27054,13 +28814,19 @@ Object.defineProperty(TwilioErrorByCode, 53101, { value: RoomNameTooLongError })
  * @property {number} code - 53102
  * @property {string} message - 'Room name contains invalid characters'
  */
-function RoomNameCharsInvalidError() {
-  TwilioError.call(this,
-    53102,
-    'Room name contains invalid characters'
-  );
-}
-inherits(RoomNameCharsInvalidError, TwilioError);
+
+var RoomNameCharsInvalidError = function (_TwilioError15) {
+  _inherits(RoomNameCharsInvalidError, _TwilioError15);
+
+  function RoomNameCharsInvalidError() {
+    _classCallCheck(this, RoomNameCharsInvalidError);
+
+    return _possibleConstructorReturn(this, (RoomNameCharsInvalidError.__proto__ || Object.getPrototypeOf(RoomNameCharsInvalidError)).call(this, 53102, 'Room name contains invalid characters'));
+  }
+
+  return RoomNameCharsInvalidError;
+}(TwilioError);
+
 exports.RoomNameCharsInvalidError = RoomNameCharsInvalidError;
 Object.defineProperty(TwilioErrorByCode, 53102, { value: RoomNameCharsInvalidError });
 
@@ -27071,13 +28837,19 @@ Object.defineProperty(TwilioErrorByCode, 53102, { value: RoomNameCharsInvalidErr
  * @property {number} code - 53103
  * @property {string} message - 'Unable to create Room'
  */
-function RoomCreateFailedError() {
-  TwilioError.call(this,
-    53103,
-    'Unable to create Room'
-  );
-}
-inherits(RoomCreateFailedError, TwilioError);
+
+var RoomCreateFailedError = function (_TwilioError16) {
+  _inherits(RoomCreateFailedError, _TwilioError16);
+
+  function RoomCreateFailedError() {
+    _classCallCheck(this, RoomCreateFailedError);
+
+    return _possibleConstructorReturn(this, (RoomCreateFailedError.__proto__ || Object.getPrototypeOf(RoomCreateFailedError)).call(this, 53103, 'Unable to create Room'));
+  }
+
+  return RoomCreateFailedError;
+}(TwilioError);
+
 exports.RoomCreateFailedError = RoomCreateFailedError;
 Object.defineProperty(TwilioErrorByCode, 53103, { value: RoomCreateFailedError });
 
@@ -27088,13 +28860,19 @@ Object.defineProperty(TwilioErrorByCode, 53103, { value: RoomCreateFailedError }
  * @property {number} code - 53104
  * @property {string} message - 'Unable to connect to Room'
  */
-function RoomConnectFailedError() {
-  TwilioError.call(this,
-    53104,
-    'Unable to connect to Room'
-  );
-}
-inherits(RoomConnectFailedError, TwilioError);
+
+var RoomConnectFailedError = function (_TwilioError17) {
+  _inherits(RoomConnectFailedError, _TwilioError17);
+
+  function RoomConnectFailedError() {
+    _classCallCheck(this, RoomConnectFailedError);
+
+    return _possibleConstructorReturn(this, (RoomConnectFailedError.__proto__ || Object.getPrototypeOf(RoomConnectFailedError)).call(this, 53104, 'Unable to connect to Room'));
+  }
+
+  return RoomConnectFailedError;
+}(TwilioError);
+
 exports.RoomConnectFailedError = RoomConnectFailedError;
 Object.defineProperty(TwilioErrorByCode, 53104, { value: RoomConnectFailedError });
 
@@ -27105,13 +28883,19 @@ Object.defineProperty(TwilioErrorByCode, 53104, { value: RoomConnectFailedError 
  * @property {number} code - 53105
  * @property {string} message - 'Room contains too many Participants'
  */
-function RoomMaxParticipantsExceededError() {
-  TwilioError.call(this,
-    53105,
-    'Room contains too many Participants'
-  );
-}
-inherits(RoomMaxParticipantsExceededError, TwilioError);
+
+var RoomMaxParticipantsExceededError = function (_TwilioError18) {
+  _inherits(RoomMaxParticipantsExceededError, _TwilioError18);
+
+  function RoomMaxParticipantsExceededError() {
+    _classCallCheck(this, RoomMaxParticipantsExceededError);
+
+    return _possibleConstructorReturn(this, (RoomMaxParticipantsExceededError.__proto__ || Object.getPrototypeOf(RoomMaxParticipantsExceededError)).call(this, 53105, 'Room contains too many Participants'));
+  }
+
+  return RoomMaxParticipantsExceededError;
+}(TwilioError);
+
 exports.RoomMaxParticipantsExceededError = RoomMaxParticipantsExceededError;
 Object.defineProperty(TwilioErrorByCode, 53105, { value: RoomMaxParticipantsExceededError });
 
@@ -27122,13 +28906,19 @@ Object.defineProperty(TwilioErrorByCode, 53105, { value: RoomMaxParticipantsExce
  * @property {number} code - 53106
  * @property {string} message - 'Room not found'
  */
-function RoomNotFoundError() {
-  TwilioError.call(this,
-    53106,
-    'Room not found'
-  );
-}
-inherits(RoomNotFoundError, TwilioError);
+
+var RoomNotFoundError = function (_TwilioError19) {
+  _inherits(RoomNotFoundError, _TwilioError19);
+
+  function RoomNotFoundError() {
+    _classCallCheck(this, RoomNotFoundError);
+
+    return _possibleConstructorReturn(this, (RoomNotFoundError.__proto__ || Object.getPrototypeOf(RoomNotFoundError)).call(this, 53106, 'Room not found'));
+  }
+
+  return RoomNotFoundError;
+}(TwilioError);
+
 exports.RoomNotFoundError = RoomNotFoundError;
 Object.defineProperty(TwilioErrorByCode, 53106, { value: RoomNotFoundError });
 
@@ -27139,13 +28929,19 @@ Object.defineProperty(TwilioErrorByCode, 53106, { value: RoomNotFoundError });
  * @property {number} code - 53107
  * @property {string} message - 'MaxParticipants is out of range'
  */
-function RoomMaxParticipantsOutOfRangeError() {
-  TwilioError.call(this,
-    53107,
-    'MaxParticipants is out of range'
-  );
-}
-inherits(RoomMaxParticipantsOutOfRangeError, TwilioError);
+
+var RoomMaxParticipantsOutOfRangeError = function (_TwilioError20) {
+  _inherits(RoomMaxParticipantsOutOfRangeError, _TwilioError20);
+
+  function RoomMaxParticipantsOutOfRangeError() {
+    _classCallCheck(this, RoomMaxParticipantsOutOfRangeError);
+
+    return _possibleConstructorReturn(this, (RoomMaxParticipantsOutOfRangeError.__proto__ || Object.getPrototypeOf(RoomMaxParticipantsOutOfRangeError)).call(this, 53107, 'MaxParticipants is out of range'));
+  }
+
+  return RoomMaxParticipantsOutOfRangeError;
+}(TwilioError);
+
 exports.RoomMaxParticipantsOutOfRangeError = RoomMaxParticipantsOutOfRangeError;
 Object.defineProperty(TwilioErrorByCode, 53107, { value: RoomMaxParticipantsOutOfRangeError });
 
@@ -27156,13 +28952,19 @@ Object.defineProperty(TwilioErrorByCode, 53107, { value: RoomMaxParticipantsOutO
  * @property {number} code - 53108
  * @property {string} message - 'RoomType is not valid'
  */
-function RoomTypeInvalidError() {
-  TwilioError.call(this,
-    53108,
-    'RoomType is not valid'
-  );
-}
-inherits(RoomTypeInvalidError, TwilioError);
+
+var RoomTypeInvalidError = function (_TwilioError21) {
+  _inherits(RoomTypeInvalidError, _TwilioError21);
+
+  function RoomTypeInvalidError() {
+    _classCallCheck(this, RoomTypeInvalidError);
+
+    return _possibleConstructorReturn(this, (RoomTypeInvalidError.__proto__ || Object.getPrototypeOf(RoomTypeInvalidError)).call(this, 53108, 'RoomType is not valid'));
+  }
+
+  return RoomTypeInvalidError;
+}(TwilioError);
+
 exports.RoomTypeInvalidError = RoomTypeInvalidError;
 Object.defineProperty(TwilioErrorByCode, 53108, { value: RoomTypeInvalidError });
 
@@ -27173,13 +28975,19 @@ Object.defineProperty(TwilioErrorByCode, 53108, { value: RoomTypeInvalidError })
  * @property {number} code - 53109
  * @property {string} message - 'Timeout is out of range'
  */
-function RoomTimeoutOutOfRangeError() {
-  TwilioError.call(this,
-    53109,
-    'Timeout is out of range'
-  );
-}
-inherits(RoomTimeoutOutOfRangeError, TwilioError);
+
+var RoomTimeoutOutOfRangeError = function (_TwilioError22) {
+  _inherits(RoomTimeoutOutOfRangeError, _TwilioError22);
+
+  function RoomTimeoutOutOfRangeError() {
+    _classCallCheck(this, RoomTimeoutOutOfRangeError);
+
+    return _possibleConstructorReturn(this, (RoomTimeoutOutOfRangeError.__proto__ || Object.getPrototypeOf(RoomTimeoutOutOfRangeError)).call(this, 53109, 'Timeout is out of range'));
+  }
+
+  return RoomTimeoutOutOfRangeError;
+}(TwilioError);
+
 exports.RoomTimeoutOutOfRangeError = RoomTimeoutOutOfRangeError;
 Object.defineProperty(TwilioErrorByCode, 53109, { value: RoomTimeoutOutOfRangeError });
 
@@ -27190,13 +28998,19 @@ Object.defineProperty(TwilioErrorByCode, 53109, { value: RoomTimeoutOutOfRangeEr
  * @property {number} code - 53110
  * @property {string} message - 'StatusCallbackMethod is invalid'
  */
-function RoomStatusCallbackMethodInvalidError() {
-  TwilioError.call(this,
-    53110,
-    'StatusCallbackMethod is invalid'
-  );
-}
-inherits(RoomStatusCallbackMethodInvalidError, TwilioError);
+
+var RoomStatusCallbackMethodInvalidError = function (_TwilioError23) {
+  _inherits(RoomStatusCallbackMethodInvalidError, _TwilioError23);
+
+  function RoomStatusCallbackMethodInvalidError() {
+    _classCallCheck(this, RoomStatusCallbackMethodInvalidError);
+
+    return _possibleConstructorReturn(this, (RoomStatusCallbackMethodInvalidError.__proto__ || Object.getPrototypeOf(RoomStatusCallbackMethodInvalidError)).call(this, 53110, 'StatusCallbackMethod is invalid'));
+  }
+
+  return RoomStatusCallbackMethodInvalidError;
+}(TwilioError);
+
 exports.RoomStatusCallbackMethodInvalidError = RoomStatusCallbackMethodInvalidError;
 Object.defineProperty(TwilioErrorByCode, 53110, { value: RoomStatusCallbackMethodInvalidError });
 
@@ -27207,13 +29021,19 @@ Object.defineProperty(TwilioErrorByCode, 53110, { value: RoomStatusCallbackMetho
  * @property {number} code - 53111
  * @property {string} message - 'StatusCallback is invalid'
  */
-function RoomStatusCallbackInvalidError() {
-  TwilioError.call(this,
-    53111,
-    'StatusCallback is invalid'
-  );
-}
-inherits(RoomStatusCallbackInvalidError, TwilioError);
+
+var RoomStatusCallbackInvalidError = function (_TwilioError24) {
+  _inherits(RoomStatusCallbackInvalidError, _TwilioError24);
+
+  function RoomStatusCallbackInvalidError() {
+    _classCallCheck(this, RoomStatusCallbackInvalidError);
+
+    return _possibleConstructorReturn(this, (RoomStatusCallbackInvalidError.__proto__ || Object.getPrototypeOf(RoomStatusCallbackInvalidError)).call(this, 53111, 'StatusCallback is invalid'));
+  }
+
+  return RoomStatusCallbackInvalidError;
+}(TwilioError);
+
 exports.RoomStatusCallbackInvalidError = RoomStatusCallbackInvalidError;
 Object.defineProperty(TwilioErrorByCode, 53111, { value: RoomStatusCallbackInvalidError });
 
@@ -27224,13 +29044,19 @@ Object.defineProperty(TwilioErrorByCode, 53111, { value: RoomStatusCallbackInval
  * @property {number} code - 53112
  * @property {string} message - 'Status is invalid'
  */
-function RoomStatusInvalidError() {
-  TwilioError.call(this,
-    53112,
-    'Status is invalid'
-  );
-}
-inherits(RoomStatusInvalidError, TwilioError);
+
+var RoomStatusInvalidError = function (_TwilioError25) {
+  _inherits(RoomStatusInvalidError, _TwilioError25);
+
+  function RoomStatusInvalidError() {
+    _classCallCheck(this, RoomStatusInvalidError);
+
+    return _possibleConstructorReturn(this, (RoomStatusInvalidError.__proto__ || Object.getPrototypeOf(RoomStatusInvalidError)).call(this, 53112, 'Status is invalid'));
+  }
+
+  return RoomStatusInvalidError;
+}(TwilioError);
+
 exports.RoomStatusInvalidError = RoomStatusInvalidError;
 Object.defineProperty(TwilioErrorByCode, 53112, { value: RoomStatusInvalidError });
 
@@ -27241,13 +29067,19 @@ Object.defineProperty(TwilioErrorByCode, 53112, { value: RoomStatusInvalidError 
  * @property {number} code - 53113
  * @property {string} message - 'Room exists'
  */
-function RoomRoomExistsError() {
-  TwilioError.call(this,
-    53113,
-    'Room exists'
-  );
-}
-inherits(RoomRoomExistsError, TwilioError);
+
+var RoomRoomExistsError = function (_TwilioError26) {
+  _inherits(RoomRoomExistsError, _TwilioError26);
+
+  function RoomRoomExistsError() {
+    _classCallCheck(this, RoomRoomExistsError);
+
+    return _possibleConstructorReturn(this, (RoomRoomExistsError.__proto__ || Object.getPrototypeOf(RoomRoomExistsError)).call(this, 53113, 'Room exists'));
+  }
+
+  return RoomRoomExistsError;
+}(TwilioError);
+
 exports.RoomRoomExistsError = RoomRoomExistsError;
 Object.defineProperty(TwilioErrorByCode, 53113, { value: RoomRoomExistsError });
 
@@ -27258,13 +29090,19 @@ Object.defineProperty(TwilioErrorByCode, 53113, { value: RoomRoomExistsError });
  * @property {number} code - 53200
  * @property {string} message - 'Participant identity is invalid'
  */
-function ParticipantIdentityInvalidError() {
-  TwilioError.call(this,
-    53200,
-    'Participant identity is invalid'
-  );
-}
-inherits(ParticipantIdentityInvalidError, TwilioError);
+
+var ParticipantIdentityInvalidError = function (_TwilioError27) {
+  _inherits(ParticipantIdentityInvalidError, _TwilioError27);
+
+  function ParticipantIdentityInvalidError() {
+    _classCallCheck(this, ParticipantIdentityInvalidError);
+
+    return _possibleConstructorReturn(this, (ParticipantIdentityInvalidError.__proto__ || Object.getPrototypeOf(ParticipantIdentityInvalidError)).call(this, 53200, 'Participant identity is invalid'));
+  }
+
+  return ParticipantIdentityInvalidError;
+}(TwilioError);
+
 exports.ParticipantIdentityInvalidError = ParticipantIdentityInvalidError;
 Object.defineProperty(TwilioErrorByCode, 53200, { value: ParticipantIdentityInvalidError });
 
@@ -27275,13 +29113,19 @@ Object.defineProperty(TwilioErrorByCode, 53200, { value: ParticipantIdentityInva
  * @property {number} code - 53201
  * @property {string} message - 'Participant identity is too long'
  */
-function ParticipantIdentityTooLongError() {
-  TwilioError.call(this,
-    53201,
-    'Participant identity is too long'
-  );
-}
-inherits(ParticipantIdentityTooLongError, TwilioError);
+
+var ParticipantIdentityTooLongError = function (_TwilioError28) {
+  _inherits(ParticipantIdentityTooLongError, _TwilioError28);
+
+  function ParticipantIdentityTooLongError() {
+    _classCallCheck(this, ParticipantIdentityTooLongError);
+
+    return _possibleConstructorReturn(this, (ParticipantIdentityTooLongError.__proto__ || Object.getPrototypeOf(ParticipantIdentityTooLongError)).call(this, 53201, 'Participant identity is too long'));
+  }
+
+  return ParticipantIdentityTooLongError;
+}(TwilioError);
+
 exports.ParticipantIdentityTooLongError = ParticipantIdentityTooLongError;
 Object.defineProperty(TwilioErrorByCode, 53201, { value: ParticipantIdentityTooLongError });
 
@@ -27292,13 +29136,19 @@ Object.defineProperty(TwilioErrorByCode, 53201, { value: ParticipantIdentityTooL
  * @property {number} code - 53202
  * @property {string} message - 'Participant identity contains invalid characters'
  */
-function ParticipantIdentityCharsInvalidError() {
-  TwilioError.call(this,
-    53202,
-    'Participant identity contains invalid characters'
-  );
-}
-inherits(ParticipantIdentityCharsInvalidError, TwilioError);
+
+var ParticipantIdentityCharsInvalidError = function (_TwilioError29) {
+  _inherits(ParticipantIdentityCharsInvalidError, _TwilioError29);
+
+  function ParticipantIdentityCharsInvalidError() {
+    _classCallCheck(this, ParticipantIdentityCharsInvalidError);
+
+    return _possibleConstructorReturn(this, (ParticipantIdentityCharsInvalidError.__proto__ || Object.getPrototypeOf(ParticipantIdentityCharsInvalidError)).call(this, 53202, 'Participant identity contains invalid characters'));
+  }
+
+  return ParticipantIdentityCharsInvalidError;
+}(TwilioError);
+
 exports.ParticipantIdentityCharsInvalidError = ParticipantIdentityCharsInvalidError;
 Object.defineProperty(TwilioErrorByCode, 53202, { value: ParticipantIdentityCharsInvalidError });
 
@@ -27309,13 +29159,19 @@ Object.defineProperty(TwilioErrorByCode, 53202, { value: ParticipantIdentityChar
  * @property {number} code - 53203
  * @property {string} message - 'Participant has too many Tracks'
  */
-function ParticipantMaxTracksExceededError() {
-  TwilioError.call(this,
-    53203,
-    'Participant has too many Tracks'
-  );
-}
-inherits(ParticipantMaxTracksExceededError, TwilioError);
+
+var ParticipantMaxTracksExceededError = function (_TwilioError30) {
+  _inherits(ParticipantMaxTracksExceededError, _TwilioError30);
+
+  function ParticipantMaxTracksExceededError() {
+    _classCallCheck(this, ParticipantMaxTracksExceededError);
+
+    return _possibleConstructorReturn(this, (ParticipantMaxTracksExceededError.__proto__ || Object.getPrototypeOf(ParticipantMaxTracksExceededError)).call(this, 53203, 'Participant has too many Tracks'));
+  }
+
+  return ParticipantMaxTracksExceededError;
+}(TwilioError);
+
 exports.ParticipantMaxTracksExceededError = ParticipantMaxTracksExceededError;
 Object.defineProperty(TwilioErrorByCode, 53203, { value: ParticipantMaxTracksExceededError });
 
@@ -27326,13 +29182,19 @@ Object.defineProperty(TwilioErrorByCode, 53203, { value: ParticipantMaxTracksExc
  * @property {number} code - 53204
  * @property {string} message - 'Participant not found'
  */
-function ParticipantNotFoundError() {
-  TwilioError.call(this,
-    53204,
-    'Participant not found'
-  );
-}
-inherits(ParticipantNotFoundError, TwilioError);
+
+var ParticipantNotFoundError = function (_TwilioError31) {
+  _inherits(ParticipantNotFoundError, _TwilioError31);
+
+  function ParticipantNotFoundError() {
+    _classCallCheck(this, ParticipantNotFoundError);
+
+    return _possibleConstructorReturn(this, (ParticipantNotFoundError.__proto__ || Object.getPrototypeOf(ParticipantNotFoundError)).call(this, 53204, 'Participant not found'));
+  }
+
+  return ParticipantNotFoundError;
+}(TwilioError);
+
 exports.ParticipantNotFoundError = ParticipantNotFoundError;
 Object.defineProperty(TwilioErrorByCode, 53204, { value: ParticipantNotFoundError });
 
@@ -27343,13 +29205,19 @@ Object.defineProperty(TwilioErrorByCode, 53204, { value: ParticipantNotFoundErro
  * @property {number} code - 53205
  * @property {string} message - 'Participant disconnected because of duplicate identity'
  */
-function ParticipantDuplicateIdentityError() {
-  TwilioError.call(this,
-    53205,
-    'Participant disconnected because of duplicate identity'
-  );
-}
-inherits(ParticipantDuplicateIdentityError, TwilioError);
+
+var ParticipantDuplicateIdentityError = function (_TwilioError32) {
+  _inherits(ParticipantDuplicateIdentityError, _TwilioError32);
+
+  function ParticipantDuplicateIdentityError() {
+    _classCallCheck(this, ParticipantDuplicateIdentityError);
+
+    return _possibleConstructorReturn(this, (ParticipantDuplicateIdentityError.__proto__ || Object.getPrototypeOf(ParticipantDuplicateIdentityError)).call(this, 53205, 'Participant disconnected because of duplicate identity'));
+  }
+
+  return ParticipantDuplicateIdentityError;
+}(TwilioError);
+
 exports.ParticipantDuplicateIdentityError = ParticipantDuplicateIdentityError;
 Object.defineProperty(TwilioErrorByCode, 53205, { value: ParticipantDuplicateIdentityError });
 
@@ -27360,13 +29228,19 @@ Object.defineProperty(TwilioErrorByCode, 53205, { value: ParticipantDuplicateIde
  * @property {number} code - 53300
  * @property {string} message - 'Track is invalid'
  */
-function TrackInvalidError() {
-  TwilioError.call(this,
-    53300,
-    'Track is invalid'
-  );
-}
-inherits(TrackInvalidError, TwilioError);
+
+var TrackInvalidError = function (_TwilioError33) {
+  _inherits(TrackInvalidError, _TwilioError33);
+
+  function TrackInvalidError() {
+    _classCallCheck(this, TrackInvalidError);
+
+    return _possibleConstructorReturn(this, (TrackInvalidError.__proto__ || Object.getPrototypeOf(TrackInvalidError)).call(this, 53300, 'Track is invalid'));
+  }
+
+  return TrackInvalidError;
+}(TwilioError);
+
 exports.TrackInvalidError = TrackInvalidError;
 Object.defineProperty(TwilioErrorByCode, 53300, { value: TrackInvalidError });
 
@@ -27377,13 +29251,19 @@ Object.defineProperty(TwilioErrorByCode, 53300, { value: TrackInvalidError });
  * @property {number} code - 53301
  * @property {string} message - 'Track name is invalid'
  */
-function TrackNameInvalidError() {
-  TwilioError.call(this,
-    53301,
-    'Track name is invalid'
-  );
-}
-inherits(TrackNameInvalidError, TwilioError);
+
+var TrackNameInvalidError = function (_TwilioError34) {
+  _inherits(TrackNameInvalidError, _TwilioError34);
+
+  function TrackNameInvalidError() {
+    _classCallCheck(this, TrackNameInvalidError);
+
+    return _possibleConstructorReturn(this, (TrackNameInvalidError.__proto__ || Object.getPrototypeOf(TrackNameInvalidError)).call(this, 53301, 'Track name is invalid'));
+  }
+
+  return TrackNameInvalidError;
+}(TwilioError);
+
 exports.TrackNameInvalidError = TrackNameInvalidError;
 Object.defineProperty(TwilioErrorByCode, 53301, { value: TrackNameInvalidError });
 
@@ -27394,13 +29274,19 @@ Object.defineProperty(TwilioErrorByCode, 53301, { value: TrackNameInvalidError }
  * @property {number} code - 53302
  * @property {string} message - 'Track name is too long'
  */
-function TrackNameTooLongError() {
-  TwilioError.call(this,
-    53302,
-    'Track name is too long'
-  );
-}
-inherits(TrackNameTooLongError, TwilioError);
+
+var TrackNameTooLongError = function (_TwilioError35) {
+  _inherits(TrackNameTooLongError, _TwilioError35);
+
+  function TrackNameTooLongError() {
+    _classCallCheck(this, TrackNameTooLongError);
+
+    return _possibleConstructorReturn(this, (TrackNameTooLongError.__proto__ || Object.getPrototypeOf(TrackNameTooLongError)).call(this, 53302, 'Track name is too long'));
+  }
+
+  return TrackNameTooLongError;
+}(TwilioError);
+
 exports.TrackNameTooLongError = TrackNameTooLongError;
 Object.defineProperty(TwilioErrorByCode, 53302, { value: TrackNameTooLongError });
 
@@ -27411,13 +29297,19 @@ Object.defineProperty(TwilioErrorByCode, 53302, { value: TrackNameTooLongError }
  * @property {number} code - 53303
  * @property {string} message - 'Track name contains invalid characters'
  */
-function TrackNameCharsInvalidError() {
-  TwilioError.call(this,
-    53303,
-    'Track name contains invalid characters'
-  );
-}
-inherits(TrackNameCharsInvalidError, TwilioError);
+
+var TrackNameCharsInvalidError = function (_TwilioError36) {
+  _inherits(TrackNameCharsInvalidError, _TwilioError36);
+
+  function TrackNameCharsInvalidError() {
+    _classCallCheck(this, TrackNameCharsInvalidError);
+
+    return _possibleConstructorReturn(this, (TrackNameCharsInvalidError.__proto__ || Object.getPrototypeOf(TrackNameCharsInvalidError)).call(this, 53303, 'Track name contains invalid characters'));
+  }
+
+  return TrackNameCharsInvalidError;
+}(TwilioError);
+
 exports.TrackNameCharsInvalidError = TrackNameCharsInvalidError;
 Object.defineProperty(TwilioErrorByCode, 53303, { value: TrackNameCharsInvalidError });
 
@@ -27428,13 +29320,19 @@ Object.defineProperty(TwilioErrorByCode, 53303, { value: TrackNameCharsInvalidEr
  * @property {number} code - 53304
  * @property {string} message - 'Track name is duplicated'
  */
-function TrackNameIsDuplicatedError() {
-  TwilioError.call(this,
-    53304,
-    'Track name is duplicated'
-  );
-}
-inherits(TrackNameIsDuplicatedError, TwilioError);
+
+var TrackNameIsDuplicatedError = function (_TwilioError37) {
+  _inherits(TrackNameIsDuplicatedError, _TwilioError37);
+
+  function TrackNameIsDuplicatedError() {
+    _classCallCheck(this, TrackNameIsDuplicatedError);
+
+    return _possibleConstructorReturn(this, (TrackNameIsDuplicatedError.__proto__ || Object.getPrototypeOf(TrackNameIsDuplicatedError)).call(this, 53304, 'Track name is duplicated'));
+  }
+
+  return TrackNameIsDuplicatedError;
+}(TwilioError);
+
 exports.TrackNameIsDuplicatedError = TrackNameIsDuplicatedError;
 Object.defineProperty(TwilioErrorByCode, 53304, { value: TrackNameIsDuplicatedError });
 
@@ -27445,13 +29343,19 @@ Object.defineProperty(TwilioErrorByCode, 53304, { value: TrackNameIsDuplicatedEr
  * @property {number} code - 53400
  * @property {string} message - 'Client is unable to create or apply a local media description'
  */
-function MediaClientLocalDescFailedError() {
-  TwilioError.call(this,
-    53400,
-    'Client is unable to create or apply a local media description'
-  );
-}
-inherits(MediaClientLocalDescFailedError, TwilioError);
+
+var MediaClientLocalDescFailedError = function (_TwilioError38) {
+  _inherits(MediaClientLocalDescFailedError, _TwilioError38);
+
+  function MediaClientLocalDescFailedError() {
+    _classCallCheck(this, MediaClientLocalDescFailedError);
+
+    return _possibleConstructorReturn(this, (MediaClientLocalDescFailedError.__proto__ || Object.getPrototypeOf(MediaClientLocalDescFailedError)).call(this, 53400, 'Client is unable to create or apply a local media description'));
+  }
+
+  return MediaClientLocalDescFailedError;
+}(TwilioError);
+
 exports.MediaClientLocalDescFailedError = MediaClientLocalDescFailedError;
 Object.defineProperty(TwilioErrorByCode, 53400, { value: MediaClientLocalDescFailedError });
 
@@ -27462,13 +29366,19 @@ Object.defineProperty(TwilioErrorByCode, 53400, { value: MediaClientLocalDescFai
  * @property {number} code - 53401
  * @property {string} message - 'Server is unable to create or apply a local media description'
  */
-function MediaServerLocalDescFailedError() {
-  TwilioError.call(this,
-    53401,
-    'Server is unable to create or apply a local media description'
-  );
-}
-inherits(MediaServerLocalDescFailedError, TwilioError);
+
+var MediaServerLocalDescFailedError = function (_TwilioError39) {
+  _inherits(MediaServerLocalDescFailedError, _TwilioError39);
+
+  function MediaServerLocalDescFailedError() {
+    _classCallCheck(this, MediaServerLocalDescFailedError);
+
+    return _possibleConstructorReturn(this, (MediaServerLocalDescFailedError.__proto__ || Object.getPrototypeOf(MediaServerLocalDescFailedError)).call(this, 53401, 'Server is unable to create or apply a local media description'));
+  }
+
+  return MediaServerLocalDescFailedError;
+}(TwilioError);
+
 exports.MediaServerLocalDescFailedError = MediaServerLocalDescFailedError;
 Object.defineProperty(TwilioErrorByCode, 53401, { value: MediaServerLocalDescFailedError });
 
@@ -27479,13 +29389,19 @@ Object.defineProperty(TwilioErrorByCode, 53401, { value: MediaServerLocalDescFai
  * @property {number} code - 53402
  * @property {string} message - 'Client is unable to apply a remote media description'
  */
-function MediaClientRemoteDescFailedError() {
-  TwilioError.call(this,
-    53402,
-    'Client is unable to apply a remote media description'
-  );
-}
-inherits(MediaClientRemoteDescFailedError, TwilioError);
+
+var MediaClientRemoteDescFailedError = function (_TwilioError40) {
+  _inherits(MediaClientRemoteDescFailedError, _TwilioError40);
+
+  function MediaClientRemoteDescFailedError() {
+    _classCallCheck(this, MediaClientRemoteDescFailedError);
+
+    return _possibleConstructorReturn(this, (MediaClientRemoteDescFailedError.__proto__ || Object.getPrototypeOf(MediaClientRemoteDescFailedError)).call(this, 53402, 'Client is unable to apply a remote media description'));
+  }
+
+  return MediaClientRemoteDescFailedError;
+}(TwilioError);
+
 exports.MediaClientRemoteDescFailedError = MediaClientRemoteDescFailedError;
 Object.defineProperty(TwilioErrorByCode, 53402, { value: MediaClientRemoteDescFailedError });
 
@@ -27496,13 +29412,19 @@ Object.defineProperty(TwilioErrorByCode, 53402, { value: MediaClientRemoteDescFa
  * @property {number} code - 53403
  * @property {string} message - 'Server is unable to apply a remote media description'
  */
-function MediaServerRemoteDescFailedError() {
-  TwilioError.call(this,
-    53403,
-    'Server is unable to apply a remote media description'
-  );
-}
-inherits(MediaServerRemoteDescFailedError, TwilioError);
+
+var MediaServerRemoteDescFailedError = function (_TwilioError41) {
+  _inherits(MediaServerRemoteDescFailedError, _TwilioError41);
+
+  function MediaServerRemoteDescFailedError() {
+    _classCallCheck(this, MediaServerRemoteDescFailedError);
+
+    return _possibleConstructorReturn(this, (MediaServerRemoteDescFailedError.__proto__ || Object.getPrototypeOf(MediaServerRemoteDescFailedError)).call(this, 53403, 'Server is unable to apply a remote media description'));
+  }
+
+  return MediaServerRemoteDescFailedError;
+}(TwilioError);
+
 exports.MediaServerRemoteDescFailedError = MediaServerRemoteDescFailedError;
 Object.defineProperty(TwilioErrorByCode, 53403, { value: MediaServerRemoteDescFailedError });
 
@@ -27513,13 +29435,19 @@ Object.defineProperty(TwilioErrorByCode, 53403, { value: MediaServerRemoteDescFa
  * @property {number} code - 53404
  * @property {string} message - 'No supported codec'
  */
-function MediaNoSupportedCodecError() {
-  TwilioError.call(this,
-    53404,
-    'No supported codec'
-  );
-}
-inherits(MediaNoSupportedCodecError, TwilioError);
+
+var MediaNoSupportedCodecError = function (_TwilioError42) {
+  _inherits(MediaNoSupportedCodecError, _TwilioError42);
+
+  function MediaNoSupportedCodecError() {
+    _classCallCheck(this, MediaNoSupportedCodecError);
+
+    return _possibleConstructorReturn(this, (MediaNoSupportedCodecError.__proto__ || Object.getPrototypeOf(MediaNoSupportedCodecError)).call(this, 53404, 'No supported codec'));
+  }
+
+  return MediaNoSupportedCodecError;
+}(TwilioError);
+
 exports.MediaNoSupportedCodecError = MediaNoSupportedCodecError;
 Object.defineProperty(TwilioErrorByCode, 53404, { value: MediaNoSupportedCodecError });
 
@@ -27530,13 +29458,19 @@ Object.defineProperty(TwilioErrorByCode, 53404, { value: MediaNoSupportedCodecEr
  * @property {number} code - 53405
  * @property {string} message - 'Media connection failed'
  */
-function MediaConnectionError() {
-  TwilioError.call(this,
-    53405,
-    'Media connection failed'
-  );
-}
-inherits(MediaConnectionError, TwilioError);
+
+var MediaConnectionError = function (_TwilioError43) {
+  _inherits(MediaConnectionError, _TwilioError43);
+
+  function MediaConnectionError() {
+    _classCallCheck(this, MediaConnectionError);
+
+    return _possibleConstructorReturn(this, (MediaConnectionError.__proto__ || Object.getPrototypeOf(MediaConnectionError)).call(this, 53405, 'Media connection failed'));
+  }
+
+  return MediaConnectionError;
+}(TwilioError);
+
 exports.MediaConnectionError = MediaConnectionError;
 Object.defineProperty(TwilioErrorByCode, 53405, { value: MediaConnectionError });
 
@@ -27547,13 +29481,19 @@ Object.defineProperty(TwilioErrorByCode, 53405, { value: MediaConnectionError })
  * @property {number} code - 53500
  * @property {string} message - 'Unable to acquire configuration'
  */
-function ConfigurationAcquireFailedError() {
-  TwilioError.call(this,
-    53500,
-    'Unable to acquire configuration'
-  );
-}
-inherits(ConfigurationAcquireFailedError, TwilioError);
+
+var ConfigurationAcquireFailedError = function (_TwilioError44) {
+  _inherits(ConfigurationAcquireFailedError, _TwilioError44);
+
+  function ConfigurationAcquireFailedError() {
+    _classCallCheck(this, ConfigurationAcquireFailedError);
+
+    return _possibleConstructorReturn(this, (ConfigurationAcquireFailedError.__proto__ || Object.getPrototypeOf(ConfigurationAcquireFailedError)).call(this, 53500, 'Unable to acquire configuration'));
+  }
+
+  return ConfigurationAcquireFailedError;
+}(TwilioError);
+
 exports.ConfigurationAcquireFailedError = ConfigurationAcquireFailedError;
 Object.defineProperty(TwilioErrorByCode, 53500, { value: ConfigurationAcquireFailedError });
 
@@ -27564,70 +29504,102 @@ Object.defineProperty(TwilioErrorByCode, 53500, { value: ConfigurationAcquireFai
  * @property {number} code - 53501
  * @property {string} message - 'Unable to acquire TURN credentials'
  */
-function ConfigurationAcquireTurnFailedError() {
-  TwilioError.call(this,
-    53501,
-    'Unable to acquire TURN credentials'
-  );
-}
-inherits(ConfigurationAcquireTurnFailedError, TwilioError);
+
+var ConfigurationAcquireTurnFailedError = function (_TwilioError45) {
+  _inherits(ConfigurationAcquireTurnFailedError, _TwilioError45);
+
+  function ConfigurationAcquireTurnFailedError() {
+    _classCallCheck(this, ConfigurationAcquireTurnFailedError);
+
+    return _possibleConstructorReturn(this, (ConfigurationAcquireTurnFailedError.__proto__ || Object.getPrototypeOf(ConfigurationAcquireTurnFailedError)).call(this, 53501, 'Unable to acquire TURN credentials'));
+  }
+
+  return ConfigurationAcquireTurnFailedError;
+}(TwilioError);
+
 exports.ConfigurationAcquireTurnFailedError = ConfigurationAcquireTurnFailedError;
 Object.defineProperty(TwilioErrorByCode, 53501, { value: ConfigurationAcquireTurnFailedError });
-
-},{"./twilioerror":142,"util":149}],142:[function(require,module,exports){
+},{"./twilioerror":144}],144:[function(require,module,exports){
 'use strict';
 
-var inherits = require('util').inherits;
-
 /**
- * Creates a new {@link TwilioError}
  * @extends Error
- * @param {number} code - Error code
- * @param {string} [message] - Error message
- * @param {string} [fileName] - Name of the script file where error was generated
- * @param {number} [lineNumber] - Line number of the script file where error was generated
  * @property {number} code - Error code
- * @constructor
  */
-function TwilioError(code) {
-  var error = Error.apply(this, [].slice.call(arguments, 1));
-  error.name = 'TwilioError';
 
-  Object.defineProperty(this, 'code', {
-    value: code,
-    enumerable: true
-  });
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-  Object.getOwnPropertyNames(error).forEach(function(prop) {
-    Object.defineProperty(this, prop, {
-      value: error[prop],
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var TwilioError = function (_Error) {
+  _inherits(TwilioError, _Error);
+
+  /**
+   * Creates a new {@link TwilioError}
+   * @param {number} code - Error code
+   * @param {string} [message] - Error message
+   * @param {string} [fileName] - Name of the script file where error was generated
+   * @param {number} [lineNumber] - Line number of the script file where error was generated
+   */
+  function TwilioError(code) {
+    var _ref;
+
+    _classCallCheck(this, TwilioError);
+
+    var args = [].slice.call(arguments, 1);
+
+    var _this = _possibleConstructorReturn(this, (_ref = TwilioError.__proto__ || Object.getPrototypeOf(TwilioError)).call.apply(_ref, [this].concat(_toConsumableArray(args))));
+
+    var error = Error.apply(_this, args);
+    error.name = 'TwilioError';
+
+    Object.defineProperty(_this, 'code', {
+      value: code,
       enumerable: true
     });
-  }, this);
-}
 
-inherits(TwilioError, Error);
+    Object.getOwnPropertyNames(error).forEach(function (prop) {
+      Object.defineProperty(this, prop, {
+        value: error[prop],
+        enumerable: true
+      });
+    }, _this);
+    return _this;
+  }
 
-/**
- * Returns human readable string describing the error.
- * @returns {string}
- */
-TwilioError.prototype.toString = function toString() {
-  var message = this.message ? ': ' + this.message : '';
-  return this.name + ' ' + this.code + message;
-};
+  /**
+   * Returns human readable string describing the error.
+   * @returns {string}
+   */
+
+
+  _createClass(TwilioError, [{
+    key: 'toString',
+    value: function toString() {
+      var message = this.message ? ': ' + this.message : '';
+      return this.name + ' ' + this.code + message;
+    }
+  }]);
+
+  return TwilioError;
+}(Error);
 
 module.exports = TwilioError;
-
-},{"util":149}],143:[function(require,module,exports){
+},{}],145:[function(require,module,exports){
 /* globals webkitAudioContext, AudioContext */
 'use strict';
 
-var NativeAudioContext = typeof AudioContext !== 'undefined'
-  ? AudioContext
-  : typeof webkitAudioContext !== 'undefined'
-    ? webkitAudioContext
-    : null;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var NativeAudioContext = typeof AudioContext !== 'undefined' ? AudioContext : typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : null;
 
 /**
  * @interface AudioContextFactoryOptions
@@ -27637,97 +29609,113 @@ var NativeAudioContext = typeof AudioContext !== 'undefined'
 /**
  * {@link AudioContextFactory} ensures we construct at most one AudioContext
  * at a time, and that it is eventually closed when we no longer need it.
- * @param {AudioContextFactoryOptions} [options]
  * @property {AudioContextFactory} AudioContextFactory - The
  *   {@link AudioContextFactory} constructor
  */
-function AudioContextFactory(options) {
-  options = Object.assign({
-    AudioContext: NativeAudioContext
-  }, options);
-  Object.defineProperties(this, {
-    _AudioContext: {
-      value: options.AudioContext
-    },
-    _audioContext: {
-      value: null,
-      writable: true
-    },
-    _holders: {
-      value: new Set()
-    },
-    AudioContextFactory: {
-      enumerable: true,
-      value: AudioContextFactory
-    }
-  });
-}
 
-/**
- * Each call to {@link AudioContextFactory#getOrCreate} should be paired with a
- * call to {@link AudioContextFactory#release}. Calling this increments an
- * internal reference count.
- * @param {*} holder - The object to hold a reference to the AudioContext
- * @returns {?AudioContext}
- */
-AudioContextFactory.prototype.getOrCreate = function getOrCreate(holder) {
-  if (!this._holders.has(holder)) {
-    this._holders.add(holder);
-    if (this._AudioContext && !this._audioContext) {
-      try {
-        this._audioContext = new this._AudioContext();
-      } catch (error) {
-        // Do nothing;
+var AudioContextFactory = function () {
+  /**
+   * @param {AudioContextFactoryOptions} [options]
+   */
+  function AudioContextFactory(options) {
+    _classCallCheck(this, AudioContextFactory);
+
+    options = Object.assign({
+      AudioContext: NativeAudioContext
+    }, options);
+    Object.defineProperties(this, {
+      _AudioContext: {
+        value: options.AudioContext
+      },
+      _audioContext: {
+        value: null,
+        writable: true
+      },
+      _holders: {
+        value: new Set()
+      },
+      AudioContextFactory: {
+        enumerable: true,
+        value: AudioContextFactory
+      }
+    });
+  }
+
+  /**
+   * Each call to {@link AudioContextFactory#getOrCreate} should be paired with a
+   * call to {@link AudioContextFactory#release}. Calling this increments an
+   * internal reference count.
+   * @param {*} holder - The object to hold a reference to the AudioContext
+   * @returns {?AudioContext}
+   */
+
+
+  _createClass(AudioContextFactory, [{
+    key: 'getOrCreate',
+    value: function getOrCreate(holder) {
+      if (!this._holders.has(holder)) {
+        this._holders.add(holder);
+        if (this._AudioContext && !this._audioContext) {
+          try {
+            this._audioContext = new this._AudioContext();
+          } catch (error) {
+            // Do nothing;
+          }
+        }
+      }
+      return this._audioContext;
+    }
+
+    /**
+     * Decrement the internal reference count. If it reaches zero, close and destroy
+     * the AudioContext.
+     * @param {*} holder - The object that held a reference to the AudioContext
+     * @returns {void}
+     */
+
+  }, {
+    key: 'release',
+    value: function release(holder) {
+      if (this._holders.has(holder)) {
+        this._holders.delete(holder);
+        if (!this._holders.size && this._audioContext) {
+          this._audioContext.close();
+          this._audioContext = null;
+        }
       }
     }
-  }
-  return this._audioContext;
-};
+  }]);
 
-/**
- * Decrement the internal reference count. If it reaches zero, close and destroy
- * the AudioContext.
- * @param {*} holder - The object that held a reference to the AudioContext
- * @returns {void}
- */
-AudioContextFactory.prototype.release = function release(holder) {
-  if (this._holders.has(holder)) {
-    this._holders.delete(holder);
-    if (!this._holders.size && this._audioContext) {
-      this._audioContext.close();
-      this._audioContext = null;
-    }
-  }
-};
+  return AudioContextFactory;
+}();
 
 module.exports = new AudioContextFactory();
-
-},{}],144:[function(require,module,exports){
+},{}],146:[function(require,module,exports){
 module.exports={
-  "_from": "twilio-video",
-  "_id": "twilio-video@1.7.0",
+  "_from": "twilio-video@1.9.0",
+  "_id": "twilio-video@1.9.0",
   "_inBundle": false,
-  "_integrity": "sha1-PEyVAgMFCjf3I+PG5nTVHvO+i20=",
+  "_integrity": "sha512-LoiCmje72rKzTIRIppcwNIOG4xGWdtLF7zP8n2FDl9SUzum2PbI1lBPrhFnG0Rhzl6QAUTv+MwWTa8+OGkIFdQ==",
   "_location": "/twilio-video",
   "_phantomChildren": {},
   "_requested": {
-    "type": "tag",
+    "type": "version",
     "registry": true,
-    "raw": "twilio-video",
+    "raw": "twilio-video@1.9.0",
     "name": "twilio-video",
     "escapedName": "twilio-video",
-    "rawSpec": "",
+    "rawSpec": "1.9.0",
     "saveSpec": null,
-    "fetchSpec": "latest"
+    "fetchSpec": "1.9.0"
   },
   "_requiredBy": [
     "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/twilio-video/-/twilio-video-1.7.0.tgz",
-  "_shasum": "3c4c950203050a37f723e3c6e674d51ef3be8b6d",
-  "_spec": "twilio-video",
-  "_where": "/Users/pnash/projects/screen-capture/video-call",
+  "_resolved": "https://registry.npmjs.org/twilio-video/-/twilio-video-1.9.0.tgz",
+  "_shasum": "2669e10a3d7bee86849863a31048cb29def1bbf0",
+  "_spec": "twilio-video@1.9.0",
+  "_where": "/Users/pnash/projects/screen-capture/video-chat",
   "author": {
     "name": "Mark Andrus Roberts",
     "email": "mroberts@twilio.com"
@@ -27759,15 +29747,22 @@ module.exports={
   "deprecated": false,
   "description": "Twilio Video JavaScript library",
   "devDependencies": {
+    "@types/express": "^4.11.0",
+    "@types/node": "^8.5.1",
+    "@types/selenium-webdriver": "^3.0.8",
+    "@types/ws": "^3.2.1",
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
     "browserify": "^14.3.0",
     "cheerio": "^0.22.0",
     "chromedriver": "2.28.0",
     "envify": "^4.0.0",
     "eslint": "^4.9.0",
+    "express": "^4.16.2",
     "geckodriver": "1.4.0",
-    "ink-docstrap": "^1.3.0",
+    "ink-docstrap": "^1.3.2",
     "istanbul": "^0.4.5",
-    "jsdoc": "^3.4.3",
+    "jsdoc": "^3.5.5",
     "karma": "^1.6.0",
     "karma-browserify": "^5.1.1",
     "karma-chrome-launcher": "^2.0.0",
@@ -27784,7 +29779,10 @@ module.exports={
     "selenium-webdriver": "3.3.0",
     "sinon": "^4.0.1",
     "travis-multirunner": "^4.0.0",
+    "ts-node": "4.0.1",
+    "tslint": "5.8.0",
     "twilio": "^2.11.1",
+    "typescript": "2.6.2",
     "uglify-js": "^2.8.22",
     "vinyl-fs": "^2.4.4",
     "vinyl-source-stream": "^1.1.0",
@@ -27803,32 +29801,35 @@ module.exports={
     "rooms"
   ],
   "license": "BSD-3-Clause",
-  "main": "./lib/index.js",
+  "main": "./es5/index.js",
   "name": "twilio-video",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/twilio/twilio-video.js.git"
   },
   "scripts": {
-    "build": "npm-run-all clean lint docs cover test:integration build:js build:min.js test:umd",
+    "build": "npm-run-all clean lint docs cover test:integration build:es5 build:js build:min.js test:umd",
+    "build:es5": "rimraf ./es5 && babel lib -d es5",
     "build:js": "node ./scripts/build.js ./src/twilio-video.js ./LICENSE.md ./dist/twilio-video.js",
     "build:min.js": "uglifyjs ./dist/twilio-video.js -o ./dist/twilio-video.min.js --comments \"/^! twilio-video.js/\" -b beautify=false,ascii_only=true",
-    "build:quick": "npm-run-all clean lint docs build:js build:min.js",
-    "build:travis": "npm-run-all clean lint docs cover test:integration:travis build:js build:min.js test:umd test:framework",
-    "clean": "rimraf ./coverage ./dist",
+    "build:quick": "npm-run-all clean lint docs build:es5 build:js build:min.js",
+    "build:travis": "npm-run-all clean lint docs cover test:integration:travis build:es5 build:js build:min.js test:umd test:framework",
+    "clean": "rimraf ./coverage ./es5 ./dist",
     "cover": "istanbul cover node_modules/mocha/bin/_mocha -- ./test/unit/index.js",
     "docs": "node ./scripts/docs.js ./dist/docs",
     "lint": "eslint ./lib ./test/*.js ./test/framework/*.js ./test/lib/*.js ./test/integration/** ./test/unit/**",
     "test": "npm-run-all test:unit test:integration",
-    "test:framework": "npm-run-all test:framework:angular test:framework:meteor test:framework:no-framework test:framework:react",
+    "test:crossbrowser": "npm-run-all test:crossbrowser:*",
+    "test:crossbrowser:build": "npm-run-all test:crossbrowser:build:*",
+    "test:crossbrowser:build:browser": "cd ./test/crossbrowser && browserify lib/crossbrowser/src/browser/index.js > src/browser/index.js",
+    "test:crossbrowser:build:clean": "rimraf ./test/crossbrowser/lib ./test/crossbrowser/src/browser/index.js",
+    "test:crossbrowser:build:lint": "cd ./test/crossbrowser && tslint --project tsconfig.json",
+    "test:crossbrowser:build:tsc": "cd ./test/crossbrowser && tsc",
+    "test:crossbrowser:test": "cd ./test/crossbrowser && mocha --compilers ts:ts-node/register test/integration/spec/**/*.ts",
+    "test:framework": "npm-run-all test:framework:angular test:framework:no-framework test:framework:react",
     "test:framework:angular": "npm-run-all test:framework:angular:*",
     "test:framework:angular:install": "cd ./test/framework/twilio-video-angular && rimraf ./node_modules && npm install",
     "test:framework:angular:run": "mocha ./test/framework/twilio-video-angular.js",
-    "test:framework:angular:test": "node ./scripts/framework.js twilio-video-angular",
-    "test:framework:meteor": "npm-run-all test:framework:meteor:*",
-    "test:framework:meteor:install": "cd ./test/framework/twilio-video-meteor && rimraf ./node_modules && npm install",
-    "test:framework:meteor:run": "mocha ./test/framework/twilio-video-meteor.js",
-    "test:framework:meteor:test": "node ./scripts/framework.js twilio-video-meteor",
     "test:framework:no-framework": "npm-run-all test:framework:no-framework:*",
     "test:framework:no-framework:run": "mocha ./test/framework/twilio-video-no-framework.js",
     "test:framework:react": "npm-run-all test:framework:react:*",
@@ -27839,20 +29840,30 @@ module.exports={
     "test:integration": "node ./scripts/karma.js karma/integration.conf.js",
     "test:integration:adapter": "node ./scripts/karma.js karma/integration.adapter.conf.js",
     "test:integration:travis": "node ./scripts/integration.js",
+    "test:sdkdriver": "npm-run-all test:sdkdriver:*",
+    "test:sdkdriver:build": "npm-run-all test:sdkdriver:build:*",
+    "test:sdkdriver:build:clean": "rimraf ./test/lib/sdkdriver/lib ./test/lib/sdkdriver/test/integration/browser/index.js",
+    "test:sdkdriver:build:lint": "cd ./test/lib/sdkdriver && tslint --project tsconfig.json",
+    "test:sdkdriver:build:tsc": "cd ./test/lib/sdkdriver && tsc --rootDir src",
+    "test:sdkdriver:test": "npm-run-all test:sdkdriver:test:*",
+    "test:sdkdriver:test:integration": "npm-run-all test:sdkdriver:test:integration:*",
+    "test:sdkdriver:test:integration:browser": "cd ./test/lib/sdkdriver/test/integration && browserify browser/browser.js > browser/index.js",
+    "test:sdkdriver:test:integration:run": "cd ./test/lib/sdkdriver && mocha --compilers ts:ts-node/register test/integration/spec/**/*.ts",
+    "test:sdkdriver:test:unit": "cd ./test/lib/sdkdriver && mocha --compilers ts:ts-node/register test/unit/spec/**/*.ts",
     "test:umd": "mocha ./test/umd/index.js",
     "test:unit": "mocha ./test/unit/index.js"
   },
   "title": "Twilio Video",
-  "version": "1.7.0"
+  "version": "1.9.0"
 }
 
-},{}],145:[function(require,module,exports){
+},{}],147:[function(require,module,exports){
 module.exports = WebSocket;
 
-},{}],146:[function(require,module,exports){
+},{}],148:[function(require,module,exports){
 exports.XMLHttpRequest = XMLHttpRequest;
 
-},{}],147:[function(require,module,exports){
+},{}],149:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -27877,14 +29888,14 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],148:[function(require,module,exports){
+},{}],150:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],149:[function(require,module,exports){
+},{}],151:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -28474,7 +30485,532 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":148,"_process":55,"inherits":147}],150:[function(require,module,exports){
+},{"./support/isBuffer":150,"_process":54,"inherits":149}],152:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+var objectCreate = Object.create || objectCreatePolyfill
+var objectKeys = Object.keys || objectKeysPolyfill
+var bind = Function.prototype.bind || functionBindPolyfill
+
+function EventEmitter() {
+  if (!this._events || !Object.prototype.hasOwnProperty.call(this, '_events')) {
+    this._events = objectCreate(null);
+    this._eventsCount = 0;
+  }
+
+  this._maxListeners = this._maxListeners || undefined;
+}
+module.exports = EventEmitter;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+var defaultMaxListeners = 10;
+
+var hasDefineProperty;
+try {
+  var o = {};
+  if (Object.defineProperty) Object.defineProperty(o, 'x', { value: 0 });
+  hasDefineProperty = o.x === 0;
+} catch (err) { hasDefineProperty = false }
+if (hasDefineProperty) {
+  Object.defineProperty(EventEmitter, 'defaultMaxListeners', {
+    enumerable: true,
+    get: function() {
+      return defaultMaxListeners;
+    },
+    set: function(arg) {
+      // check whether the input is a positive number (whose value is zero or
+      // greater and not a NaN).
+      if (typeof arg !== 'number' || arg < 0 || arg !== arg)
+        throw new TypeError('"defaultMaxListeners" must be a positive number');
+      defaultMaxListeners = arg;
+    }
+  });
+} else {
+  EventEmitter.defaultMaxListeners = defaultMaxListeners;
+}
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function setMaxListeners(n) {
+  if (typeof n !== 'number' || n < 0 || isNaN(n))
+    throw new TypeError('"n" argument must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+function $getMaxListeners(that) {
+  if (that._maxListeners === undefined)
+    return EventEmitter.defaultMaxListeners;
+  return that._maxListeners;
+}
+
+EventEmitter.prototype.getMaxListeners = function getMaxListeners() {
+  return $getMaxListeners(this);
+};
+
+// These standalone emit* functions are used to optimize calling of event
+// handlers for fast cases because emit() itself often has a variable number of
+// arguments and can be deoptimized because of that. These functions always have
+// the same number of arguments and thus do not get deoptimized, so the code
+// inside them can execute faster.
+function emitNone(handler, isFn, self) {
+  if (isFn)
+    handler.call(self);
+  else {
+    var len = handler.length;
+    var listeners = arrayClone(handler, len);
+    for (var i = 0; i < len; ++i)
+      listeners[i].call(self);
+  }
+}
+function emitOne(handler, isFn, self, arg1) {
+  if (isFn)
+    handler.call(self, arg1);
+  else {
+    var len = handler.length;
+    var listeners = arrayClone(handler, len);
+    for (var i = 0; i < len; ++i)
+      listeners[i].call(self, arg1);
+  }
+}
+function emitTwo(handler, isFn, self, arg1, arg2) {
+  if (isFn)
+    handler.call(self, arg1, arg2);
+  else {
+    var len = handler.length;
+    var listeners = arrayClone(handler, len);
+    for (var i = 0; i < len; ++i)
+      listeners[i].call(self, arg1, arg2);
+  }
+}
+function emitThree(handler, isFn, self, arg1, arg2, arg3) {
+  if (isFn)
+    handler.call(self, arg1, arg2, arg3);
+  else {
+    var len = handler.length;
+    var listeners = arrayClone(handler, len);
+    for (var i = 0; i < len; ++i)
+      listeners[i].call(self, arg1, arg2, arg3);
+  }
+}
+
+function emitMany(handler, isFn, self, args) {
+  if (isFn)
+    handler.apply(self, args);
+  else {
+    var len = handler.length;
+    var listeners = arrayClone(handler, len);
+    for (var i = 0; i < len; ++i)
+      listeners[i].apply(self, args);
+  }
+}
+
+EventEmitter.prototype.emit = function emit(type) {
+  var er, handler, len, args, i, events;
+  var doError = (type === 'error');
+
+  events = this._events;
+  if (events)
+    doError = (doError && events.error == null);
+  else if (!doError)
+    return false;
+
+  // If there is no 'error' event listener then throw.
+  if (doError) {
+    if (arguments.length > 1)
+      er = arguments[1];
+    if (er instanceof Error) {
+      throw er; // Unhandled 'error' event
+    } else {
+      // At least give some kind of context to the user
+      var err = new Error('Unhandled "error" event. (' + er + ')');
+      err.context = er;
+      throw err;
+    }
+    return false;
+  }
+
+  handler = events[type];
+
+  if (!handler)
+    return false;
+
+  var isFn = typeof handler === 'function';
+  len = arguments.length;
+  switch (len) {
+      // fast cases
+    case 1:
+      emitNone(handler, isFn, this);
+      break;
+    case 2:
+      emitOne(handler, isFn, this, arguments[1]);
+      break;
+    case 3:
+      emitTwo(handler, isFn, this, arguments[1], arguments[2]);
+      break;
+    case 4:
+      emitThree(handler, isFn, this, arguments[1], arguments[2], arguments[3]);
+      break;
+      // slower
+    default:
+      args = new Array(len - 1);
+      for (i = 1; i < len; i++)
+        args[i - 1] = arguments[i];
+      emitMany(handler, isFn, this, args);
+  }
+
+  return true;
+};
+
+function _addListener(target, type, listener, prepend) {
+  var m;
+  var events;
+  var existing;
+
+  if (typeof listener !== 'function')
+    throw new TypeError('"listener" argument must be a function');
+
+  events = target._events;
+  if (!events) {
+    events = target._events = objectCreate(null);
+    target._eventsCount = 0;
+  } else {
+    // To avoid recursion in the case that type === "newListener"! Before
+    // adding it to the listeners, first emit "newListener".
+    if (events.newListener) {
+      target.emit('newListener', type,
+          listener.listener ? listener.listener : listener);
+
+      // Re-assign `events` because a newListener handler could have caused the
+      // this._events to be assigned to a new object
+      events = target._events;
+    }
+    existing = events[type];
+  }
+
+  if (!existing) {
+    // Optimize the case of one listener. Don't need the extra array object.
+    existing = events[type] = listener;
+    ++target._eventsCount;
+  } else {
+    if (typeof existing === 'function') {
+      // Adding the second element, need to change to array.
+      existing = events[type] =
+          prepend ? [listener, existing] : [existing, listener];
+    } else {
+      // If we've already got an array, just append.
+      if (prepend) {
+        existing.unshift(listener);
+      } else {
+        existing.push(listener);
+      }
+    }
+
+    // Check for listener leak
+    if (!existing.warned) {
+      m = $getMaxListeners(target);
+      if (m && m > 0 && existing.length > m) {
+        existing.warned = true;
+        var w = new Error('Possible EventEmitter memory leak detected. ' +
+            existing.length + ' "' + String(type) + '" listeners ' +
+            'added. Use emitter.setMaxListeners() to ' +
+            'increase limit.');
+        w.name = 'MaxListenersExceededWarning';
+        w.emitter = target;
+        w.type = type;
+        w.count = existing.length;
+        if (typeof console === 'object' && console.warn) {
+          console.warn('%s: %s', w.name, w.message);
+        }
+      }
+    }
+  }
+
+  return target;
+}
+
+EventEmitter.prototype.addListener = function addListener(type, listener) {
+  return _addListener(this, type, listener, false);
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.prependListener =
+    function prependListener(type, listener) {
+      return _addListener(this, type, listener, true);
+    };
+
+function onceWrapper() {
+  if (!this.fired) {
+    this.target.removeListener(this.type, this.wrapFn);
+    this.fired = true;
+    switch (arguments.length) {
+      case 0:
+        return this.listener.call(this.target);
+      case 1:
+        return this.listener.call(this.target, arguments[0]);
+      case 2:
+        return this.listener.call(this.target, arguments[0], arguments[1]);
+      case 3:
+        return this.listener.call(this.target, arguments[0], arguments[1],
+            arguments[2]);
+      default:
+        var args = new Array(arguments.length);
+        for (var i = 0; i < args.length; ++i)
+          args[i] = arguments[i];
+        this.listener.apply(this.target, args);
+    }
+  }
+}
+
+function _onceWrap(target, type, listener) {
+  var state = { fired: false, wrapFn: undefined, target: target, type: type, listener: listener };
+  var wrapped = bind.call(onceWrapper, state);
+  wrapped.listener = listener;
+  state.wrapFn = wrapped;
+  return wrapped;
+}
+
+EventEmitter.prototype.once = function once(type, listener) {
+  if (typeof listener !== 'function')
+    throw new TypeError('"listener" argument must be a function');
+  this.on(type, _onceWrap(this, type, listener));
+  return this;
+};
+
+EventEmitter.prototype.prependOnceListener =
+    function prependOnceListener(type, listener) {
+      if (typeof listener !== 'function')
+        throw new TypeError('"listener" argument must be a function');
+      this.prependListener(type, _onceWrap(this, type, listener));
+      return this;
+    };
+
+// Emits a 'removeListener' event if and only if the listener was removed.
+EventEmitter.prototype.removeListener =
+    function removeListener(type, listener) {
+      var list, events, position, i, originalListener;
+
+      if (typeof listener !== 'function')
+        throw new TypeError('"listener" argument must be a function');
+
+      events = this._events;
+      if (!events)
+        return this;
+
+      list = events[type];
+      if (!list)
+        return this;
+
+      if (list === listener || list.listener === listener) {
+        if (--this._eventsCount === 0)
+          this._events = objectCreate(null);
+        else {
+          delete events[type];
+          if (events.removeListener)
+            this.emit('removeListener', type, list.listener || listener);
+        }
+      } else if (typeof list !== 'function') {
+        position = -1;
+
+        for (i = list.length - 1; i >= 0; i--) {
+          if (list[i] === listener || list[i].listener === listener) {
+            originalListener = list[i].listener;
+            position = i;
+            break;
+          }
+        }
+
+        if (position < 0)
+          return this;
+
+        if (position === 0)
+          list.shift();
+        else
+          spliceOne(list, position);
+
+        if (list.length === 1)
+          events[type] = list[0];
+
+        if (events.removeListener)
+          this.emit('removeListener', type, originalListener || listener);
+      }
+
+      return this;
+    };
+
+EventEmitter.prototype.removeAllListeners =
+    function removeAllListeners(type) {
+      var listeners, events, i;
+
+      events = this._events;
+      if (!events)
+        return this;
+
+      // not listening for removeListener, no need to emit
+      if (!events.removeListener) {
+        if (arguments.length === 0) {
+          this._events = objectCreate(null);
+          this._eventsCount = 0;
+        } else if (events[type]) {
+          if (--this._eventsCount === 0)
+            this._events = objectCreate(null);
+          else
+            delete events[type];
+        }
+        return this;
+      }
+
+      // emit removeListener for all listeners on all events
+      if (arguments.length === 0) {
+        var keys = objectKeys(events);
+        var key;
+        for (i = 0; i < keys.length; ++i) {
+          key = keys[i];
+          if (key === 'removeListener') continue;
+          this.removeAllListeners(key);
+        }
+        this.removeAllListeners('removeListener');
+        this._events = objectCreate(null);
+        this._eventsCount = 0;
+        return this;
+      }
+
+      listeners = events[type];
+
+      if (typeof listeners === 'function') {
+        this.removeListener(type, listeners);
+      } else if (listeners) {
+        // LIFO order
+        for (i = listeners.length - 1; i >= 0; i--) {
+          this.removeListener(type, listeners[i]);
+        }
+      }
+
+      return this;
+    };
+
+function _listeners(target, type, unwrap) {
+  var events = target._events;
+
+  if (!events)
+    return [];
+
+  var evlistener = events[type];
+  if (!evlistener)
+    return [];
+
+  if (typeof evlistener === 'function')
+    return unwrap ? [evlistener.listener || evlistener] : [evlistener];
+
+  return unwrap ? unwrapListeners(evlistener) : arrayClone(evlistener, evlistener.length);
+}
+
+EventEmitter.prototype.listeners = function listeners(type) {
+  return _listeners(this, type, true);
+};
+
+EventEmitter.prototype.rawListeners = function rawListeners(type) {
+  return _listeners(this, type, false);
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  if (typeof emitter.listenerCount === 'function') {
+    return emitter.listenerCount(type);
+  } else {
+    return listenerCount.call(emitter, type);
+  }
+};
+
+EventEmitter.prototype.listenerCount = listenerCount;
+function listenerCount(type) {
+  var events = this._events;
+
+  if (events) {
+    var evlistener = events[type];
+
+    if (typeof evlistener === 'function') {
+      return 1;
+    } else if (evlistener) {
+      return evlistener.length;
+    }
+  }
+
+  return 0;
+}
+
+EventEmitter.prototype.eventNames = function eventNames() {
+  return this._eventsCount > 0 ? Reflect.ownKeys(this._events) : [];
+};
+
+// About 1.5x faster than the two-arg version of Array#splice().
+function spliceOne(list, index) {
+  for (var i = index, k = i + 1, n = list.length; k < n; i += 1, k += 1)
+    list[i] = list[k];
+  list.pop();
+}
+
+function arrayClone(arr, n) {
+  var copy = new Array(n);
+  for (var i = 0; i < n; ++i)
+    copy[i] = arr[i];
+  return copy;
+}
+
+function unwrapListeners(arr) {
+  var ret = new Array(arr.length);
+  for (var i = 0; i < ret.length; ++i) {
+    ret[i] = arr[i].listener || arr[i];
+  }
+  return ret;
+}
+
+function objectCreatePolyfill(proto) {
+  var F = function() {};
+  F.prototype = proto;
+  return new F;
+}
+function objectKeysPolyfill(obj) {
+  var keys = [];
+  for (var k in obj) if (Object.prototype.hasOwnProperty.call(obj, k)) {
+    keys.push(k);
+  }
+  return k;
+}
+function functionBindPolyfill(context) {
+  var fn = this;
+  return function () {
+    return fn.apply(context, arguments);
+  };
+}
+
+},{}],153:[function(require,module,exports){
 'use strict';
 
 var Video = require('twilio-video');
@@ -28483,6 +31019,62 @@ var activeRoom;
 var previewTracks;
 var identity;
 var roomName;
+var screenTrack;
+
+function isFirefox() {
+  var mediaSourceSupport = !!navigator.mediaDevices.getSupportedConstraints()
+    .mediaSource;
+  var matchData = navigator.userAgent.match(/Firefox\/(\d+)/);
+  var firefoxVersion = 0;
+  if (matchData && matchData[1]) {
+    firefoxVersion = parseInt(matchData[1], 10);
+  }
+  return mediaSourceSupport && firefoxVersion >= 52;
+}
+
+function isChrome() {
+  return 'chrome' in window;
+}
+
+function canScreenShare() {
+  return isChrome || isFirefox;
+}
+
+function getUserScreen() {
+  var extensionId = YOUR_EXTENSION_ID;
+  if (!canScreenShare()) {
+    return;
+  }
+  if (isChrome()) {
+    return new Promise((resolve, reject) => {
+      const request = {
+        sources: ['screen']
+      };
+      chrome.runtime.sendMessage(extensionId, request, response => {
+        if (response && response.type === 'success') {
+          resolve({ streamId: response.streamId });
+        } else {
+          reject(new Error('Could not get stream'));
+        }
+      });
+    }).then(response => {
+      return navigator.mediaDevices.getUserMedia({
+        video: {
+          mandatory: {
+            chromeMediaSource: 'desktop',
+            chromeMediaSourceId: response.streamId
+          }
+        }
+      });
+    });
+  } else if (isFirefox()) {
+    return navigator.mediaDevices.getUserMedia({
+      video: {
+        mediaSource: 'screen'
+      }
+    });
+  }
+}
 
 // Attach the Tracks to the DOM.
 function attachTracks(tracks, container) {
@@ -28565,6 +31157,23 @@ function getToken(id) {
       log('Leaving room...');
       activeRoom.disconnect();
     };
+
+    document.getElementById('button-share-screen').onclick = function() {
+      getUserScreen().then(function(stream) {
+        screenTrack = stream.getVideoTracks()[0];
+        activeRoom.localParticipant.publishTrack(screenTrack);
+        document.getElementById('button-share-screen').style.display = 'none';
+        document.getElementById('button-unshare-screen').style.display =
+          'inline';
+      });
+    };
+
+    document.getElementById('button-unshare-screen').onclick = function() {
+      activeRoom.localParticipant.unpublishTrack(screenTrack);
+      screenTrack = null;
+      document.getElementById('button-share-screen').style.display = 'inline';
+      document.getElementById('button-unshare-screen').style.display = 'none';
+    };
   });
 }
 
@@ -28575,6 +31184,9 @@ function roomJoined(room) {
   log("Joined as '" + identity + "'");
   document.getElementById('button-join').style.display = 'none';
   document.getElementById('button-leave').style.display = 'inline';
+  if (canScreenShare()) {
+    document.getElementById('button-share-screen').style.display = 'inline';
+  }
 
   // Attach LocalParticipant's Tracks, if not already attached.
   var previewContainer = document.getElementById('local-media');
@@ -28665,4 +31277,4 @@ function leaveRoomIfJoined() {
   }
 }
 
-},{"twilio-video":67}]},{},[150]);
+},{"twilio-video":66}]},{},[153]);
