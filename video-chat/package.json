@@ -12,11 +12,11 @@
   "license": "MIT",
   "dependencies": {
     "browserify": "^16.5.0",
-    "concurrently": "^3.5.1",
-    "express": "^4.16.3",
+    "concurrently": "^3.6.1",
+    "express": "^4.17.1",
     "node-env-run": "^2.0.1",
     "twilio": "^3.42.0",
-    "twilio-video": "^1.9.0",
+    "twilio-video": "^2.3.0",
     "watchify": "^3.11.1"
   }
 }
