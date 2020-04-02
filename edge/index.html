@@ -1,47 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Screen</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Screen</title>
-</head>
+  <body>
+    <h1>Show my screen</h1>
 
-<body>
-  <h1>Show my screen</h1>
+    <video autoplay id="screen-view" width="50%"></video>
 
-  <video autoplay id="screen-view" width="50%"></video>
+    <button id="get-screen">Get the screen</button>
+    <button id="stop-screen" style="display:none">Stop the screen</button>
 
-  <button id="get-screen">Get the screen</button>
-  <button id="stop-screen" style="display:none">Stop the screen</button>
+    <script>
+      (() => {
+        const video = document.getElementById("screen-view");
+        const getScreen = document.getElementById("get-screen");
+        const stopScreen = document.getElementById("stop-screen");
+        let stream;
 
-  <script>
-    (() => {
-      const video = document.getElementById('screen-view');
-      const getScreen = document.getElementById('get-screen');
-      const stopScreen = document.getElementById('stop-screen');
-      let stream;
-
-      getScreen.addEventListener('click', event => {
-        navigator.getDisplayMedia().then(returnedStream => {
-          stream = returnedStream;
-          video.src = URL.createObjectURL(stream);
-          getScreen.style.display = "none";
-          stopScreen.style.display = "inline";
-        }).catch(err => {
-          console.error('Could not get stream: ', err);
+        getScreen.addEventListener("click", event => {
+          navigator.mediaDevices
+            .getDisplayMedia()
+            .then(returnedStream => {
+              stream = returnedStream;
+              video.srcObject = stream;
+              getScreen.style.display = "none";
+              stopScreen.style.display = "inline";
+            })
+            .catch(err => {
+              console.error("Could not get stream: ", err);
+            });
         });
-      });
 
-      stopScreen.addEventListener('click', event => {
-        stream.getTracks().forEach(track => track.stop());
-        video.src = '';
-        stopScreen.style.display = "none";
-        getScreen.style.display = "inline";
-      });
-    })();
-  </script>
-</body>
-
+        stopScreen.addEventListener("click", event => {
+          stream.getTracks().forEach(track => track.stop());
+          video.src = "";
+          stopScreen.style.display = "none";
+          getScreen.style.display = "inline";
+        });
+      })();
+    </script>
+  </body>
 </html>

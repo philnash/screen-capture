@@ -6,6 +6,7 @@ You can read about these examples on the Twilio Blog:
 
 - [Screen capture in Google Chrome](https://www.twilio.com/blog/2017/10/screen-capture-in-google-chrome.html)
 - [Screen capture in Firefox](https://www.twilio.com/blog/2017/10/screen-capture-in-firefox.html)
+- [Screen capture in Microsoft Edge](https://www.twilio.com/blog/2018/05/screen-capture-in-microsoft-edge.html)
 - [Screen sharing in a Twilio Video application](https://www.twilio.com/blog/2018/01/screen-sharing-twilio-video.html)
 
 ## Chrome extension
@@ -39,6 +40,10 @@ In the `/firefox` directory is an HTML page that uses the `mediaDevices` API wit
 ### _Note_
 
 You will need to load this demo over HTTPS, even locally. You can do so by configuring a local web server with a self signed certificate or by setting up [ngrok](https://ngrok.com) and using the HTTPS URL that it generates.
+
+## Screen capture in Edge
+
+In the `/edge` directory is an HTML page that uses the `getDisplayMedia` method of the `mediaDevices` API to capture the screen or a window or a tab.
 
 ## Video Chat example
 
